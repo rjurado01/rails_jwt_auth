@@ -21,17 +21,36 @@ Or install it yourself as:
 $ gem install rails_token_auth
 ```
 
-## Configuration
-Include `AuthModel` module into your User class:
+## Authenticatable
+
+### Mongoid
+Include `RailsTokenAuth::Authenticatable` module into your User class:
 
 ```ruby
 # app/models/user.rb
 class User
   include Mongoid::Document
-  include Mongoid::AuthModel
+  include RailsTokenAuth::Authenticatable
 end
 ```
 
+### ActiveRecord
+Include `RailsTokenAuth::Authenticatable` module into your User class:
+
+```ruby
+# app/models/user.rb
+class User < ApplicationRecord
+  include RailsTokenAuth::Authenticatable
+end
+```
+
+and add this fields to User model:
+
+* email: string
+* password_digest: string
+* auth_token: string
+
+### Controllers
 Include `WardenHelper` into your `ApplicationController`:
 
 ```ruby
@@ -49,8 +68,29 @@ class MyController < ApplicationController
 end
 ```
 
-## Contributing
-Contribution directions go here.
+### Usage
+
+1. Get session token:
+
+```
+{
+  url: host/session,
+  method: POST,
+  data: {
+    email: "user@email.com",
+    password: "12345678"
+  }
+}
+```
+
+2. Delete session
+
+```
+{
+  url: host/session,
+  method: DELETE,
+}
+```
 
 ## License
 The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
