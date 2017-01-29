@@ -8,8 +8,8 @@ class AuthTokenStrategy < ::Warden::Strategies::Base
       fail!('strategies.authentication_token.failed')
     end
 
-    if user = User.where(auth_token: payload[0]['auth_token']).first
-      success!(user)
+    if model = RTA.model.where(auth_token: payload[0]['auth_token']).first
+      success!(model)
     else
       fail!('strategies.authentication_token.failed')
     end

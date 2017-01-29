@@ -17,6 +17,8 @@ module RailsTokenAuth
         base.send(:field, :auth_token,      {type: String})
       end
 
+      base.send(:validates, :email, {presence: true, uniqueness: true, email: true})
+
       base.send(:has_secure_password)
     end
   end
