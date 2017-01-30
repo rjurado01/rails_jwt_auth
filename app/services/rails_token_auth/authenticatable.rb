@@ -12,12 +12,13 @@ module RailsTokenAuth
 
     def self.included(base)
       if defined? Mongoid
-        base.send(:field, :email,           {type: String})
-        base.send(:field, :password_digest, {type: String})
-        base.send(:field, :auth_token,      {type: String})
+        base.send(:field, RTA.auth_field_name,  {type: String})
+        base.send(:field, :password_digest,     {type: String})
+        base.send(:field, :auth_token,          {type: String})
       end
 
-      base.send(:validates, :email, {presence: true, uniqueness: true, email: true})
+      base.send(:validates, RTA.auth_field_name, {presence: true, uniqueness: true})
+      base.send(:validates, RTA.auth_field_name, {email: true}) if RTA.auth_field_email
 
       base.send(:has_secure_password)
     end

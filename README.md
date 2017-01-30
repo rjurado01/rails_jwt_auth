@@ -23,6 +23,10 @@ Finally execute:
 rails g rails_token_auth:install
 ```
 
+## Configuration
+You can edit configuration options into `config/initializers/auth_token_auth.rb` file created by generator.
+
+
 ## Authenticatable model
 
 ### ActiveRecord
@@ -35,9 +39,10 @@ class User < ApplicationRecord
 end
 ```
 
-and add this fields to User model:
+and add this fields to User model by migration:
 
-* email: string
+* email: string (email is the default authentication field, you can
+  configure other field)
 * password_digest: string
 * auth_token: string
 
@@ -58,7 +63,7 @@ Fields are added automatically.
 
 RailsTokenAuth will create some helpers to use inside your controllers.
 
-Include `WardenHelper` into your `ApplicationController`:
+To use this helpers we need to include `WardenHelper` into `ApplicationController`:
 
 ```ruby
 # app/controllers/application_controller.rb
@@ -133,6 +138,40 @@ Registration api is defined by RailsTokenAuth::RegistrationController.
   url: host/registration,
   method: DELETE,
 }
+```
+
+To remove registration remove resource registration from
+`config/routes.rb` file.
+
+To create your your own registration controller see this.
+
+
+## Custom controllers
+
+You can overwrite RailsTokenAuth controller to edit actions, responses,
+permited parameters...
+
+For example, if we want to change registration strong parameters we
+create new registration controller inherited from default controller:
+
+
+```ruby
+# app/controllers/registrations_controller.rb
+class RegistrationsController < RailsTokenAuth::RegistrationsController
+  private
+
+  def create_params
+    params.require(:user).permit(:email, :name, :surname, :password, :password_confirmation)
+  end
+end
+```
+
+And edit route resource to use it:
+
+```ruby
+# config/routes.rb
+resource :registration, controller: 'registrations', only: [:create, :update, :destroy]
+
 ```
 
 

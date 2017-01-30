@@ -17,7 +17,7 @@ class RailsTokenAuth::RegistrationsController < ApplicationController
   private
 
   def create_success_response(user)
-    {user: {id: user.id.to_s, email: user.email} }
+    {user: {id: user.id.to_s, RTA.auth_field_name => user.send(RTA.auth_field_name)} }
   end
 
   def create_error_response(user)
@@ -25,6 +25,6 @@ class RailsTokenAuth::RegistrationsController < ApplicationController
   end
 
   def create_params
-    params.require(:user).permit(:email, :password, :password_confirmation)
+    params.require(:user).permit(RTA.auth_field_name, :password, :password_confirmation)
   end
 end

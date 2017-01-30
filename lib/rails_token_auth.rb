@@ -7,6 +7,12 @@ module RailsTokenAuth
   mattr_accessor :model_name
   @@model_name = 'User'
 
+  mattr_accessor :auth_field_name
+  @@auth_field_name = 'email'
+
+  mattr_accessor :auth_field_email
+  @@auth_field_email = true
+
   mattr_accessor :jwt_expiration_time
   @@jwt_expiration_time = 7.days
 

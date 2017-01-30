@@ -1,6 +1,6 @@
 class RailsTokenAuth::SessionsController < ApplicationController
   def create
-    user = RTA.model.find_by(email: params[:email].to_s.downcase)
+    user = RTA.model.find_by(RTA.auth_field_name => params[RTA.auth_field_name].to_s.downcase)
 
     if user && user.authenticate(params[:password])
       user.regenerate_auth_token
@@ -23,6 +23,6 @@ class RailsTokenAuth::SessionsController < ApplicationController
   end
 
   def create_error_response(user)
-    {session: {error: 'Invalid email / password'}}
+    {session: {error: "Invalid #{RTA.auth_field_name} / password"}}
   end
 end
