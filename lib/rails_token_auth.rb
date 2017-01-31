@@ -19,6 +19,9 @@ module RailsTokenAuth
   mattr_accessor :jwt_issuer
   @@jwt_issuer = 'RTA'
 
+  mattr_accessor :simultaneous_sessions
+  @simultaneous_sessions = 2
+
   def self.model
     @@model_name.constantize
   end

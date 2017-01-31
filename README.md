@@ -26,8 +26,22 @@ rails g rails_token_auth:install
 ## Configuration
 You can edit configuration options into `config/initializers/auth_token_auth.rb` file created by generator.
 
+| Option                  | Default value | Description |
+| ----                    | ----          | ----          |
+| model_name              | 'User'        | Authentication model name |
+| auth_field_name         | 'email'       | Field used to authenticate user with password |
+| auth_field_email        | true          | Validate auth field email format |
+| jwt_expiration_time     | 7.days        | Tokens expiration time |
+| jwt_issuer              | 'RTA'         | The "iss" (issuer) claim identifies the principal that issued the JWT |
+| simultaneous_sessions   | 2             | Number of simultaneous sessions for an user |
+
+
 
 ## Authenticatable model
+
+It is the model used to authenticate requests.  
+You can change default model (User) usin the configuration property
+`model_name`.
 
 ### ActiveRecord
 Include `RailsTokenAuth::Authenticatable` module into your User class:
@@ -41,10 +55,22 @@ end
 
 and create a migration to add this fields to User model:
 
-* **email**: string _(email is the default authentication field, you can
-  configure other field)_
+* **email**: string _(change 'email' by your authentication field)_
 * **password_digest**: string _(required by has_secure_password)_
 * **auth_token**: string _(used to generate jwt)_
+
+```ruby
+# example migration
+create_table :users do |t|
+  t.string :name
+  t.string :email
+  t.string :password_digest
+  t.string :auth_tokens
+
+  t.timestamps
+end
+```
+
 
 ### Mongoid
 Include `RailsTokenAuth::Authenticatable` module into your User class:
@@ -58,6 +84,7 @@ end
 ```
 
 Fields are added automatically.
+
 
 ## Controller helpers
 
@@ -91,6 +118,7 @@ end
 
   Verify if a user is signed in.
 
+
 ## Session
 Session api is defined by RailsTokenAuth::SessionController.
 
@@ -116,6 +144,7 @@ Session api is defined by RailsTokenAuth::SessionController.
   headers: { 'Authorization': 'auth_token'}
 }
 ```
+
 
 ## Registration
 Registration api is defined by RailsTokenAuth::RegistrationController.

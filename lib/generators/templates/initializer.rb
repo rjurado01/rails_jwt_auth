@@ -11,6 +11,9 @@ RailsTokenAuth.setup do |config|
   # expiration time for generated tokens
   #config.jwt_expiration_time = 7.days
 
-  # The "iss" (issuer) claim identifies the principal that issued the JWT
+  # the "iss" (issuer) claim identifies the principal that issued the JWT
   #config.jwt_issuer = 'RTA'
+
+  # number of simultaneously sessions for an user
+  #config.simultaneously_sessions = 3
 end
