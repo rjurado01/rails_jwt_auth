@@ -72,7 +72,7 @@ class ApplicationController < ActionController::API
 end
 ```
 
-* authenticate!
+* **authenticate!**
 
   Authenticate your controllers:
 
@@ -81,12 +81,13 @@ end
     before_action :authenticate!
   end
   ```
+  This helper expect that token has been into **AUTHORIZATION** header.
 
-* current_user
+* **current_user**
 
   Return current signed-in user.
 
-* signed_in?
+* **signed_in?**
 
   Verify if a user is signed in.
 
@@ -112,6 +113,7 @@ Session api is defined by RailsTokenAuth::SessionController.
 {
   url: host/session,
   method: DELETE,
+  headers: { 'Authorization': 'auth_token'}
 }
 ```
 
@@ -137,6 +139,7 @@ Registration api is defined by RailsTokenAuth::RegistrationController.
 {
   url: host/registration,
   method: DELETE,
+  headers: { 'Authorization': 'auth_token'}
 }
 ```
 
