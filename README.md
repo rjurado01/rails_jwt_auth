@@ -41,10 +41,10 @@ end
 
 and add this fields to User model by migration:
 
-* email: string (email is the default authentication field, you can
-  configure other field)
-* password_digest: string
-* auth_token: string
+* email: string _(email is the default authentication field, you can
+  configure other field)_
+* password_digest: string _(required by has_secure_password)_
+* auth_token: string _(used to generate jwt)_
 
 ### Mongoid
 Include `RailsTokenAuth::Authenticatable` module into your User class:
