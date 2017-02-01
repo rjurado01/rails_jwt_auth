@@ -1,9 +1,9 @@
 require 'rails_helper'
 
-describe RailsTokenAuth::SessionsController do
+describe RailsJwtAuth::SessionsController do
   context "when use ActiveRecord model" do
     before :all do
-      RTA.model_name = ActiveRecordUser.to_s
+      RailsJwtAuth.model_name = ActiveRecordUser.to_s
 
       ActiveRecordUser.destroy_all
       @user = ActiveRecordUser.create(email: "user@emailc.com", password: "12345678")
@@ -43,7 +43,7 @@ describe RailsTokenAuth::SessionsController do
 
   context "when use Montoid model" do
     before :all do
-      RTA.model_name = MongoidUser.to_s
+      RailsJwtAuth.model_name = MongoidUser.to_s
 
       MongoidUser.destroy_all
       @user = MongoidUser.create(email: "user@emailc.com", password: "12345678")

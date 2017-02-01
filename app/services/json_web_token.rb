@@ -24,8 +24,8 @@ class JsonWebToken
   # Default options to be encoded in the token
   def self.meta
     {
-      exp: RTA.jwt_expiration_time.from_now.to_i,
-      iss: RTA.jwt_issuer
+      exp: RailsJwtAuth.jwt_expiration_time.from_now.to_i,
+      iss: RailsJwtAuth.jwt_issuer
     }
   end
 

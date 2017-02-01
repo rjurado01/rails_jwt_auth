@@ -1,9 +1,9 @@
 require "warden"
 require "bcrypt"
 
-require "rails_token_auth/engine"
+require "rails_jwt_auth/engine"
 
-module RailsTokenAuth
+module RailsJwtAuth
   mattr_accessor :model_name
   @@model_name = 'User'
 
@@ -17,7 +17,7 @@ module RailsTokenAuth
   @@jwt_expiration_time = 7.days
 
   mattr_accessor :jwt_issuer
-  @@jwt_issuer = 'RTA'
+  @@jwt_issuer = 'RailsJwtAuth'
 
   mattr_accessor :simultaneous_sessions
   @@simultaneous_sessions = 2
@@ -30,6 +30,3 @@ module RailsTokenAuth
     yield self
   end
 end
-
-# create alias
-RTA = RailsTokenAuth

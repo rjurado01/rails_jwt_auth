@@ -1,12 +1,12 @@
 $:.push File.expand_path("../lib", __FILE__)
 
 # Maintain your gem's version:
-require "rails_token_auth/version"
+require "rails_jwt_auth/version"
 
 # Describe your gem and declare its dependencies:
 Gem::Specification.new do |s|
-  s.name        = "rails_token_auth"
-  s.version     = RailsTokenAuth::VERSION
+  s.name        = "rails_jwt_auth"
+  s.version     = RailsJwtAuth::VERSION
   s.authors     = ["rjurado"]
   s.email       = ["rjurado@openmailbox.org"]
   s.homepage    = "https://github.com/rjurado01/rails-token-auth"

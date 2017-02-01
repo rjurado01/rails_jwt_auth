@@ -1,4 +1,4 @@
-RailsTokenAuth.setup do |config|
+RailsJwtAuth.setup do |config|
   # authentication model class name
   #config.model_name = 'User'
 
@@ -12,7 +12,7 @@ RailsTokenAuth.setup do |config|
   #config.jwt_expiration_time = 7.days
 
   # the "iss" (issuer) claim identifies the principal that issued the JWT
-  #config.jwt_issuer = 'RTA'
+  #config.jwt_issuer = 'RailsJwtAuth'
 
   # number of simultaneously sessions for an user
   #config.simultaneously_sessions = 3

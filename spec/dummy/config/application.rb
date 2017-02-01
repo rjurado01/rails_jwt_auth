@@ -11,7 +11,7 @@ require "action_cable/engine"
 require "sprockets/railtie"
 
 Bundler.require(*Rails.groups)
-require "rails_token_auth"
+require "rails_jwt_auth"
 
 module Dummy
   class Application < Rails::Application

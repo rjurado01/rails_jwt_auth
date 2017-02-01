@@ -1,3 +1,3 @@
 class ActiveRecordUser < ApplicationRecord
-  include RailsTokenAuth::Authenticatable
+  include RailsJwtAuth::Authenticatable
 end

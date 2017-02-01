@@ -1,6 +1,7 @@
-class RailsTokenAuth::SessionsController < ApplicationController
+class RailsJwtAuth::SessionsController < ApplicationController
   def create
-    user = RTA.model.where(RTA.auth_field_name => params[RTA.auth_field_name].to_s.downcase).first
+    user = RailsJwtAuth.model.where(
+      RailsJwtAuth.auth_field_name => params[RailsJwtAuth.auth_field_name].to_s.downcase).first
 
     if user && user.authenticate(params[:password])
       token = user.regenerate_auth_token
@@ -23,6 +24,6 @@ class RailsTokenAuth::SessionsController < ApplicationController
   end
 
   def create_error_response(user)
-    {session: {error: "Invalid #{RTA.auth_field_name} / password"}}
+    {session: {error: "Invalid #{RailsJwtAuth.auth_field_name} / password"}}
   end
 end

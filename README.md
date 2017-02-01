@@ -1,11 +1,11 @@
-# RailsTokenAuth
-Rails token authentication solution for Rails based on Warden and JWT.
+# RailsJwtAuth
+Rails authentication solution based on Warden and JWT.
 
 ## Installation
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'rails_token_auth'
+gem 'rails_jwt_auth'
 ```
 
 And then execute:
@@ -15,12 +15,12 @@ $ bundle
 
 Or install it yourself as:
 ```bash
-$ gem install rails_token_auth
+$ gem install rails_jwt_auth
 ```
 
 Finally execute:
 ```bash
-rails g rails_token_auth:install
+rails g rails_jwt_auth:install
 ```
 
 ## Configuration
@@ -32,7 +32,7 @@ You can edit configuration options into `config/initializers/auth_token_auth.rb`
 | auth_field_name         | 'email'       | Field used to authenticate user with password |
 | auth_field_email        | true          | Validate auth field email format |
 | jwt_expiration_time     | 7.days        | Tokens expiration time |
-| jwt_issuer              | 'RTA'         | The "iss" (issuer) claim identifies the principal that issued the JWT |
+| jwt_issuer              | 'RailsJwtAuth'         | The "iss" (issuer) claim identifies the principal that issued the JWT |
 | simultaneous_sessions   | 2             | Number of simultaneous sessions for an user |
 
 
@@ -44,12 +44,12 @@ You can change default model (User) usin the configuration property
 `model_name`.
 
 ### ActiveRecord
-Include `RailsTokenAuth::Authenticatable` module into your User class:
+Include `RailsJwtAuth::Authenticatable` module into your User class:
 
 ```ruby
 # app/models/user.rb
 class User < ApplicationRecord
-  include RailsTokenAuth::Authenticatable
+  include RailsJwtAuth::Authenticatable
 end
 ```
 
@@ -70,13 +70,13 @@ end
 
 
 ### Mongoid
-Include `RailsTokenAuth::Authenticatable` module into your User class:
+Include `RailsJwtAuth::Authenticatable` module into your User class:
 
 ```ruby
 # app/models/user.rb
 class User
   include Mongoid::Document
-  include RailsTokenAuth::Authenticatable
+  include RailsJwtAuth::Authenticatable
 end
 ```
 
@@ -85,7 +85,7 @@ Fields are added automatically.
 
 ## Controller helpers
 
-RailsTokenAuth will create some helpers to use inside your controllers.
+RailsJwtAuth will create some helpers to use inside your controllers.
 
 To use this helpers we need to include `WardenHelper` into `ApplicationController`:
 
@@ -117,7 +117,7 @@ end
 
 
 ## Session
-Session api is defined by RailsTokenAuth::SessionController.
+Session api is defined by RailsJwtAuth::SessionController.
 
 1. Get session token:
 
@@ -144,7 +144,7 @@ Session api is defined by RailsTokenAuth::SessionController.
 
 
 ## Registration
-Registration api is defined by RailsTokenAuth::RegistrationController.
+Registration api is defined by RailsJwtAuth::RegistrationController.
 
 1. Register user:
 
@@ -177,7 +177,7 @@ To create your your own registration controller see this.
 
 ## Custom controllers
 
-You can overwrite RailsTokenAuth controller to edit actions, responses,
+You can overwrite RailsJwtAuth controller to edit actions, responses,
 permited parameters...
 
 For example, if we want to change registration strong parameters we
@@ -186,7 +186,7 @@ create new registration controller inherited from default controller:
 
 ```ruby
 # app/controllers/registrations_controller.rb
-class RegistrationsController < RailsTokenAuth::RegistrationsController
+class RegistrationsController < RailsJwtAuth::RegistrationsController
   private
 
   def create_params

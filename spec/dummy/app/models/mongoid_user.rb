@@ -1,4 +1,4 @@
 class MongoidUser
   include Mongoid::Document
-  include RailsTokenAuth::Authenticatable
+  include RailsJwtAuth::Authenticatable
 end
