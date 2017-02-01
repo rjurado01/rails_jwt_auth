@@ -3,12 +3,16 @@ include ActiveModel::SecurePassword
 module RailsTokenAuth
   module Authenticatable
     def regenerate_auth_token(token=nil)
+      new_token = SecureRandom.base58(24)
+
       if RTA.simultaneous_sessions > 1
         tokens = ((self.auth_tokens || []) - [token]).last(RTA.simultaneous_sessions)
-        self.update_attribute(:auth_tokens, (tokens + [SecureRandom.base58(24)]).uniq)
+        self.update_attribute(:auth_tokens, (tokens + [new_token]).uniq)
       else
-        self.update_attribute(:auth_tokens, [SecureRandom.base58(24)])
+        self.update_attribute(:auth_tokens, [new_token])
       end
+
+      new_token
     end
 
     def destroy_auth_token(token)
@@ -31,11 +35,11 @@ module RailsTokenAuth
     end
 
     def self.included(base)
-      if defined? Mongoid
+      if base.ancestors.include? Mongoid::Document
         base.send(:field, RTA.auth_field_name,  {type: String})
         base.send(:field, :password_digest,     {type: String})
         base.send(:field, :auth_tokens,         {type: Array})
-      else
+      elsif base.ancestors.include? ActiveRecord::Base
         base.send(:serialize, :auth_tokens, Array)
       end
 

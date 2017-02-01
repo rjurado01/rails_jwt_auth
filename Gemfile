@@ -7,4 +7,5 @@ gemspec
 
 gem "rspec-rails"
 gem "factory_girl_rails"
+gem "sqlite3"
 gem "mongoid"

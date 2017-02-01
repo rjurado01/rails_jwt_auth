@@ -1,0 +1,8 @@
+test:
+  clients:
+    default:
+      database: rails_token_auth_test
+      hosts:
+        - localhost:27017
+      options:
+        max_pool_size: 1

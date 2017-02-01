@@ -1,11 +1,11 @@
 class RailsTokenAuth::SessionsController < ApplicationController
   def create
-    user = RTA.model.find_by(RTA.auth_field_name => params[RTA.auth_field_name].to_s.downcase)
+    user = RTA.model.where(RTA.auth_field_name => params[RTA.auth_field_name].to_s.downcase).first
 
     if user && user.authenticate(params[:password])
-      user.regenerate_auth_token
-      token = JsonWebToken.encode({auth_token: user.auth_token})
-      render json: create_success_response(user, token), status: 201
+      token = user.regenerate_auth_token
+      jwt = JsonWebToken.encode({auth_token: token})
+      render json: create_success_response(user, jwt), status: 201
     else
       render json: create_error_response(user), status: 422
     end
@@ -18,8 +18,8 @@ class RailsTokenAuth::SessionsController < ApplicationController
 
   private
 
-  def create_success_response(user, token)
-    {session: {auth_token: token}}
+  def create_success_response(user, jwt)
+    {session: {auth_token: jwt}}
   end
 
   def create_error_response(user)

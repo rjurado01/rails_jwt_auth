@@ -57,17 +57,14 @@ and create a migration to add this fields to User model:
 
 * **email**: string _(change 'email' by your authentication field)_
 * **password_digest**: string _(required by has_secure_password)_
-* **auth_token**: string _(used to generate jwt)_
+* **auth_tokens**: string _(used to generate jwt)_
 
 ```ruby
 # example migration
 create_table :users do |t|
-  t.string :name
   t.string :email
   t.string :password_digest
   t.string :auth_tokens
-
-  t.timestamps
 end
 ```
 
