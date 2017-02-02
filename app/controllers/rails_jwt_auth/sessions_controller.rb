@@ -1,3 +1,5 @@
+require 'rails_jwt_auth/json_web_token'
+
 class RailsJwtAuth::SessionsController < ApplicationController
   def create
     user = RailsJwtAuth.model.where(
@@ -5,7 +7,7 @@ class RailsJwtAuth::SessionsController < ApplicationController
 
     if user && user.authenticate(params[:password])
       token = user.regenerate_auth_token
-      jwt = JsonWebToken.encode({auth_token: token})
+      jwt = RailsJwtAuth::JsonWebToken.encode({auth_token: token})
       render json: create_success_response(user, jwt), status: 201
     else
       render json: create_error_response(user), status: 422
@@ -20,7 +22,7 @@ class RailsJwtAuth::SessionsController < ApplicationController
   private
 
   def create_success_response(user, jwt)
-    {session: {auth_token: jwt}}
+    {session: {jwt: jwt}}
   end
 
   def create_error_response(user)
