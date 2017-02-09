@@ -24,11 +24,11 @@ module RailsJwtAuth
 
     private
 
-    def create_success_response(user, jwt)
+    def create_success_response(_user, jwt)
       {session: {jwt: jwt}}
     end
 
-    def create_error_response(user)
+    def create_error_response(_user)
       {session: {error: "Invalid #{RailsJwtAuth.auth_field_name} / password"}}
     end
   end
