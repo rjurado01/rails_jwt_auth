@@ -9,22 +9,27 @@ class RailsJwtAuth::RegistrationsController < ApplicationController
     end
   end
 
-  def destroy
-    authenticate!
-    current_user.destroy
-  end
-
   private
 
+  def root
+    RailsJwtAuth.model_name.underscore
+  end
+
   def create_success_response(user)
-    {user: {id: user.id.to_s, RailsJwtAuth.auth_field_name => user.send(RailsJwtAuth.auth_field_name)} }
+    {
+      root => {
+        id: user.id.to_s,
+        RailsJwtAuth.auth_field_name => user.send(RailsJwtAuth.auth_field_name)
+      }
+    }
   end
 
   def create_error_response(user)
-    {user: user.errors}
+    {root => user.errors}
   end
 
   def create_params
-    params.require(:user).permit(RailsJwtAuth.auth_field_name, :password, :password_confirmation)
+    params.require(root).permit(
+      RailsJwtAuth.auth_field_name, :password, :password_confirmation)
   end
 end

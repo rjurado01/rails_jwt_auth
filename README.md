@@ -92,7 +92,7 @@ To use this helpers we need to include `WardenHelper` into `ApplicationControlle
 ```ruby
 # app/controllers/application_controller.rb
 class ApplicationController < ActionController::API
-  include WardenHelper
+  include RailsJwtAuth::WardenHelper
 end
 ```
 

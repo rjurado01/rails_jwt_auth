@@ -15,5 +15,9 @@ module RailsJwtAuth
     def authenticate!
       warden.authenticate!
     end
+
+    def render_401
+      render json: {}, status: 401
+    end
   end
 end

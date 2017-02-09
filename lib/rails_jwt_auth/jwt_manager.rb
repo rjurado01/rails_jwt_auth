@@ -1,7 +1,7 @@
 require 'jwt'
 
 module RailsJwtAuth
-  class JsonWebToken
+  class JwtManager
     # Encodes and signs JWT Payload with expiration
     def self.encode(payload)
       payload.reverse_merge!(meta)
@@ -9,17 +9,14 @@ module RailsJwtAuth
     end
 
     # Decodes the JWT with the signed secret
+    # [{"auth_token"=>"xxx", "exp"=>148..., "iss"=>"RJA"}, {"typ"=>"JWT", "alg"=>"HS256"}]
     def self.decode(token)
       JWT.decode(token, Rails.application.secrets.secret_key_base)
     end
 
     # Validates the payload hash for expiration and meta claims
     def self.valid_payload?(payload)
-      if expired?(payload) || payload['iss'] != meta[:iss] || payload['aud'] != meta[:aud]
-        return false
-      else
-        return true
-      end
+      payload && !expired?(payload) && payload['iss'] == meta[:iss]
     end
 
     # Default options to be encoded in the token
