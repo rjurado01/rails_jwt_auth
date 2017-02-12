@@ -1,5 +1,5 @@
-require 'rails_jwt_auth/jwt_manager'
-require 'rails_jwt_auth/jwt_request'
+require 'rails_jwt_auth/jwt/manager'
+require 'rails_jwt_auth/jwt/request'
 
 module RailsJwtAuth
   class SessionsController < ApplicationController
@@ -10,7 +10,7 @@ module RailsJwtAuth
 
       if user && user.authenticate(params[:password])
         token = user.regenerate_auth_token
-        jwt = RailsJwtAuth::JwtManager.encode(auth_token: token)
+        jwt = RailsJwtAuth::Jwt::Manager.encode(auth_token: token)
         render json: create_success_response(user, jwt), status: 201
       else
         render json: create_error_response(user), status: 422
@@ -19,7 +19,7 @@ module RailsJwtAuth
 
     def destroy
       authenticate!
-      current_user.destroy_auth_token JwtRequest.new(request).auth_token
+      current_user.destroy_auth_token Jwt::Request.new(request).auth_token
     end
 
     private

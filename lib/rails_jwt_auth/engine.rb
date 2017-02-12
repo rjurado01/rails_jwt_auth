@@ -1,6 +1,6 @@
 module RailsJwtAuth
   class Engine < ::Rails::Engine
-    require 'rails_jwt_auth/jwt_strategy'
+    require 'rails_jwt_auth/strategies/jwt'
 
     config.generators do |g|
       g.test_framework :rspec
@@ -13,7 +13,7 @@ module RailsJwtAuth
         manager.failure_app = UnauthorizedController
       end
 
-      Warden::Strategies.add(:authentication_token, JwtStrategy)
+      Warden::Strategies.add(:authentication_token, Strategies::Jwt)
     end
   end
 end

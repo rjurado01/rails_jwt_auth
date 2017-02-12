@@ -23,7 +23,7 @@ describe RailsJwtAuth::SessionsController do
 
         it 'returns valid authentication token' do
           jwt = json['session']['jwt']
-          token = RailsJwtAuth::JwtManager.decode(jwt)[0]['auth_token']
+          token = RailsJwtAuth::Jwt::Manager.decode(jwt)[0]['auth_token']
           expect(token).to eq(@user.reload.auth_tokens.last)
         end
       end
@@ -94,7 +94,7 @@ describe RailsJwtAuth::SessionsController do
 
         it 'returns valid authentication token' do
           jwt = json['session']['jwt']
-          token = RailsJwtAuth::JwtManager.decode(jwt)[0]['auth_token']
+          token = RailsJwtAuth::Jwt::Manager.decode(jwt)[0]['auth_token']
           expect(token).to eq(@user.reload.auth_tokens.last)
         end
       end
