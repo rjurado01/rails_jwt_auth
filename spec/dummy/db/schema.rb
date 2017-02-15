@@ -11,9 +11,13 @@
 # It's strongly recommended that you check this file into your version control system.
 
 ActiveRecord::Schema.define do
-  create_table "active_record_users", force: :cascade do |t|
-    t.string   "email"
-    t.string   "password_digest"
-    t.string   "auth_tokens"
+  create_table 'active_record_users', force: :cascade do |t|
+    t.string  'email'
+    t.string  'password_digest'
+    t.string  'auth_tokens'
+
+    t.string    'confirmation_token'
+    t.datetime  'confirmation_sent_at'
+    t.datetime  'confirmed_at'
   end
 end

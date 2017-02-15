@@ -8,6 +8,8 @@ require 'rspec/rails'
 # Add additional requires below this line. Rails is not loaded until this point!
 require 'rails_jwt_auth/spec/helpers'
 
+Dir['spec/factories/**/*.rb'].each { |f| require "./#{f}" }
+
 # Requires supporting ruby files with custom matchers and macros, etc, in
 # spec/support/ and its subdirectories. Files matching `spec/**/*_spec.rb` are
 # run as spec files by default. This means that files in spec/support that end
@@ -57,4 +59,12 @@ RSpec.configure do |config|
   # config.filter_gems_from_backtrace('gem name')
 
   config.include RailsJwtAuth::Spec::Helpers
+
+  config.before(:each) do
+    MongoidUser.destroy_all
+    ActiveRecordUser.destroy_all
+
+    RailsJwtAuth.simultaneous_sessions = 1
+    RailsJwtAuth.confirmation_url = nil
+  end
 end

@@ -16,4 +16,10 @@ RailsJwtAuth.setup do |config|
 
   # number of simultaneously sessions for an user
   #config.simultaneously_sessions = 3
+
+  # mailer sender
+  #config.mailer_sender = 'initialize-mailer_sender@example.com'
+
+  # url used into confirmation email to reditect with confirmation_token
+  #config.confirmation_url = 'http://frontend.com/confirmation'
 end

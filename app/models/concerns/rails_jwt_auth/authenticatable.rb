@@ -6,7 +6,7 @@ module RailsJwtAuth
       new_token = SecureRandom.base58(24)
 
       if RailsJwtAuth.simultaneous_sessions > 1
-        tokens = ((auth_tokens || []) - [token]).last(RailsJwtAuth.simultaneous_sessions)
+        tokens = ((auth_tokens || []) - [token]).last(RailsJwtAuth.simultaneous_sessions - 1)
         update_attribute(:auth_tokens, (tokens + [new_token]).uniq)
       else
         update_attribute(:auth_tokens, [new_token])
@@ -26,20 +26,20 @@ module RailsJwtAuth
 
     module ClassMethods
       def get_by_token(token)
-        if ancestors.include? Mongoid::Document
-          RailsJwtAuth.model.where(auth_tokens: token).first
-        elsif ancestors.include? ActiveRecord::Base
-          RailsJwtAuth.model.where('auth_tokens like ?', "% #{token}\n%").first
+        if defined?(Mongoid) && ancestors.include?(Mongoid::Document)
+          where(auth_tokens: token).first
+        elsif defined?(ActiveRecord) && ancestors.include?(ActiveRecord::Base)
+          where('auth_tokens like ?', "%#{token}%").first
         end
       end
     end
 
     def self.included(base)
-      if base.ancestors.include? Mongoid::Document
+      if defined?(Mongoid) && base.ancestors.include?(Mongoid::Document)
         base.send(:field, RailsJwtAuth.auth_field_name, type: String)
         base.send(:field, :password_digest,             type: String)
         base.send(:field, :auth_tokens,                 type: Array)
-      elsif base.ancestors.include? ActiveRecord::Base
+      elsif defined?(ActiveRecord) && base.ancestors.include?(ActiveRecord::Base)
         base.send(:serialize, :auth_tokens, Array)
       end
 

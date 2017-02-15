@@ -25,7 +25,7 @@ class RailsJwtAuth::RegistrationsController < ApplicationController
   end
 
   def create_error_response(user)
-    {root => user.errors}
+    {errors: user.errors}
   end
 
   def create_params

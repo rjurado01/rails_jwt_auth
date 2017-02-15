@@ -22,6 +22,15 @@ module RailsJwtAuth
   mattr_accessor :simultaneous_sessions
   @@simultaneous_sessions = 2
 
+  mattr_accessor :mailer_sender
+  @@mailer_sender = "initialize-mailer_sender@example.com"
+
+  mattr_accessor :confirmation_url
+  @@confirmation_url = nil
+
+  mattr_accessor :confirmation_expiration_time
+  @@confirmation_expiration_time = 1.day
+
   def self.model
     @@model_name.constantize
   end
