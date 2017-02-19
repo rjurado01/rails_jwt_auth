@@ -1,7 +1,9 @@
 # RailsJwtAuth
-Rails authentication solution based on Warden and JWT.
+
+Rails authentication solution based on Warden and JWT and inspired by Devise.
 
 ## Installation
+
 Add this line to your application's Gemfile:
 
 ```ruby
@@ -9,41 +11,45 @@ gem 'rails_jwt_auth'
 ```
 
 And then execute:
+
 ```bash
 $ bundle
 ```
 
 Or install it yourself as:
+
 ```bash
 $ gem install rails_jwt_auth
 ```
 
 Finally execute:
+
 ```bash
 rails g rails_jwt_auth:install
 ```
 
 ## Configuration
+
 You can edit configuration options into `config/initializers/auth_token_auth.rb` file created by generator.
 
-| Option                  | Default value   | Description |
-| ----                    | ----            | ----          |
-| model_name              | 'User'          | Authentication model name |
-| auth_field_name         | 'email'         | Field used to authenticate user with password |
-| auth_field_email        | true            | Validate auth field email format |
-| jwt_expiration_time     | 7.days          | Tokens expiration time |
-| jwt_issuer              | 'RailsJwtAuth'  | The "iss" (issuer) claim identifies the principal that issued the JWT |
-| simultaneous_sessions   | 2               | Number of simultaneous sessions for an user |
+| Option                       | Default value     | Description                                                           |
+| ---------------------------- | ----------------- | --------------------------------------------------------------------- |
+| model_name                   | 'User'            | Authentication model name                                             |
+| auth_field_name              | 'email'           | Field used to authenticate user with password                         |
+| auth_field_email             | true              | Validate auth field email format                                      |
+| jwt_expiration_time          | 7.days            | Tokens expiration time                                                |
+| jwt_issuer                   | 'RailsJwtAuth'    | The "iss" (issuer) claim identifies the principal that issued the JWT |
+| simultaneous_sessions        | 2                 | Number of simultaneous sessions for an user                           |
+| mailer_sender                |                   | E-mail address which will be shown in RailsJwtAuth::Mailer            |
+| confirmation_url             | confirmation_path | Url used to create confirmation url into confirmation email           |
+| confirmation_expiration_time | 1.day             | Confirmation token expiration time                                    |
 
+## Authenticatable
 
-
-## Authenticatable model
-
-It is the model used to authenticate requests.  
-You can change default model (User) usin the configuration property
-`model_name`.
+Hashes and stores a password in the database to validate the authenticity of a user while signing in.
 
 ### ActiveRecord
+
 Include `RailsJwtAuth::Authenticatable` module into your User class:
 
 ```ruby
@@ -53,11 +59,7 @@ class User < ApplicationRecord
 end
 ```
 
-and create a migration to add this fields to User model:
-
-* **email**: string _(change 'email' by your authentication field)_
-* **password_digest**: string _(required by has_secure_password)_
-* **auth_tokens**: string _(used to generate jwt)_
+and create a migration to add authenticable fields to User model:
 
 ```ruby
 # example migration
@@ -68,8 +70,8 @@ create_table :users do |t|
 end
 ```
 
-
 ### Mongoid
+
 Include `RailsJwtAuth::Authenticatable` module into your User class:
 
 ```ruby
@@ -82,6 +84,45 @@ end
 
 Fields are added automatically.
 
+## Confirmable
+
+Sends emails with confirmation instructions and verifies whether an account is already confirmed during sign in.
+
+### ActiveRecord
+
+Include `RailsJwtAuth::Confirmable` module into your User class:
+
+```ruby
+# app/models/user.rb
+class User < ApplicationRecord
+  include RailsJwtAuth::Authenticatable
+  include RailsJwtAuth::Confirmable
+end
+```
+
+and create a migration to add confirmation fields to User model:
+
+```ruby
+# example migration
+change_table :users do |t|
+  t.string :confirmation_token
+  t.datetime :confirmation_sent_at
+  t.datetime :confimed_at
+end
+```
+
+### Mongoid
+
+Include `RailsJwtAuth::Confirmable` module into your User class:
+
+```ruby
+# app/models/user.rb
+class User
+  include Mongoid::Document
+  include RailsJwtAuth::Authenticatable
+  include RailsJwtAuth::Confirmable
+end
+```
 
 ## Controller helpers
 
@@ -96,43 +137,46 @@ class ApplicationController < ActionController::API
 end
 ```
 
-* **authenticate!**
+-   **authenticate!**
 
-  Authenticate your controllers:
+    Authenticate your controllers:
 
-  ```ruby
-  class MyController < ApplicationController
-    before_action :authenticate!
-  end
-  ```
-  This helper expect that token has been into **AUTHORIZATION** header.
+    ```ruby
+    class MyController < ApplicationController
+      before_action :authenticate!
+    end
+    ```
 
-* **current_user**
+    This helper expect that token has been into **AUTHORIZATION** header.
 
-  Return current signed-in user.
+-   **current_user**
 
-* **signed_in?**
+    Return current signed-in user.
 
-  Verify if a user is signed in.
+-   **signed_in?**
 
+    Verify if a user is signed in.
 
 ## Session
-Session api is defined by RailsJwtAuth::SessionController.
 
-1. Get session token:
+Session api is defined by RailsJwtAuth::SessionsController.
+
+1.  Get session token:
 
 ```js
 {
   url: host/session,
   method: POST,
   data: {
-    email: "user@email.com",
-    password: "12345678"
+    session: {
+      email: "user@email.com",
+      password: "12345678"
+    }
   }
 }
 ```
 
-2. Delete session
+2.  Delete session
 
 ```js
 {
@@ -141,25 +185,27 @@ Session api is defined by RailsJwtAuth::SessionController.
   headers: { 'Authorization': 'auth_token'}
 }
 ```
-
 
 ## Registration
-Registration api is defined by RailsJwtAuth::RegistrationController.
 
-1. Register user:
+Registration api is defined by RailsJwtAuth::RegistrationsController.
+
+1.  Register user:
 
 ```js
 {
   url: host/registration,
   method: POST,
   data: {
-    email: "user@email.com",
-    password: "12345678"
+    user: {
+      email: "user@email.com",
+      password: "12345678"
+    }
   }
 }
 ```
 
-2. Delete user:
+2.  Delete user:
 
 ```js
 {
@@ -169,20 +215,41 @@ Registration api is defined by RailsJwtAuth::RegistrationController.
 }
 ```
 
-To remove registration remove resource registration from
-`config/routes.rb` file.
+## Confirmation
 
-To create your your own registration controller see this.
+Confirmation api is defined by RailsJwtAuth::ConfirmationsController.
 
+1.  Confirm user:
+
+```js
+{
+  url: host/confirmation,
+  method: GET
+  data: {
+    confirmation_token: "token"
+  }
+}
+```
+
+2.  Create confirmation (resend confirmation email):
+
+```js
+{
+  url: host/confirmation,
+  method: POST,
+  data: {
+    email: "user@example.com"
+  }
+}
+```
 
 ## Custom controllers
 
 You can overwrite RailsJwtAuth controller to edit actions, responses,
-permited parameters...
+permitted parameters...
 
 For example, if we want to change registration strong parameters we
 create new registration controller inherited from default controller:
-
 
 ```ruby
 # app/controllers/registrations_controller.rb
@@ -200,7 +267,6 @@ And edit route resource to use it:
 ```ruby
 # config/routes.rb
 resource :registration, controller: 'registrations', only: [:create, :update, :destroy]
-
 ```
 
 ## Testing (rspec)
@@ -222,19 +288,16 @@ And then in controller examples we can just call sign_in(user) to sign in as a u
 ```ruby
   it "blocks unauthenticated access" do
     sign_out
-
     expect { get :index }.to raise_error(RailsJwtAuth::Errors::NotAuthorized)
   end
 
   it "allows authenticated access" do
     sign_in
-
     get :index
-
     expect(response).to be_success
   end
 ```
 
-
 ## License
+
 The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
