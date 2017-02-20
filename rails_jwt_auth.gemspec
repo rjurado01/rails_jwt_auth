@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
   s.version     = RailsJwtAuth::VERSION
   s.authors     = ["rjurado"]
   s.email       = ["rjurado@openmailbox.org"]
-  s.homepage    = "https://github.com/rjurado01/rails-token-auth"
+  s.homepage    = "https://github.com/rjurado01/rails_jwt_auth"
   s.summary     = "Rails jwt authentication."
   s.description = "Rails authentication solution based on Warden and JWT and inspired by Devise."
   s.license     = "MIT"

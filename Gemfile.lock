@@ -1,11 +1,11 @@
 PATH
   remote: .
   specs:
-    rails_jwt_auth (0.1.0)
-      bcrypt (~> 3.1.11)
-      jwt (~> 1.5.6)
-      rails (~> 5.0.1)
-      warden (~> 1.2.6)
+    rails_jwt_auth (0.1.1)
+      bcrypt (~> 3.1)
+      jwt (~> 1.5)
+      rails (~> 5.0)
+      warden (~> 1.2)
 
 GEM
   remote: https://rubygems.org/
@@ -139,7 +139,7 @@ GEM
       thread_safe (~> 0.1)
     warden (1.2.6)
       rack (>= 1.0)
-    websocket-driver (0.6.4)
+    websocket-driver (0.6.5)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.2)
 
