@@ -1,15 +1,13 @@
 class RailsJwtAuth::ConfirmationsController < ApplicationController
   def show
-    unless token = params[:confirmation_token]
-      return render json: {}, status: 400
-    end
+    return render json: {}, status: 400 unless params[:confirmation_token]
 
-    user = RailsJwtAuth.model.find_by!(confirmation_token: token)
+    user = RailsJwtAuth.model.find_by!(confirmation_token: params[:confirmation_token])
 
     if user.confirm!
       render json: {}, status: 204
     else
-      render json: {errors: user.errors}, status: 422
+      render json: show_error_response(user), status: 422
     end
   end
 
@@ -23,5 +21,9 @@ class RailsJwtAuth::ConfirmationsController < ApplicationController
 
   def confirmation_params
     params.require(:confirmation).permit(:email)
+  end
+
+  def show_error_response(user)
+    {errors: user.errors}
   end
 end

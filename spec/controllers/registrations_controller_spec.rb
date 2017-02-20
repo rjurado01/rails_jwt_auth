@@ -13,24 +13,26 @@ describe RailsJwtAuth::RegistrationsController do
       end
 
       let(:root) { RailsJwtAuth.model_name.underscore }
-      let(:json) { JSON.parse(response.body)[root] }
 
       describe 'POST #create' do
         before do
           RailsJwtAuth.model.destroy_all
         end
 
-        context 'when parameters are invalid' do
+        let(:json) { JSON.parse(response.body)['errors'] }
+
+        context 'when parameters are blank' do
           before do
-            post :create, params: {root => {}}
+            post :create, params: {root => {email: '', password: ''}}
           end
 
           it 'returns 422 status code' do
             expect(response.status).to eq(422)
           end
 
-          it 'returns error message' do
-            expect(json).to eq('is required')
+          it 'returns errors messages' do
+            expect(json['email']).to include('can\'t be blank')
+            expect(json['password']).to include('can\'t be blank')
           end
         end
 
@@ -39,6 +41,8 @@ describe RailsJwtAuth::RegistrationsController do
             params = {email: 'user@email.com', password: '12345678'}
             post :create, params: {root => params}
           end
+
+          let(:json) { JSON.parse(response.body)[root] }
 
           it 'creates new user' do
             expect(RailsJwtAuth.model.count).to eq(1)

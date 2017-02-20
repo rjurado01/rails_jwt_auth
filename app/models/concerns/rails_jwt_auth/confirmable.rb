@@ -22,15 +22,9 @@ module RailsJwtAuth
       self.confirmed_at = Time.now.utc
     end
 
-    def validate_confirmation
-      return unless confirmed_at
-
-      if confirmed_at_was
-        errors.add(:email, I18n.t('rails_jwt_auth.errors.already_confirmed'))
-      elsif confirmation_sent_at &&
-            (confirmation_sent_at < (Time.now - RailsJwtAuth.confirmation_expiration_time))
-        errors.add(:confirmation_token, I18n.t('rails_jwt_auth.errors.confirmation_expired'))
-      end
+    def confirmation_in_progress?
+      !confirmed_at && confirmation_token && confirmation_sent_at &&
+        (Time.now < (confirmation_sent_at + RailsJwtAuth.confirmation_expiration_time))
     end
 
     def self.included(base)
@@ -44,6 +38,19 @@ module RailsJwtAuth
 
       base.send(:after_create) do
         send_confirmation_instructions unless confirmed_at || confirmation_sent_at
+      end
+    end
+
+    private
+
+    def validate_confirmation
+      return unless confirmed_at
+
+      if confirmed_at_was
+        errors.add(:email, I18n.t('rails_jwt_auth.errors.already_confirmed'))
+      elsif confirmation_sent_at &&
+            (confirmation_sent_at < (Time.now - RailsJwtAuth.confirmation_expiration_time))
+        errors.add(:confirmation_token, I18n.t('rails_jwt_auth.errors.confirmation_expired'))
       end
     end
   end

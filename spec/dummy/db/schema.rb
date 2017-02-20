@@ -19,5 +19,8 @@ ActiveRecord::Schema.define do
     t.string    'confirmation_token'
     t.datetime  'confirmation_sent_at'
     t.datetime  'confirmed_at'
+
+    t.string    'reset_password_token'
+    t.datetime  'reset_password_sent_at'
   end
 end

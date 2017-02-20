@@ -32,17 +32,19 @@ rails g rails_jwt_auth:install
 
 You can edit configuration options into `config/initializers/auth_token_auth.rb` file created by generator.
 
-| Option                       | Default value     | Description                                                           |
-| ---------------------------- | ----------------- | --------------------------------------------------------------------- |
-| model_name                   | 'User'            | Authentication model name                                             |
-| auth_field_name              | 'email'           | Field used to authenticate user with password                         |
-| auth_field_email             | true              | Validate auth field email format                                      |
-| jwt_expiration_time          | 7.days            | Tokens expiration time                                                |
-| jwt_issuer                   | 'RailsJwtAuth'    | The "iss" (issuer) claim identifies the principal that issued the JWT |
-| simultaneous_sessions        | 2                 | Number of simultaneous sessions for an user                           |
-| mailer_sender                |                   | E-mail address which will be shown in RailsJwtAuth::Mailer            |
-| confirmation_url             | confirmation_path | Url used to create confirmation url into confirmation email           |
-| confirmation_expiration_time | 1.day             | Confirmation token expiration time                                    |
+| Option                         | Default value     | Description                                                           |
+| ------------------------------ | ----------------- | --------------------------------------------------------------------- |
+| model_name                     | 'User'            | Authentication model name                                             |
+| auth_field_name                | 'email'           | Field used to authenticate user with password                         |
+| auth_field_email               | true              | Validate auth field email format                                      |
+| jwt_expiration_time            | 7.days            | Tokens expiration time                                                |
+| jwt_issuer                     | 'RailsJwtAuth'    | The "iss" (issuer) claim identifies the principal that issued the JWT |
+| simultaneous_sessions          | 2                 | Number of simultaneous sessions for an user                           |
+| mailer_sender                  |                   | E-mail address which will be shown in RailsJwtAuth::Mailer            |
+| confirmation_url               | confirmation_path | Url used to create email link with confirmation token                 |
+| confirmation_expiration_time   | 1.day             | Confirmation token expiration time                                    |
+| reset_password_url             | password_path     | Url used to create email link with reset password token               |
+| reset_password_expiration_time | 1.day             | Confirmation token expiration time                                    |
 
 ## Authenticatable
 
@@ -124,6 +126,45 @@ class User
 end
 ```
 
+## Recoverable
+
+Resets the user password and sends reset instructions
+
+### ActiveRecord
+
+Include `RailsJwtAuth::Recoverable` module into your User class:
+
+```ruby
+# app/models/user.rb
+class User < ApplicationRecord
+  include RailsJwtAuth::Authenticatable
+  include RailsJwtAuth::Recoverable
+end
+```
+
+and create a migration to add recoverable fields to User model:
+
+```ruby
+# example migration
+change_table :users do |t|
+  t.string :reset_password_token
+  t.datetime :reset_password_sent_at
+end
+```
+
+### Mongoid
+
+Include `RailsJwtAuth::Recoverable` module into your User class:
+
+```ruby
+# app/models/user.rb
+class User
+  include Mongoid::Document
+  include RailsJwtAuth::Authenticatable
+  include RailsJwtAuth::Recoverable
+end
+```
+
 ## Controller helpers
 
 RailsJwtAuth will create some helpers to use inside your controllers.
@@ -157,7 +198,9 @@ end
 
     Verify if a user is signed in.
 
-## Session
+## Default Controllers API
+
+### Session
 
 Session api is defined by RailsJwtAuth::SessionsController.
 
@@ -186,7 +229,7 @@ Session api is defined by RailsJwtAuth::SessionsController.
 }
 ```
 
-## Registration
+### Registration
 
 Registration api is defined by RailsJwtAuth::RegistrationsController.
 
@@ -215,7 +258,7 @@ Registration api is defined by RailsJwtAuth::RegistrationsController.
 }
 ```
 
-## Confirmation
+### Confirmation
 
 Confirmation api is defined by RailsJwtAuth::ConfirmationsController.
 
@@ -239,6 +282,38 @@ Confirmation api is defined by RailsJwtAuth::ConfirmationsController.
   method: POST,
   data: {
     email: "user@example.com"
+  }
+}
+```
+
+### Password
+
+Password api is defined by RailsJwtAuth::PasswordsController.
+
+1.  Send reset password email:
+
+```js
+{
+  url: host/confirmation,
+  method: POST,
+  data: {
+    email: "user@example.com"
+  }
+}
+```
+
+2.  Update password:
+
+```js
+{
+  url: host/confirmation,
+  method: PUT,
+  data: {
+    reset_password_token: "token",
+    password: {
+      password: '1234',
+      password_confirmation: '1234'
+    }
   }
 }
 ```

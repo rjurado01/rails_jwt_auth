@@ -31,6 +31,12 @@ module RailsJwtAuth
   mattr_accessor :confirmation_expiration_time
   @@confirmation_expiration_time = 1.day
 
+  mattr_accessor :reset_password_url
+  @@reset_password_url = nil
+
+  mattr_accessor :reset_password_expiration_time
+  @@reset_password_expiration_time = 1.day
+
   def self.model
     @@model_name.constantize
   end

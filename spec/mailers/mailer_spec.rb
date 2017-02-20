@@ -1,9 +1,12 @@
 require 'rails_helper'
 
 RSpec.describe RailsJwtAuth::Mailer, type: :mailer do
-  let(:user) { FactoryGirl.create(:active_record_user) }
-
   describe 'confirmation_instructions' do
+    let(:user) do
+      FactoryGirl.create(:active_record_unconfirmed_user,
+        confirmation_token: 'abcd', confirmation_sent_at: Time.now)
+    end
+
     let(:mail) { described_class.confirmation_instructions(user).deliver_now }
 
     it 'sends email with correct info' do
@@ -21,6 +24,34 @@ RSpec.describe RailsJwtAuth::Mailer, type: :mailer do
 
       it 'uses this to generate confirmation url' do
         url = "#{RailsJwtAuth.confirmation_url}?confirmation_token=#{user.confirmation_token}"
+        expect(mail.body).to include(url)
+      end
+    end
+  end
+
+  describe 'reset_password_instructions' do
+    let(:user) do
+      FactoryGirl.create(:active_record_user,
+        reset_password_token: 'abcd', reset_password_sent_at: Time.now)
+    end
+
+    let(:mail) { described_class.reset_password_instructions(user).deliver_now }
+
+    it 'sends email with correct info' do
+      expect { mail }.to change { ActionMailer::Base.deliveries.count }.by(1)
+      expect(mail.subject).to eq(I18n.t('rails_jwt_auth.mailer.reset_password_instructions.subject'))
+      expect(mail.to).to include(user.email)
+      expect(mail.from).to include(RailsJwtAuth.mailer_sender)
+      expect(mail.body).to include(password_url(reset_password_token: user.reset_password_token))
+    end
+
+    context 'when reset_password_url opton is defined' do
+      before do
+        RailsJwtAuth.reset_password_url = 'http://my-url.com'
+      end
+
+      it 'uses this to generate reset_password url' do
+        url = "#{RailsJwtAuth.reset_password_url}?reset_password_token=#{user.reset_password_token}"
         expect(mail.body).to include(url)
       end
     end
