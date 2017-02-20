@@ -10,14 +10,14 @@ Gem::Specification.new do |s|
   s.authors     = ["rjurado"]
   s.email       = ["rjurado@openmailbox.org"]
   s.homepage    = "https://github.com/rjurado01/rails-token-auth"
-  s.summary     = "Rails token authentication."
-  s.description = "Rails authentication utilities usign jwt token."
+  s.summary     = "Rails jwt authentication."
+  s.description = "Rails authentication solution based on Warden and JWT and inspired by Devise."
   s.license     = "MIT"
 
   s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.md"]
 
-  s.add_dependency "rails", "~> 5.0.1"
-  s.add_dependency "warden", "~> 1.2.6"
-  s.add_dependency "jwt", "~> 1.5.6"
-  s.add_dependency "bcrypt", "~> 3.1.11"
+  s.add_dependency "rails", "~> 5.0"
+  s.add_dependency "warden", "~> 1.2"
+  s.add_dependency "jwt", "~> 1.5"
+  s.add_dependency "bcrypt", "~> 3.1"
 end
