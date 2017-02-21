@@ -20,6 +20,15 @@ RailsJwtAuth.setup do |config|
   # mailer sender
   #config.mailer_sender = 'initialize-mailer_sender@example.com'
 
-  # url used into confirmation email to reditect with confirmation_token
+  # url used to create email link with confirmation token
   #config.confirmation_url = 'http://frontend.com/confirmation'
+
+  # expiration time for confirmation tokens
+  #config.confirmation_expiration_time = 1.day
+
+  # url used to create email link with reset password token
+  #config.reset_password_url
+
+  # expiration time for reset password tokens
+  #config.reset_password_expiration_time
 end
