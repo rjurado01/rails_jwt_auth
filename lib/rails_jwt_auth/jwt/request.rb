@@ -2,7 +2,8 @@ module RailsJwtAuth
   module Jwt
     class Request
       def initialize(request)
-        return unless (@jwt = request.env['HTTP_AUTHORIZATION'])
+        return unless request.env['HTTP_AUTHORIZATION']
+        @jwt = request.env['HTTP_AUTHORIZATION'].split.last
         @jwt_info = RailsJwtAuth::Jwt::Manager.decode(@jwt)
       end
 

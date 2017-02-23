@@ -225,7 +225,7 @@ Session api is defined by RailsJwtAuth::SessionsController.
 {
   url: host/session,
   method: DELETE,
-  headers: { 'Authorization': 'auth_token'}
+  headers: { 'Authorization': 'Bearer auth_token'}
 }
 ```
 
@@ -254,7 +254,7 @@ Registration api is defined by RailsJwtAuth::RegistrationsController.
 {
   url: host/registration,
   method: DELETE,
-  headers: { 'Authorization': 'auth_token'}
+  headers: { 'Authorization': 'Bearer auth_token'}
 }
 ```
 

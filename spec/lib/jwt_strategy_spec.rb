@@ -15,7 +15,7 @@ describe RailsJwtAuth::Strategies::Jwt do
       it 'success!' do
         token = user.regenerate_auth_token
         jwt = RailsJwtAuth::Jwt::Manager.encode(auth_token: token)
-        env = {'HTTP_AUTHORIZATION' => jwt}
+        env = {'HTTP_AUTHORIZATION' => "Bearer #{jwt}"}
 
         strategy = RailsJwtAuth::Strategies::Jwt.new(env)
         expect(strategy).to receive('success!')
@@ -31,7 +31,7 @@ describe RailsJwtAuth::Strategies::Jwt do
       it 'fail!' do
         token = user.regenerate_auth_token
         jwt = RailsJwtAuth::Jwt::Manager.encode(auth_token: token)
-        env = {'HTTP_AUTHORIZATION' => jwt}
+        env = {'HTTP_AUTHORIZATION' => "Bearer #{jwt}"}
 
         strategy = RailsJwtAuth::Strategies::Jwt.new(env)
         expect(strategy).to receive('fail!')
@@ -44,7 +44,7 @@ describe RailsJwtAuth::Strategies::Jwt do
       it 'fail!' do
         token = user.regenerate_auth_token
         jwt = RailsJwtAuth::Jwt::Manager.encode(auth_token: token)
-        env = {'HTTP_AUTHORIZATION' => jwt}
+        env = {'HTTP_AUTHORIZATION' => "Bearer #{jwt}"}
 
         strategy = RailsJwtAuth::Strategies::Jwt.new(env)
         expect(strategy).to receive('fail!')
