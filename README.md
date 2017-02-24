@@ -294,7 +294,7 @@ Password api is defined by RailsJwtAuth::PasswordsController.
 
 ```js
 {
-  url: host/confirmation,
+  url: host/password,
   method: POST,
   data: {
     email: "user@example.com"
@@ -306,7 +306,7 @@ Password api is defined by RailsJwtAuth::PasswordsController.
 
 ```js
 {
-  url: host/confirmation,
+  url: host/password,
   method: PUT,
   data: {
     reset_password_token: "token",
