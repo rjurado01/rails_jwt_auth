@@ -7,9 +7,11 @@ if defined?(ActionMailer)
       @user = user
 
       if RailsJwtAuth.confirmation_url
-        url = URI.parse(RailsJwtAuth.confirmation_url)
-        url.query = [url.query, "confirmation_token=#{@user.confirmation_token}"].compact.join('&')
-        @confirmation_url = url.to_s
+        url, params = RailsJwtAuth.confirmation_url.split('?')
+        params = params ? params.split('&') : []
+        params.push("confirmation_token=#{@user.confirmation_token}")
+
+        @confirmation_url = "#{url}?#{params.join('&')}"
       else
         @confirmation_url = confirmation_url(confirmation_token: @user.confirmation_token)
       end
@@ -23,9 +25,11 @@ if defined?(ActionMailer)
       @user = user
 
       if RailsJwtAuth.reset_password_url
-        url = URI.parse(RailsJwtAuth.reset_password_url)
-        url.query = [url.query, "reset_password_token=#{@user.reset_password_token}"].compact.join('&')
-        @reset_password_url = url.to_s
+        url, params = RailsJwtAuth.reset_password_url.split('?')
+        params = params ? params.split('&') : []
+        params.push("reset_password_token=#{@user.reset_password_token}")
+
+        @reset_password_url = "#{url}?#{params.join('&')}"
       else
         @reset_password_url = password_url(reset_password_token: @user.reset_password_token)
       end

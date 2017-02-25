@@ -27,6 +27,17 @@ RSpec.describe RailsJwtAuth::Mailer, type: :mailer do
         expect(mail.body).to include(url)
       end
     end
+
+    context 'when confirmation_url opton is defined with hash url' do
+      before do
+        RailsJwtAuth.confirmation_url = 'http://www.host.com/#/url?param=value'
+      end
+
+      it 'uses this to generate confirmation url' do
+        url = "#{RailsJwtAuth.confirmation_url}&confirmation_token=#{user.confirmation_token}"
+        expect(mail.body).to include(url)
+      end
+    end
   end
 
   describe 'reset_password_instructions' do
@@ -52,6 +63,17 @@ RSpec.describe RailsJwtAuth::Mailer, type: :mailer do
 
       it 'uses this to generate reset_password url' do
         url = "#{RailsJwtAuth.reset_password_url}?reset_password_token=#{user.reset_password_token}"
+        expect(mail.body).to include(url)
+      end
+    end
+
+    context 'when reset_password_url opton is defined with hash url' do
+      before do
+        RailsJwtAuth.reset_password_url = 'http://www.host.com/#/url?param=value'
+      end
+
+      it 'uses this to generate confirmation url' do
+        url = "#{RailsJwtAuth.reset_password_url}&reset_password_token=#{user.reset_password_token}"
         expect(mail.body).to include(url)
       end
     end
