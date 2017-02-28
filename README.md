@@ -373,6 +373,10 @@ And then in controller examples we can just call sign_in(user) to sign in as a u
   end
 ```
 
+## Locales
+
+Copy `config/locales/en.yml` into your project `config/locales` folder and edit it.
+
 ## License
 
 The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).

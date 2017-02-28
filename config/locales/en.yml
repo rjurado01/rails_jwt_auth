@@ -3,6 +3,8 @@ en:
     mailer:
       confirmation_instructions:
         subject: "Confirmation instructions"
+      reset_password_instructions.subject:
+        subject: "Reset password instructions"
     errors:
       already_confirmed: "was already confirmed, please try signing in"
       expired: "has expired, please request a new one"
