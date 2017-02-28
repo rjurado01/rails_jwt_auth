@@ -12,7 +12,10 @@ class RailsJwtAuth::ConfirmationsController < ApplicationController
   end
 
   def create
-    user = RailsJwtAuth.model.find_by!(email: confirmation_params[:email])
+    unless (user = RailsJwtAuth.model.where(email: confirmation_params[:email]).first)
+      return render json: create_error_response, status: 422
+    end
+
     user.send_confirmation_instructions
     render json: {}, status: 204
   end
@@ -25,5 +28,9 @@ class RailsJwtAuth::ConfirmationsController < ApplicationController
 
   def show_error_response(user)
     {errors: user.errors}
+  end
+
+  def create_error_response
+    {errors: {email: [I18n.t('rails_jwt_auth.errors.not_found')]}}
   end
 end

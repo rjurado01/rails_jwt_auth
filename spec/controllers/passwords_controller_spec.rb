@@ -33,9 +33,16 @@ describe RailsJwtAuth::PasswordsController do
         end
 
         context 'when send invalid email' do
-          it 'returns 404 http status code' do
+          before do
             post :create, params: {password: {email: 'invalid'}}
-            expect(response).to have_http_status(404)
+          end
+
+          it 'returns 422 http status code' do
+            expect(response).to have_http_status(422)
+          end
+
+          it 'returns not found error' do
+            expect(json['errors']['email']).to include(I18n.t('rails_jwt_auth.errors.not_found'))
           end
         end
       end

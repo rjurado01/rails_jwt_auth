@@ -1,6 +1,9 @@
 class RailsJwtAuth::PasswordsController < ApplicationController
   def create
-    user = RailsJwtAuth.model.find_by!(email: create_password_params[:email])
+    unless (user = RailsJwtAuth.model.where(email: create_password_params[:email]).first)
+      return render json: create_error_response, status: 422
+    end
+
     user.send_reset_password_instructions
     render json: {}, status: 204
   end
@@ -19,6 +22,10 @@ class RailsJwtAuth::PasswordsController < ApplicationController
 
   def create_password_params
     params.require(:password).permit(:email)
+  end
+
+  def create_error_response
+    {errors: {email: [I18n.t('rails_jwt_auth.errors.not_found')]}}
   end
 
   def update_password_params

@@ -50,7 +50,7 @@ module RailsJwtAuth
         errors.add(:email, I18n.t('rails_jwt_auth.errors.already_confirmed'))
       elsif confirmation_sent_at &&
             (confirmation_sent_at < (Time.now - RailsJwtAuth.confirmation_expiration_time))
-        errors.add(:confirmation_token, I18n.t('rails_jwt_auth.errors.confirmation_expired'))
+        errors.add(:confirmation_token, I18n.t('rails_jwt_auth.errors.expired'))
       end
     end
   end
