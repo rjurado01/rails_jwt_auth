@@ -281,7 +281,9 @@ Confirmation api is defined by RailsJwtAuth::ConfirmationsController.
   url: host/confirmation,
   method: POST,
   data: {
-    email: "user@example.com"
+    confirmation: {
+      email: "user@example.com"
+    }
   }
 }
 ```
@@ -297,7 +299,9 @@ Password api is defined by RailsJwtAuth::PasswordsController.
   url: host/password,
   method: POST,
   data: {
-    email: "user@example.com"
+    password: {
+      email: "user@example.com"
+    }
   }
 }
 ```

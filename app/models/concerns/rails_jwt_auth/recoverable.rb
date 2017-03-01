@@ -17,6 +17,12 @@ module RailsJwtAuth
         base.send(:field, :reset_password_token,   type: String)
         base.send(:field, :reset_password_sent_at, type: Time)
       end
+
+      base.send(:before_update) do
+        if password_digest_changed? && reset_password_token
+          self.reset_password_token = nil
+        end
+      end
     end
   end
 end
