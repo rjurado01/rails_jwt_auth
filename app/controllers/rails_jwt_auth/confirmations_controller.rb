@@ -1,23 +1,21 @@
 class RailsJwtAuth::ConfirmationsController < ApplicationController
-  def show
-    return render json: {}, status: 400 unless params[:confirmation_token]
+  def create
+    user = RailsJwtAuth.model.where(email: confirmation_params[:email]).first
+    return render json: create_error_response, status: 422 unless user
 
-    user = RailsJwtAuth.model.find_by!(confirmation_token: params[:confirmation_token])
+    user.send_confirmation_instructions
+    render json: {}, status: 204
+  end
+
+  def update
+    user = RailsJwtAuth.model.where(confirmation_token: params[:confirmation_token]).first
+    return render json: update_error_response(nil), status: 422 unless user
 
     if user.confirm!
       render json: {}, status: 204
     else
-      render json: show_error_response(user), status: 422
+      render json: update_error_response(user), status: 422
     end
-  end
-
-  def create
-    unless (user = RailsJwtAuth.model.where(email: confirmation_params[:email]).first)
-      return render json: create_error_response, status: 422
-    end
-
-    user.send_confirmation_instructions
-    render json: {}, status: 204
   end
 
   private
@@ -26,11 +24,15 @@ class RailsJwtAuth::ConfirmationsController < ApplicationController
     params.require(:confirmation).permit(:email)
   end
 
-  def show_error_response(user)
-    {errors: user.errors}
-  end
-
   def create_error_response
     {errors: {email: [I18n.t('rails_jwt_auth.errors.not_found')]}}
+  end
+
+  def update_error_response(user)
+    if user
+      {errors: user.errors}
+    else
+      {errors: {confirmation_token: [I18n.t('rails_jwt_auth.errors.not_found')]}}
+    end
   end
 end

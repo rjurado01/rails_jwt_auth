@@ -31,20 +31,20 @@ module RailsJwtAuth
       RailsJwtAuth::Jwt::Manager.encode(auth_token: token)
     end
 
-    def unconfirmed_error_response
-      {errors: {session: 'Unconfirmed email'}}
-    end
-
-    def create_success_response(_user, jwt)
-      {session: {jwt: jwt}}
+    def create_params
+      params.require(:session).permit(RailsJwtAuth.auth_field_name, :password)
     end
 
     def create_error_response(_user)
       {errors: {session: "Invalid #{RailsJwtAuth.auth_field_name} / password"}}
     end
 
-    def create_params
-      params.require(:session).permit(RailsJwtAuth.auth_field_name, :password)
+    def unconfirmed_error_response
+      {errors: {session: 'Unconfirmed email'}}
+    end
+
+    def create_success_response(_user, jwt)
+      {session: {jwt: jwt}}
     end
   end
 end

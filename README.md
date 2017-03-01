@@ -1,6 +1,6 @@
 # RailsJwtAuth
 
-Rails authentication solution based on Warden and JWT and inspired by Devise.
+Rails-API authentication solution based on Warden and JWT and inspired by Devise.
 
 ## Installation
 
@@ -267,7 +267,7 @@ Confirmation api is defined by RailsJwtAuth::ConfirmationsController.
 ```js
 {
   url: host/confirmation,
-  method: GET
+  method: PUT
   data: {
     confirmation_token: "token"
   }

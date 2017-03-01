@@ -67,9 +67,34 @@ describe RailsJwtAuth::PasswordsController do
         end
 
         context 'when reset_password_token is invalid' do
-          it 'returns 404 http status code' do
+          before do
             put :update, params: {reset_password_token: 'invalid'}
-            expect(response).to have_http_status 404
+          end
+
+          it 'returns 422 http status code' do
+            expect(response).to have_http_status 422
+          end
+
+          it 'returns error message' do
+            expect(json['errors']['reset_password_token']).to(
+              include(I18n.t('rails_jwt_auth.errors.not_found'))
+            )
+          end
+        end
+
+        context 'when does not send reset_password_token' do
+          before do
+            put :update
+          end
+
+          it 'returns 422 http status code' do
+            expect(response).to have_http_status 422
+          end
+
+          it 'returns error message' do
+            expect(json['errors']['reset_password_token']).to(
+              include(I18n.t('rails_jwt_auth.errors.not_found'))
+            )
           end
         end
 
