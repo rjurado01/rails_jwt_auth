@@ -352,6 +352,10 @@ resource :registration, controller: 'registrations', only: [:create, :update, :d
 
 You can overwrite `RailsJwtAuth::RenderHelper` to customize controllers responses.
 
+## Custom strong parameters
+
+You can overwrite `RailsJwtAuth::ParamsHelper` to customize controllers strong parameters.
+
 ## Testing (rspec)
 
 Require the RailsJwtAuth::Spec::Helpers helper module in `rails_helper.rb`.
