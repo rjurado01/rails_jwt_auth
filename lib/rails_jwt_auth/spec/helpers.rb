@@ -1,12 +1,12 @@
 module RailsJwtAuth
   module Spec
     module Helpers
-      require 'rails_jwt_auth/errors/not_authorized'
+      require 'rails_jwt_auth/spec/not_authorized'
       require 'rails_jwt_auth/jwt/manager'
 
       def sign_out
         request.env['warden'] = RailsJwtAuth::Strategies::Jwt.new request.env
-        allow(request.env['warden']).to receive(:authenticate!).and_raise(RailsJwtAuth::Errors::NotAuthorized)
+        allow(request.env['warden']).to receive(:authenticate!).and_raise(RailsJwtAuth::Spec::NotAuthorized)
       end
 
       def sign_in(user)

@@ -350,7 +350,7 @@ resource :registration, controller: 'registrations', only: [:create, :update, :d
 
 ## Testing (rspec)
 
-Require the RailsJwtAuth::Spec::Helpers helper module in `spec_helper.rb`.
+Require the RailsJwtAuth::Spec::Helpers helper module in `rails_helper.rb`.
 
 ```ruby
   require 'rails_jwt_auth/spec/helpers'
@@ -358,22 +358,23 @@ Require the RailsJwtAuth::Spec::Helpers helper module in `spec_helper.rb`.
   RSpec.configure do |config|
     ...
     config.include RailsJwtAuth::Spec::Helpers, :type => :controller
-    ...
   end
 ```
 
-And then in controller examples we can just call sign_in(user) to sign in as a user, or sign_out for examples that have no user signed in. Here's two quick examples:
+And then we can just call sign_in(user) to sign in as a user, or sign_out for examples that have no user signed in. Here's two quick examples:
 
 ```ruby
-  it "blocks unauthenticated access" do
-    sign_out
-    expect { get :index }.to raise_error(RailsJwtAuth::Errors::NotAuthorized)
-  end
+  describe ExampleController
+    it "blocks unauthenticated access" do
+      sign_out
+      expect { get :index }.to raise_error(RailsJwtAuth::Errors::NotAuthorized)
+    end
 
-  it "allows authenticated access" do
-    sign_in
-    get :index
-    expect(response).to be_success
+    it "allows authenticated access" do
+      sign_in
+      get :index
+      expect(response).to be_success
+    end
   end
 ```
 

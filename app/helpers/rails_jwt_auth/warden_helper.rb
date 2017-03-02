@@ -16,8 +16,12 @@ module RailsJwtAuth
       warden.authenticate!
     end
 
-    def render_401
-      render json: {}, status: 401
+    def self.included(base)
+      return unless Rails.env.test? && base.name == 'ApplicationController'
+
+      base.send(:rescue_from, RailsJwtAuth::Spec::NotAuthorized) do
+        render json: {}, status: 401
+      end
     end
   end
 end

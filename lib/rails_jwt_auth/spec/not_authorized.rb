@@ -1,5 +1,5 @@
 module RailsJwtAuth
-  module Errors
+  module Spec
     class NotAuthorized < StandardError
     end
   end
