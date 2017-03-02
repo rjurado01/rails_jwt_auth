@@ -27,8 +27,8 @@ RailsJwtAuth.setup do |config|
   #config.confirmation_expiration_time = 1.day
 
   # url used to create email link with reset password token
-  #config.reset_password_url
+  #config.reset_password_url = 'http://frontend.com/reset_password'
 
   # expiration time for reset password tokens
-  #config.reset_password_expiration_time
+  #config.reset_password_expiration_time = 1.day
 end

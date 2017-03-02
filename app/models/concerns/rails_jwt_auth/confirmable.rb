@@ -1,7 +1,10 @@
 module RailsJwtAuth
   module Confirmable
     def send_confirmation_instructions
-      return false if confirmed?
+      if confirmed?
+        errors.add(:email, I18n.t('rails_jwt_auth.errors.already_confirmed'))
+        return false
+      end
 
       self.confirmation_token = SecureRandom.base58(24)
       self.confirmation_sent_at = Time.now

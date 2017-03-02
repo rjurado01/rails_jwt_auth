@@ -53,7 +53,6 @@ describe RailsJwtAuth::RegistrationsController do
           end
 
           it 'returns user info' do
-            expect(json['id']).to eq(RailsJwtAuth.model.first.id.to_s)
             expect(json['email']).to eq('user@email.com')
           end
         end

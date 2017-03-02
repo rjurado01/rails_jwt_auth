@@ -45,24 +45,41 @@ describe RailsJwtAuth::Confirmable do
 
         it 'fills confirmation fields' do
           mock = Mock.new
-          new_user = FactoryGirl.create("#{orm.underscore}_unconfirmed_user")
           allow(RailsJwtAuth::Mailer).to receive(:confirmation_instructions).and_return(mock)
-          new_user.send_confirmation_instructions
-          expect(new_user.confirmation_token).not_to be_nil
-          expect(new_user.confirmation_sent_at).not_to be_nil
+          unconfirmed_user.send_confirmation_instructions
+          expect(unconfirmed_user.confirmation_token).not_to be_nil
+          expect(unconfirmed_user.confirmation_sent_at).not_to be_nil
         end
 
-        it 'send confirmation email' do
+        it 'sends confirmation email' do
           mock = Mock.new
           new_user = FactoryGirl.create("#{orm.underscore}_unconfirmed_user")
           allow(RailsJwtAuth::Mailer).to receive(:confirmation_instructions).and_return(mock)
           expect(mock).to receive(:deliver)
           new_user.send_confirmation_instructions
         end
+
+        context 'when user is confirmed' do
+          it 'returns false' do
+            expect(user.send_confirmation_instructions).to eq(false)
+          end
+
+          it 'addds error to user' do
+            user.send_confirmation_instructions
+            expect(user.errors['email']).to include(I18n.t('rails_jwt_auth.errors.already_confirmed'))
+          end
+
+          it 'does not send confirmation email' do
+            mock = Mock.new
+            allow(RailsJwtAuth::Mailer).to receive(:confirmation_instructions).and_return(mock)
+            expect(mock).not_to receive(:deliver)
+            user.send_confirmation_instructions
+          end
+        end
       end
 
       describe '#after_create' do
-        it 'send confirmation instructions' do
+        it 'sends confirmation instructions' do
           new_user = FactoryGirl.build("#{orm.underscore}_user")
           expect(new_user).to receive(:send_confirmation_instructions)
           new_user.save

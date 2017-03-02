@@ -6,7 +6,9 @@ en:
       reset_password_instructions.subject:
         subject: "Reset password instructions"
     errors:
+      unconfirmed: "unconfirmed email"
       already_confirmed: "was already confirmed, please try signing in"
+      create_session: "invalid %{field} / password"
       expired: "has expired, please request a new one"
       invalid: "invalid"
       not_found: "not found"

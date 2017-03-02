@@ -324,7 +324,7 @@ Password api is defined by RailsJwtAuth::PasswordsController.
 
 ## Custom controllers
 
-You can overwrite RailsJwtAuth controller to edit actions, responses,
+You can overwrite RailsJwtAuth controllers to edit actions, responses,
 permitted parameters...
 
 For example, if we want to change registration strong parameters we
@@ -347,6 +347,10 @@ And edit route resource to use it:
 # config/routes.rb
 resource :registration, controller: 'registrations', only: [:create, :update, :destroy]
 ```
+
+## Custom responses
+
+You can overwrite `RailsJwtAuth::RenderHelper` to customize controllers responses.
 
 ## Testing (rspec)
 

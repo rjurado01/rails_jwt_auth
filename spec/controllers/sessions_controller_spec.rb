@@ -52,7 +52,8 @@ describe RailsJwtAuth::SessionsController do
           end
 
           it 'returns error message' do
-            expect(json).to eq('errors' => {'session' => 'Invalid email / password'})
+            error = I18n.t('rails_jwt_auth.errors.create_session', field: RailsJwtAuth.auth_field_name)
+            expect(json['errors']['session']).to include(error)
           end
         end
 
@@ -66,7 +67,8 @@ describe RailsJwtAuth::SessionsController do
           end
 
           it 'returns error message' do
-            expect(json).to eq('errors' => {'session' => 'Invalid email / password'})
+            error = I18n.t('rails_jwt_auth.errors.create_session', field: RailsJwtAuth.auth_field_name)
+            expect(json['errors']['session']).to include(error)
           end
         end
 

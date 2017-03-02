@@ -3,19 +3,21 @@ require 'rails_jwt_auth/jwt/request'
 
 module RailsJwtAuth
   class SessionsController < ApplicationController
+    include RenderHelper
+
     def create
       user = RailsJwtAuth.model.where(
         RailsJwtAuth.auth_field_name => create_params[RailsJwtAuth.auth_field_name].to_s.downcase
       ).first
 
       if !user
-        render json: create_error_response(user), status: 422
+        render_422 session: [create_session_error]
       elsif user.respond_to?('confirmed?') && !user.confirmed?
-        render json: unconfirmed_error_response, status: 422
+        render_422 session: [I18n.t('rails_jwt_auth.errors.unconfirmed')]
       elsif user.authenticate(create_params[:password])
-        render json: create_success_response(user, get_jwt(user)), status: 201
+        render_201 session: {jwt: get_jwt(user)}
       else
-        render json: create_error_response(user), status: 422
+        render_422 session: [create_session_error]
       end
     end
 
@@ -35,16 +37,8 @@ module RailsJwtAuth
       params.require(:session).permit(RailsJwtAuth.auth_field_name, :password)
     end
 
-    def create_error_response(_user)
-      {errors: {session: "Invalid #{RailsJwtAuth.auth_field_name} / password"}}
-    end
-
-    def unconfirmed_error_response
-      {errors: {session: 'Unconfirmed email'}}
-    end
-
-    def create_success_response(_user, jwt)
-      {session: {jwt: jwt}}
+    def create_session_error
+      I18n.t('rails_jwt_auth.errors.create_session', field: RailsJwtAuth.auth_field_name)
     end
   end
 end
