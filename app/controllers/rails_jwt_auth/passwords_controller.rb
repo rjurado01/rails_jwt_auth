@@ -12,7 +12,14 @@ module RailsJwtAuth
 
     def update
       user = RailsJwtAuth.model.where(reset_password_token: params[:reset_password_token]).first
-      return render_422(reset_password_token: [I18n.t('rails_jwt_auth.errors.not_found')]) unless user
+
+      unless user
+        return render_422(reset_password_token: [I18n.t('rails_jwt_auth.errors.not_found')])
+      end
+
+      unless password_update_params[:password].present?
+        return render_422(password: [I18n.t('rails_jwt_auth.errors.invalid')])
+      end
 
       user.update_attributes(password_update_params) ? render_204 : render_422(user.errors)
     end

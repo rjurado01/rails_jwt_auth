@@ -112,7 +112,27 @@ describe RailsJwtAuth::PasswordsController do
           end
 
           it 'returns expiration confirmation error message' do
-            expect(json['errors']['password_confirmation']).to include('doesn\'t match Password')
+            expect(json['errors']['password_confirmation']).to include(
+              I18n.t('errors.messages.confirmation', attribute: 'Password')
+            )
+          end
+        end
+
+        context 'when password is blank' do
+          before do
+            user.send_reset_password_instructions
+            put :update, params: {
+              reset_password_token: user.reset_password_token,
+              password: {password: ''}
+            }
+          end
+
+          it 'returns 422 http status code' do
+            expect(response).to have_http_status(422)
+          end
+
+          it 'returns expiration confirmation error message' do
+            expect(json['errors']['password']).to include(I18n.t('rails_jwt_auth.errors.invalid'))
           end
         end
       end
