@@ -32,15 +32,36 @@ describe RailsJwtAuth::Recoverable do
           mock = Mock.new
           allow(RailsJwtAuth::Mailer).to receive(:reset_password_instructions).and_return(mock)
           user.send_reset_password_instructions
+          user.reload
           expect(user.reset_password_token).not_to be_nil
           expect(user.reset_password_sent_at).not_to be_nil
         end
 
-        it 'send  reset password email' do
+        it 'sends reset password email' do
           mock = Mock.new
           allow(RailsJwtAuth::Mailer).to receive(:reset_password_instructions).and_return(mock)
           expect(mock).to receive(:deliver)
           user.send_reset_password_instructions
+        end
+
+        context 'when user is unconfirmed' do
+          let(:user) { FactoryGirl.create("#{orm.underscore}_unconfirmed_user") }
+
+          it 'returns false' do
+            expect(user.send_reset_password_instructions).to be_falsey
+          end
+
+          it 'does not fill reset password fields' do
+            user.send_reset_password_instructions
+            user.reload
+            expect(user.reset_password_token).to be_nil
+            expect(user.reset_password_sent_at).to be_nil
+          end
+
+          it 'doe not send reset password email' do
+            expect(RailsJwtAuth::Mailer).not_to receive(:reset_password_instructions)
+            user.send_reset_password_instructions
+          end
         end
       end
 

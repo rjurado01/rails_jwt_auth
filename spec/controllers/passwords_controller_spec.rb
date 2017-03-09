@@ -9,6 +9,7 @@ describe RailsJwtAuth::PasswordsController do
 
       let(:json) { JSON.parse(response.body) }
       let(:user) { FactoryGirl.create("#{orm.underscore}_user", password: '12345678') }
+      let(:unconfirmed_user) { FactoryGirl.create("#{orm.underscore}_unconfirmed_user") }
 
       describe 'POST #create' do
         context 'when sends valid email' do
@@ -29,6 +30,18 @@ describe RailsJwtAuth::PasswordsController do
             old_token = user.reset_password_token
             post :create, params: {password: {email: user.email}}
             expect(user.reload.reset_password_token).not_to eq(old_token)
+          end
+
+          context 'when user is unconfirmed' do
+            it 'returns 422 http status code' do
+              post :create, params: {password: {email: unconfirmed_user.email}}
+              expect(response).to have_http_status(422)
+            end
+
+            it 'returns unconfirmed error message' do
+              post :create, params: {password: {email: unconfirmed_user.email}}
+              expect(json['errors']['email']).to include(I18n.t('rails_jwt_auth.errors.unconfirmed'))
+            end
           end
         end
 

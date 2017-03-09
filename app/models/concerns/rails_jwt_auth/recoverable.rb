@@ -1,6 +1,11 @@
 module RailsJwtAuth
   module Recoverable
     def send_reset_password_instructions
+      if self.class.ancestors.include?(RailsJwtAuth::Confirmable) && !confirmed?
+        errors.add(:email, I18n.t('rails_jwt_auth.errors.unconfirmed'))
+        return false
+      end
+
       self.reset_password_token = SecureRandom.base58(24)
       self.reset_password_sent_at = Time.now
 
