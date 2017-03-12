@@ -38,6 +38,18 @@ RSpec.describe RailsJwtAuth::Mailer, type: :mailer do
         expect(mail.body).to include(url)
       end
     end
+
+    context 'when model has unconfirmed_email' do
+      it 'sends email with correct info' do
+        user.email = 'new@email.com'
+        user.save
+        expect { mail }.to change { ActionMailer::Base.deliveries.count }.by(1)
+        expect(mail.subject).to eq(I18n.t('rails_jwt_auth.mailer.confirmation_instructions.subject'))
+        expect(mail.to).to include('new@email.com')
+        expect(mail.from).to include(RailsJwtAuth.mailer_sender)
+        expect(mail.body).to include(confirmation_url(confirmation_token: user.confirmation_token))
+      end
+    end
   end
 
   describe 'reset_password_instructions' do

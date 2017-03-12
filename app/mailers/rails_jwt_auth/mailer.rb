@@ -17,7 +17,7 @@ if defined?(ActionMailer)
       end
 
       subject = I18n.t('rails_jwt_auth.mailer.confirmation_instructions.subject')
-      mail(to: @user.email, subject: subject)
+      mail(to: @user.unconfirmed_email || @user.email, subject: subject)
     end
 
     def reset_password_instructions(user)

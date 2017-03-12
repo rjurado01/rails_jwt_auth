@@ -1,7 +1,7 @@
 module RailsJwtAuth
   module Confirmable
     def send_confirmation_instructions
-      if confirmed?
+      if confirmed? && !unconfirmed_email_changed?
         errors.add(:email, I18n.t('rails_jwt_auth.errors.already_confirmed'))
         return false
       end
@@ -18,6 +18,12 @@ module RailsJwtAuth
 
     def confirm!
       self.confirmed_at = Time.now.utc
+
+      if unconfirmed_email
+        self.email = unconfirmed_email
+        self.unconfirmed_email = nil
+      end
+
       save
     end
 
@@ -32,6 +38,8 @@ module RailsJwtAuth
 
     def self.included(base)
       if base.ancestors.include? Mongoid::Document
+        base.send(:field, :email,                type: String)
+        base.send(:field, :unconfirmed_email,    type: String)
         base.send(:field, :confirmation_token,   type: String)
         base.send(:field, :confirmation_sent_at, type: Time)
         base.send(:field, :confirmed_at,         type: Time)
@@ -42,12 +50,20 @@ module RailsJwtAuth
       base.send(:after_create) do
         send_confirmation_instructions unless confirmed_at || confirmation_sent_at
       end
+
+      base.send(:before_update) do
+        if email_changed? && email_was && !confirmed_at_changed?
+          self.unconfirmed_email = email
+          self.email = email_was
+          send_confirmation_instructions
+        end
+      end
     end
 
     private
 
     def validate_confirmation
-      return unless confirmed_at
+      return true if !confirmed_at || email_changed?
 
       if confirmed_at_was
         errors.add(:email, I18n.t('rails_jwt_auth.errors.already_confirmed'))

@@ -24,6 +24,17 @@ describe RailsJwtAuth::Confirmable do
           unconfirmed_user.confirm!
           expect(unconfirmed_user.confirmed?).to be_truthy
         end
+
+        context 'when unconfirmed_email exists' do
+          it 'confirms new email' do
+            user.email = 'new@email.com'
+            user.save
+
+            user.confirm!
+            expect(user.reload.email).to eq('new@email.com')
+            expect(user.confirmed?).to be_truthy
+          end
+        end
       end
 
       describe '#skip_confirmation!' do
@@ -83,6 +94,19 @@ describe RailsJwtAuth::Confirmable do
           new_user = FactoryGirl.build("#{orm.underscore}_user")
           expect(new_user).to receive(:send_confirmation_instructions)
           new_user.save
+        end
+      end
+
+      describe '#before_update' do
+        context 'when email is updated' do
+          it 'fills in unconfirmed_email field' do
+            old_email = user.email
+            user.email = 'new@email.com'
+            user.save
+            user.reload
+            expect(user.unconfirmed_email).to eq('new@email.com')
+            expect(user.email).to eq(old_email)
+          end
         end
       end
     end

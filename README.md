@@ -107,6 +107,8 @@ and create a migration to add confirmation fields to User model:
 ```ruby
 # example migration
 change_table :users do |t|
+  t.string :email # if it doesn't exist yet
+  t.string :unconfirmed_email
   t.string :confirmation_token
   t.datetime :confirmation_sent_at
   t.datetime :confimed_at
@@ -125,6 +127,8 @@ class User
   include RailsJwtAuth::Confirmable
 end
 ```
+
+This module needs that model has `email` field.
 
 ## Recoverable
 
