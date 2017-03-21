@@ -15,7 +15,7 @@ module RailsJwtAuth
       elsif user.respond_to?('confirmed?') && !user.confirmed?
         render_422 session: [I18n.t('rails_jwt_auth.errors.unconfirmed')]
       elsif user.authenticate(session_create_params[:password])
-        render_201 session: {jwt: get_jwt(user)}
+        render_session get_jwt(user), user
       else
         render_422 session: [create_session_error]
       end
@@ -24,6 +24,7 @@ module RailsJwtAuth
     def destroy
       authenticate!
       current_user.destroy_auth_token Jwt::Request.new(request).auth_token
+      render_204
     end
 
     private
