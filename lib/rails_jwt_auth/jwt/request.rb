@@ -1,3 +1,5 @@
+require 'rails_jwt_auth/jwt/manager'
+
 module RailsJwtAuth
   module Jwt
     class Request
