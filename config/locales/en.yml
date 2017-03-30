@@ -11,4 +11,5 @@ en:
       create_session: "invalid %{field} / password"
       expired: "has expired, please request a new one"
       invalid: "invalid"
+      blank: "blank"
       not_found: "not found"

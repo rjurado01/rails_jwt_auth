@@ -352,6 +352,31 @@ And edit route resource to use it:
 resource :registration, controller: 'registrations', only: [:create, :update, :destroy]
 ```
 
+## Edit user information
+
+This is a controller example that allows users to edit their `email` and `password`.
+
+```ruby
+class CurrentUserController < ApplicationController
+  before_action 'authenticate!'
+
+  def update
+    if update_params[:password]
+      current_user.update_with_password(update_params)
+    else
+      current_user.update_attributes(update_params)
+    end
+  end
+
+  private
+
+  def update_params
+    params.require(:user).permit(:email, :current_password, :password)
+  end
+end
+
+```
+
 ## Custom responses
 
 You can overwrite `RailsJwtAuth::RenderHelper` to customize controllers responses.

@@ -20,6 +20,59 @@ describe RailsJwtAuth::Authenticatable do
         end
       end
 
+      describe '#update_with_password' do
+        let(:user) { FactoryGirl.create(:active_record_user, password: '12345678') }
+
+        context 'when curren_password is blank' do
+          it 'returns false' do
+            expect(user.update_with_password(password: 'new_password')).to be_falsey
+          end
+
+          it 'addd blank error message' do
+            user.update_with_password(password: 'new_password')
+            expect(user.errors.messages[:current_password]).to include(
+              I18n.t('rails_jwt_auth.errors.blank')
+            )
+          end
+
+          it "don't updates password" do
+            user.update_with_password(password: 'new_password')
+            expect(user.authenticate('new_password')).to be_falsey
+          end
+        end
+
+        context 'when curren_password is invalid' do
+          it 'returns false' do
+            expect(user.update_with_password(current_password: 'invalid')).to be_falsey
+          end
+
+          it 'addd blank error message' do
+            user.update_with_password(current_password: 'invalid')
+            expect(user.errors.messages[:current_password]).to include(
+              I18n.t('rails_jwt_auth.errors.invalid')
+            )
+          end
+
+          it "don't updates password" do
+            user.update_with_password(current_password: 'invalid')
+            expect(user.authenticate('new_password')).to be_falsey
+          end
+        end
+
+        context 'when curren_password is valid' do
+          it 'returns true' do
+            expect(
+              user.update_with_password(current_password: '12345678', password: 'new_password')
+            ).to be_truthy
+          end
+
+          it 'updates password' do
+            user.update_with_password(current_password: '12345678', password: 'new_password')
+            expect(user.authenticate('new_password')).to be_truthy
+          end
+        end
+      end
+
       describe '#regenerate_auth_token' do
         context 'when simultaneous_sessions = 1' do
           before do

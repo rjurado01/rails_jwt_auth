@@ -24,6 +24,18 @@ module RailsJwtAuth
       end
     end
 
+    def update_with_password(params)
+      if (current_password = params.delete(:current_password)).blank?
+        errors.add(:current_password, I18n.t('rails_jwt_auth.errors.blank'))
+        false
+      elsif authenticate(current_password)
+        update_attributes(params)
+      else
+        errors.add(:current_password, I18n.t('rails_jwt_auth.errors.invalid'))
+        false
+      end
+    end
+
     module ClassMethods
       def get_by_token(token)
         if defined?(Mongoid) && ancestors.include?(Mongoid::Document)
