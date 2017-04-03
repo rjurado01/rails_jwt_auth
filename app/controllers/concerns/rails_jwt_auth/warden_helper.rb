@@ -13,7 +13,7 @@ module RailsJwtAuth
     end
 
     def authenticate!
-      warden.authenticate!
+      warden.authenticate!(store: false)
     end
 
     def self.included(base)

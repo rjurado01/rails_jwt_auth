@@ -38,7 +38,7 @@ describe RailsJwtAuth::SessionsController do
           end
 
           it 'returns error message' do
-            expect(json).to eq({"session"=>"is required"})
+            expect(json).to eq('session' => 'is required')
           end
         end
 
@@ -82,7 +82,7 @@ describe RailsJwtAuth::SessionsController do
           end
 
           it 'returns error message' do
-            expect(json).to eq({"session"=>"is required"})
+            expect(json).to eq('session' => 'is required')
           end
         end
       end
