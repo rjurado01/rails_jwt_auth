@@ -31,4 +31,7 @@ RailsJwtAuth.setup do |config|
 
   # expiration time for reset password tokens
   #config.reset_password_expiration_time = 1.day
+
+  # uses deliver_later to send emails instead of deliver method
+  #config.deliver_later = false
 end

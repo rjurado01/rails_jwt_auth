@@ -37,6 +37,9 @@ module RailsJwtAuth
   mattr_accessor :reset_password_expiration_time
   @@reset_password_expiration_time = 1.day
 
+  mattr_accessor :deliver_later
+  @@deliver_later = false
+
   def self.model
     @@model_name.constantize
   end

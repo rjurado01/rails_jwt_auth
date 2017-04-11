@@ -8,8 +8,10 @@ module RailsJwtAuth
 
       self.confirmation_token = SecureRandom.base58(24)
       self.confirmation_sent_at = Time.now
+      return false unless save
 
-      Mailer.confirmation_instructions(self).deliver if save
+      mailer = Mailer.confirmation_instructions(self)
+      RailsJwtAuth.deliver_later ? mailer.deliver_later : mailer.deliver
     end
 
     def confirmed?
@@ -38,6 +40,10 @@ module RailsJwtAuth
 
     def self.included(base)
       if base.ancestors.include? Mongoid::Document
+        # include GlobalID::Identification to use deliver_later method
+        # http://edgeguides.rubyonrails.org/active_job_basics.html#globalid
+        base.send(:include, GlobalID::Identification) if RailsJwtAuth.deliver_later
+
         base.send(:field, :email,                type: String)
         base.send(:field, :unconfirmed_email,    type: String)
         base.send(:field, :confirmation_token,   type: String)

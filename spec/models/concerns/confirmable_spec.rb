@@ -51,6 +51,9 @@ describe RailsJwtAuth::Confirmable do
           class Mock
             def deliver
             end
+
+            def deliver_later
+            end
           end
         end
 
@@ -64,10 +67,23 @@ describe RailsJwtAuth::Confirmable do
 
         it 'sends confirmation email' do
           mock = Mock.new
-          new_user = FactoryGirl.create("#{orm.underscore}_unconfirmed_user")
+          new_user = FactoryGirl.build("#{orm.underscore}_unconfirmed_user")
           allow(RailsJwtAuth::Mailer).to receive(:confirmation_instructions).and_return(mock)
           expect(mock).to receive(:deliver)
           new_user.send_confirmation_instructions
+        end
+
+        context 'when use deliver_later option' do
+          before { RailsJwtAuth.deliver_later = true }
+          after  { RailsJwtAuth.deliver_later = false }
+
+          it 'uses deliver_later method to send email' do
+            mock = Mock.new
+            new_user = FactoryGirl.build("#{orm.underscore}_unconfirmed_user")
+            allow(RailsJwtAuth::Mailer).to receive(:confirmation_instructions).and_return(mock)
+            expect(mock).to receive(:deliver_later)
+            new_user.send_confirmation_instructions
+          end
         end
 
         context 'when user is confirmed' do

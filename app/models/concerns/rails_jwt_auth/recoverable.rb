@@ -8,8 +8,10 @@ module RailsJwtAuth
 
       self.reset_password_token = SecureRandom.base58(24)
       self.reset_password_sent_at = Time.now
+      return false unless save
 
-      Mailer.reset_password_instructions(self).deliver if save
+      mailer = Mailer.reset_password_instructions(self)
+      RailsJwtAuth.deliver_later ? mailer.deliver_later : mailer.deliver
     end
 
     def reset_password_in_progress?
@@ -19,6 +21,10 @@ module RailsJwtAuth
 
     def self.included(base)
       if base.ancestors.include? Mongoid::Document
+        # include GlobalID::Identification to use deliver_later method
+        # http://edgeguides.rubyonrails.org/active_job_basics.html#globalid
+        base.send(:include, GlobalID::Identification) if RailsJwtAuth.deliver_later
+
         base.send(:field, :reset_password_token,   type: String)
         base.send(:field, :reset_password_sent_at, type: Time)
       end

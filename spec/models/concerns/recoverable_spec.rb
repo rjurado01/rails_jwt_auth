@@ -25,6 +25,9 @@ describe RailsJwtAuth::Recoverable do
           class Mock
             def deliver
             end
+
+            def deliver_later
+            end
           end
         end
 
@@ -42,6 +45,18 @@ describe RailsJwtAuth::Recoverable do
           allow(RailsJwtAuth::Mailer).to receive(:reset_password_instructions).and_return(mock)
           expect(mock).to receive(:deliver)
           user.send_reset_password_instructions
+        end
+
+        context 'when use deliver_later option' do
+          before { RailsJwtAuth.deliver_later = true }
+          after  { RailsJwtAuth.deliver_later = false }
+
+          it 'uses deliver_later method to send email' do
+            mock = Mock.new
+            allow(RailsJwtAuth::Mailer).to receive(:reset_password_instructions).and_return(mock)
+            expect(mock).to receive(:deliver_later)
+            user.send_reset_password_instructions
+          end
         end
 
         context 'when user is unconfirmed' do
