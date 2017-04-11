@@ -169,6 +169,45 @@ class User
 end
 ```
 
+## Trackable
+
+Tracks sign in timestamps and IP address.
+
+### ActiveRecord
+
+Include `RailsJwtAuth::Trackable` module into your User class:
+
+```ruby
+# app/models/user.rb
+class User < ApplicationRecord
+  include RailsJwtAuth::Authenticatable
+  include RailsJwtAuth::Trackable
+end
+```
+
+and create a migration to add recoverable fields to User model:
+
+```ruby
+# example migration
+change_table :users do |t|
+  t.string :last_sign_in_ip
+  t.datetime :last_sign_in_at
+end
+```
+
+### Mongoid
+
+Include `RailsJwtAuth::Trackable` module into your User class:
+
+```ruby
+# app/models/user.rb
+class User
+  include Mongoid::Document
+  include RailsJwtAuth::Authenticatable
+  include RailsJwtAuth::Trackable
+end
+```
+
 ## Controller helpers
 
 RailsJwtAuth will create some helpers to use inside your controllers.

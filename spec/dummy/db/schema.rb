@@ -23,5 +23,8 @@ ActiveRecord::Schema.define do
 
     t.string    'reset_password_token'
     t.datetime  'reset_password_sent_at'
+
+    t.datetime  'last_sign_in_at'
+    t.string    'last_sign_in_ip'
   end
 end
