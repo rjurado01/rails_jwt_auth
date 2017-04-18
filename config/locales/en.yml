@@ -13,3 +13,4 @@ en:
       invalid: "invalid"
       blank: "blank"
       not_found: "not found"
+      invalid_email: "is not an email"

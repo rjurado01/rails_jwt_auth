@@ -2,7 +2,7 @@ require 'rails_helper'
 
 describe RailsJwtAuth::Authenticatable do
   %w(ActiveRecord Mongoid).each do |orm|
-    let(:user) { FactoryGirl.create("#{orm.underscore}_user", auth_tokens: %w(abcd)) }
+    let(:user) { FactoryGirl.create("#{orm.underscore}_user", auth_tokens: %w[abcd]) }
 
     context "when use #{orm}" do
       describe '#attributes' do
@@ -10,6 +10,15 @@ describe RailsJwtAuth::Authenticatable do
         it { expect(user).to have_attributes(password: user.password) }
         it { expect(user).to have_attributes(password: user.password) }
         it { expect(user).to have_attributes(auth_tokens: user.auth_tokens) }
+      end
+
+      describe 'validators' do
+        it 'validates email' do
+          user.email = 'invalid'
+          user.valid?
+          error = I18n.t('rails_jwt_auth.errors.invalid_email')
+          expect(user.errors.messages[:email]).to include(error)
+        end
       end
 
       describe '#authenticate' do
