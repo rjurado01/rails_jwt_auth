@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 describe RailsJwtAuth::Authenticatable do
-  %w(ActiveRecord Mongoid).each do |orm|
+  %w[ActiveRecord Mongoid].each do |orm|
     let(:user) do
       FactoryGirl.create(
         "#{orm.underscore}_user",
@@ -17,12 +17,18 @@ describe RailsJwtAuth::Authenticatable do
       end
 
       describe '#update_tracked_fields!' do
-        it 'updates tracked fields and save record' do
+        before do
           class Request
             def remote_ip
             end
           end
+        end
 
+        after do
+          Object.send(:remove_const, :Request)
+        end
+
+        it 'updates tracked fields and save record' do
           user = FactoryGirl.create(:active_record_user)
           request = Request.new
           allow(request).to receive(:remote_ip).and_return('127.0.0.1')

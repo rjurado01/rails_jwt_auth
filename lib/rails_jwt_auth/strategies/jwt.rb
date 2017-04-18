@@ -7,10 +7,10 @@ module RailsJwtAuth
         jwt = RailsJwtAuth::Jwt::Request.new(request)
 
         if jwt.valid? && (model = RailsJwtAuth.model.get_by_token(jwt.auth_token))
-          success!(model)
-        else
-          fail!('strategies.authentication_token.failed')
+          return success!(model)
         end
+
+        fail!('strategies.authentication_token.failed')
       end
     end
   end

@@ -6,11 +6,16 @@ module RailsJwtAuth
       def initialize(request)
         return unless request.env['HTTP_AUTHORIZATION']
         @jwt = request.env['HTTP_AUTHORIZATION'].split.last
-        @jwt_info = RailsJwtAuth::Jwt::Manager.decode(@jwt)
+
+        begin
+          @jwt_info = RailsJwtAuth::Jwt::Manager.decode(@jwt)
+        rescue JWT::ExpiredSignature
+          @jwt_info = false
+        end
       end
 
       def valid?
-        @jwt && RailsJwtAuth::Jwt::Manager.valid_payload?(payload)
+        @jwt && @jwt_info && RailsJwtAuth::Jwt::Manager.valid_payload?(payload)
       end
 
       def payload
