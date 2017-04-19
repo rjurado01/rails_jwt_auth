@@ -18,7 +18,7 @@ module RailsJwtAuth
       end
 
       unless password_update_params[:password].present?
-        return render_422(password: [I18n.t('rails_jwt_auth.errors.invalid')])
+        return render_422(password: [I18n.t('rails_jwt_auth.errors.password.blank')])
       end
 
       user.update_attributes(password_update_params) ? render_204 : render_422(user.errors)

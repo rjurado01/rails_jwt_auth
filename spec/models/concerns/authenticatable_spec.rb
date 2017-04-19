@@ -16,7 +16,7 @@ describe RailsJwtAuth::Authenticatable do
         it 'validates email' do
           user.email = 'invalid'
           user.valid?
-          error = I18n.t('rails_jwt_auth.errors.invalid_email')
+          error = I18n.t('rails_jwt_auth.errors.email.invalid')
           expect(user.errors.messages[:email]).to include(error)
         end
       end
@@ -40,7 +40,7 @@ describe RailsJwtAuth::Authenticatable do
           it 'addd blank error message' do
             user.update_with_password(password: 'new_password')
             expect(user.errors.messages[:current_password]).to include(
-              I18n.t('rails_jwt_auth.errors.blank')
+              I18n.t('rails_jwt_auth.errors.current_password.blank')
             )
           end
 
@@ -58,7 +58,7 @@ describe RailsJwtAuth::Authenticatable do
           it 'addd blank error message' do
             user.update_with_password(current_password: 'invalid')
             expect(user.errors.messages[:current_password]).to include(
-              I18n.t('rails_jwt_auth.errors.invalid')
+              I18n.t('rails_jwt_auth.errors.current_password.invalid')
             )
           end
 

@@ -13,4 +13,10 @@ en:
       invalid: "invalid"
       blank: "blank"
       not_found: "not found"
-      invalid_email: "is not an email"
+      email:
+        invlid: "is not an email"
+      current_password:
+        blank: "blank"
+        invalid: "invalid"
+      password:
+        blank: "blank"
