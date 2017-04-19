@@ -3,7 +3,6 @@ if defined?(ActionMailer)
     default from: RailsJwtAuth.mailer_sender
 
     def confirmation_instructions(user)
-      return unless user.confirmation_in_progress?
       @user = user
 
       if RailsJwtAuth.confirmation_url
@@ -21,7 +20,6 @@ if defined?(ActionMailer)
     end
 
     def reset_password_instructions(user)
-      return unless user.reset_password_in_progress?
       @user = user
 
       if RailsJwtAuth.reset_password_url

@@ -1,17 +1,17 @@
 module RailsJwtAuth
   module Confirmable
     def send_confirmation_instructions
-      if confirmed? && !unconfirmed_email_changed?
+      if confirmed? && !unconfirmed_email
         errors.add(:email, I18n.t('rails_jwt_auth.errors.already_confirmed'))
         return false
       end
 
       self.confirmation_token = SecureRandom.base58(24)
       self.confirmation_sent_at = Time.now
-      return false unless save
 
       mailer = Mailer.confirmation_instructions(self)
       RailsJwtAuth.deliver_later ? mailer.deliver_later : mailer.deliver
+      save
     end
 
     def confirmed?
@@ -20,6 +20,7 @@ module RailsJwtAuth
 
     def confirm!
       self.confirmed_at = Time.now.utc
+      self.confirmation_token = nil
 
       if unconfirmed_email
         self.email = unconfirmed_email
@@ -31,11 +32,7 @@ module RailsJwtAuth
 
     def skip_confirmation!
       self.confirmed_at = Time.now.utc
-    end
-
-    def confirmation_in_progress?
-      !confirmed_at && confirmation_token && confirmation_sent_at &&
-        (Time.now < (confirmation_sent_at + RailsJwtAuth.confirmation_expiration_time))
+      self.confirmation_token = nil
     end
 
     def self.included(base)

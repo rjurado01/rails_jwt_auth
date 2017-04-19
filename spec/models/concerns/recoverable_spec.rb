@@ -10,16 +10,6 @@ describe RailsJwtAuth::Recoverable do
         it { expect(user).to respond_to(:reset_password_sent_at) }
       end
 
-      describe '#reset_password_in_progress?' do
-        it 'returns if reset password is in progress' do
-          expect(user.reset_password_in_progress?).to be_falsey
-
-          user.reset_password_token = 'abcd'
-          user.reset_password_sent_at = Time.now
-          expect(user.reset_password_in_progress?).to be_truthy
-        end
-      end
-
       describe '#send_reset_password_instructions' do
         before :all do
           class Mock

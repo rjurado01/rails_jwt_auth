@@ -45,6 +45,23 @@ describe RailsJwtAuth::ConfirmationsController do
             expect(json['errors']['email']).to include(I18n.t('rails_jwt_auth.errors.not_found'))
           end
         end
+
+        context 'when email is already confirmed' do
+          before do
+            user.confirm!
+            post :create, params: {confirmation: {email: user.email}}
+          end
+
+          it 'returns 422 http status code' do
+            expect(response).to have_http_status(422)
+          end
+
+          it 'returns expiration confirmation error message' do
+            expect(json['errors']['email'].first).to(
+              eq(I18n.t('rails_jwt_auth.errors.already_confirmed'))
+            )
+          end
+        end
       end
 
       describe 'PUT #update' do
@@ -120,23 +137,6 @@ describe RailsJwtAuth::ConfirmationsController do
 
           it 'does not confirm user' do
             expect(user.reload.confirmed?).to be_falsey
-          end
-        end
-
-        context 'when email is already confirmed' do
-          before do
-            user.confirm!
-            put :update, params: {confirmation_token: user.confirmation_token}
-          end
-
-          it 'returns 422 http status code' do
-            expect(response).to have_http_status(422)
-          end
-
-          it 'returns expiration confirmation error message' do
-            expect(json['errors']['email'].first).to(
-              eq(I18n.t('rails_jwt_auth.errors.already_confirmed'))
-            )
           end
         end
       end

@@ -14,11 +14,6 @@ module RailsJwtAuth
       RailsJwtAuth.deliver_later ? mailer.deliver_later : mailer.deliver
     end
 
-    def reset_password_in_progress?
-      reset_password_token && reset_password_sent_at &&
-        (Time.now < (reset_password_sent_at + RailsJwtAuth.reset_password_expiration_time))
-    end
-
     def self.included(base)
       if base.ancestors.include? Mongoid::Document
         # include GlobalID::Identification to use deliver_later method
