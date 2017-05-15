@@ -34,6 +34,9 @@ module RailsJwtAuth
   mattr_accessor :reset_password_url
   @@reset_password_url = nil
 
+  mattr_accessor :set_password_url
+  @@set_password_url = nil
+
   mattr_accessor :reset_password_expiration_time
   @@reset_password_expiration_time = 1.day
 

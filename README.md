@@ -45,6 +45,7 @@ You can edit configuration options into `config/initializers/auth_token_auth.rb`
 | confirmation_expiration_time   | 1.day             | Confirmation token expiration time                                    |
 | reset_password_url             | password_path     | Url used to create email link with reset password token               |
 | reset_password_expiration_time | 1.day             | Confirmation token expiration time                                    |
+| set_password_url               | password_path     | Url used to create email link with set password token                 |
 | deliver_later                  | false             | Uses `deliver_later` method to send emails                            |
 
 ## Authenticatable
@@ -414,7 +415,28 @@ class CurrentUserController < ApplicationController
     params.require(:user).permit(:email, :current_password, :password)
   end
 end
+```
 
+## Register users with random password
+
+This is a controller example that allows admins to register users with random password and send email to reset it.  
+If registration is sucess it will send email to `set_password_url` with reset password token.
+
+```ruby
+class UsersController < ApplicationController
+  before_action 'authenticate!'
+
+  def create
+    user = User.new(create_params)
+    user.set_and_send_password_instructions ? render_204 : render_422(user.errors)
+  end
+
+  private
+
+  def create_params
+    params.require(:user).permit(:email)
+  end
+end
 ```
 
 ## Custom responses

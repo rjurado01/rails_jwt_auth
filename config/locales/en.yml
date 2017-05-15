@@ -3,8 +3,10 @@ en:
     mailer:
       confirmation_instructions:
         subject: "Confirmation instructions"
-      reset_password_instructions.subject:
+      reset_password_instructions:
         subject: "Reset password instructions"
+      set_password_instructions:
+        subject: "Set password instructions"
     errors:
       unconfirmed: "unconfirmed email"
       already_confirmed: "was already confirmed, please try signing in"
@@ -14,7 +16,7 @@ en:
       blank: "blank"
       not_found: "not found"
       email:
-        invlid: "is not an email"
+        invalid: "is not an email"
       current_password:
         blank: "blank"
         invalid: "invalid"
