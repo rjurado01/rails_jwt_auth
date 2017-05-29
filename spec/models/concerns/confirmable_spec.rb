@@ -136,6 +136,27 @@ describe RailsJwtAuth::Confirmable do
           end
         end
       end
+
+      describe '#validations' do
+        context 'when confirmation token has expired' do
+          before do
+            RailsJwtAuth.confirmation_expiration_time = 1.second
+          end
+
+          after do
+            RailsJwtAuth.confirmation_expiration_time = 1.day
+          end
+
+          it 'adds expiration error' do
+            unconfirmed_user.confirmed_at = Time.now
+            sleep 1
+            expect(unconfirmed_user.save).to be_falsey
+            expect(unconfirmed_user.errors['confirmation_token']).to include(
+              I18n.t('rails_jwt_auth.errors.expired')
+            )
+          end
+        end
+      end
     end
   end
 end

@@ -29,7 +29,7 @@ describe RailsJwtAuth::Recoverable do
           expect(user.reset_password_token).not_to be_nil
           expect(user.reset_password_sent_at).not_to be_nil
         end
-
+0
         it 'sends reset password email' do
           mock = Mock.new
           allow(RailsJwtAuth::Mailer).to receive(:reset_password_instructions).and_return(mock)
@@ -66,21 +66,6 @@ describe RailsJwtAuth::Recoverable do
           it 'doe not send reset password email' do
             expect(RailsJwtAuth::Mailer).not_to receive(:reset_password_instructions)
             user.send_reset_password_instructions
-          end
-        end
-      end
-
-      describe '#before_save' do
-        context 'when updates password' do
-          it 'cleans reset password token' do
-            user.reset_password_token = 'abcd'
-            user.reset_password_sent_at = Time.now
-            user.save
-            expect(user.reload.reset_password_token).not_to be_nil
-
-            user.password = 'newpassword'
-            user.save
-            expect(user.reload.reset_password_token).to be_nil
           end
         end
       end
@@ -122,6 +107,46 @@ describe RailsJwtAuth::Recoverable do
             allow(RailsJwtAuth::Mailer).to receive(:set_password_instructions).and_return(mock)
             expect(mock).to receive(:deliver_later)
             user.set_and_send_password_instructions
+          end
+        end
+      end
+
+      describe '#before_save' do
+        context 'when updates password' do
+          it 'cleans reset password token' do
+            user.reset_password_token = 'abcd'
+            user.reset_password_sent_at = Time.now
+            user.save
+            expect(user.reload.reset_password_token).not_to be_nil
+
+            user.password = 'newpassword'
+            user.save
+            expect(user.reload.reset_password_token).to be_nil
+          end
+        end
+      end
+
+      describe '#validations' do
+        context 'when reset password token has expired' do
+          before do
+            RailsJwtAuth.reset_password_expiration_time = 1.second
+          end
+
+          after do
+            RailsJwtAuth.reset_password_expiration_time = 1.day
+          end
+
+          it 'adds expiration error' do
+            user.reset_password_token = 'abcd'
+            user.reset_password_sent_at = Time.now
+            user.save
+            sleep 1
+
+            user.password = 'newpassword'
+            expect(user.save).to be_falsey
+            expect(user.errors['reset_password_token']).to include(
+              I18n.t('rails_jwt_auth.errors.expired')
+            )
           end
         end
       end

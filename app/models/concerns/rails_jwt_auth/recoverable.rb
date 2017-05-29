@@ -40,10 +40,21 @@ module RailsJwtAuth
         base.send(:field, :reset_password_sent_at, type: Time)
       end
 
+      base.send(:validate, :validate_reset_password_token, if: :password_digest_changed?)
+
       base.send(:before_update) do
         if password_digest_changed? && reset_password_token
           self.reset_password_token = nil
         end
+      end
+    end
+
+    private
+
+    def validate_reset_password_token
+      if reset_password_sent_at &&
+         (reset_password_sent_at < (Time.now - RailsJwtAuth.reset_password_expiration_time))
+        errors.add(:reset_password_token, I18n.t('rails_jwt_auth.errors.expired'))
       end
     end
   end

@@ -124,7 +124,7 @@ describe RailsJwtAuth::PasswordsController do
             expect(response).to have_http_status(422)
           end
 
-          it 'returns expiration confirmation error message' do
+          it 'returns confirmation error message' do
             expect(json['errors']['password_confirmation']).to include(
               I18n.t('errors.messages.confirmation', attribute: 'Password')
             )
