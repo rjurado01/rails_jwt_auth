@@ -9,7 +9,7 @@ module RailsJwtAuth
 
         begin
           @jwt_info = RailsJwtAuth::Jwt::Manager.decode(@jwt)
-        rescue JWT::ExpiredSignature
+        rescue JWT::ExpiredSignature, JWT::VerificationError
           @jwt_info = false
         end
       end

@@ -64,6 +64,21 @@ describe RailsJwtAuth::Jwt::Request do
       end
     end
 
+    context 'when verification fails' do
+      after do
+        RailsJwtAuth.jwt_expiration_time = 7.days
+      end
+
+      it 'returns false' do
+        invalid = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhdXRoX3Rva2VuIjoiZXc2bkN5RGZxQ3k5dEhzc2lCQUFmVVF0IiwiZXhwIjoxNDk5MDk4MTM0LCJpc3MiOiJSYWlsc0p3dEF1dGgifQ.V46G2lOT8CmzCGvToMfCAhB5C0t6eOa7XDO0J5eKsvL"
+        request = Request.new('HTTP_AUTHORIZATION' => "Bearer #{invalid}")
+
+        RailsJwtAuth.jwt_issuer = 'new_issuer'
+        jwt_request = RailsJwtAuth::Jwt::Request.new(request)
+        expect(jwt_request.valid?).to be_falsey
+      end
+    end
+
     context 'when user does not exist' do
       after do
         RailsJwtAuth.jwt_issuer = 'RailsJwtAuth'
