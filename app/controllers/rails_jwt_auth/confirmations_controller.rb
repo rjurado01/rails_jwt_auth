@@ -11,6 +11,10 @@ module RailsJwtAuth
     end
 
     def update
+      if params[:confirmation_token].blank?
+        return render_422(confirmation_token: [I18n.t('rails_jwt_auth.errors.not_found')])
+      end
+
       user = RailsJwtAuth.model.where(confirmation_token: params[:confirmation_token]).first
       return render_422(confirmation_token: [I18n.t('rails_jwt_auth.errors.not_found')]) unless user
 

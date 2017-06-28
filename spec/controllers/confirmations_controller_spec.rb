@@ -81,6 +81,8 @@ describe RailsJwtAuth::ConfirmationsController do
 
         context 'when does not send confirmation token' do
           before do
+            FactoryGirl.create("#{orm.underscore}_user", password: '12345678')
+
             put :update
           end
 

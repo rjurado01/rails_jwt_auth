@@ -11,6 +11,10 @@ module RailsJwtAuth
     end
 
     def update
+      if params[:reset_password_token].blank?
+        return render_422(reset_password_token: [I18n.t('rails_jwt_auth.errors.not_found')])
+      end
+
       user = RailsJwtAuth.model.where(reset_password_token: params[:reset_password_token]).first
 
       unless user
