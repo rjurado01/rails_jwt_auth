@@ -8,6 +8,9 @@ RailsJwtAuth.setup do |config|
   # set to true to validate auth_field email format
   #config.auth_field_email = true
 
+  # regex used to Validate email format
+  #config.email_regex = /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\z/i
+
   # expiration time for generated tokens
   #config.jwt_expiration_time = 7.days
 
@@ -15,7 +18,7 @@ RailsJwtAuth.setup do |config|
   #config.jwt_issuer = 'RailsJwtAuth'
 
   # number of simultaneously sessions for an user
-  #config.simultaneously_sessions = 3
+  #config.simultaneously_sessions = 2
 
   # mailer sender
   #config.mailer_sender = 'initialize-mailer_sender@example.com'
@@ -28,6 +31,9 @@ RailsJwtAuth.setup do |config|
 
   # url used to create email link with reset password token
   #config.reset_password_url = 'http://frontend.com/reset_password'
+
+  # url used to create email link with set password token
+  #config.set_password_url = 'http://frontend.com/set_password'
 
   # expiration time for reset password tokens
   #config.reset_password_expiration_time = 1.day

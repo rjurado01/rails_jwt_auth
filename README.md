@@ -37,6 +37,7 @@ You can edit configuration options into `config/initializers/auth_token_auth.rb`
 | model_name                     | 'User'            | Authentication model name                                             |
 | auth_field_name                | 'email'           | Field used to authenticate user with password                         |
 | auth_field_email               | true              | Validate auth field email format                                      |
+| email_regex                    | see config file   | Regex used to Validate email format                                   |
 | jwt_expiration_time            | 7.days            | Tokens expiration time                                                |
 | jwt_issuer                     | 'RailsJwtAuth'    | The "iss" (issuer) claim identifies the principal that issued the JWT |
 | simultaneous_sessions          | 2                 | Number of simultaneous sessions for an user                           |

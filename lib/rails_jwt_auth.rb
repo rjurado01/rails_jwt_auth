@@ -13,6 +13,9 @@ module RailsJwtAuth
   mattr_accessor :auth_field_email
   @@auth_field_email = true
 
+  mattr_accessor :email_regex
+  @@email_regex = /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\z/i
+
   mattr_accessor :jwt_expiration_time
   @@jwt_expiration_time = 7.days
 
@@ -23,7 +26,7 @@ module RailsJwtAuth
   @@simultaneous_sessions = 2
 
   mattr_accessor :mailer_sender
-  @@mailer_sender = "initialize-mailer_sender@example.com"
+  @@mailer_sender = 'initialize-mailer_sender@example.com'
 
   mattr_accessor :confirmation_url
   @@confirmation_url = nil
