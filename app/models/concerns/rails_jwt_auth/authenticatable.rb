@@ -62,6 +62,10 @@ module RailsJwtAuth
 
       base.send(:has_secure_password)
 
+      base.send(:before_validation) do
+        self.email = email.downcase if self.email
+      end
+
       base.extend(ClassMethods)
     end
   end

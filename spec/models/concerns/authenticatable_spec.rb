@@ -12,12 +12,20 @@ describe RailsJwtAuth::Authenticatable do
         it { expect(user).to have_attributes(auth_tokens: user.auth_tokens) }
       end
 
-      describe 'validators' do
+      describe '#validators' do
         it 'validates email' do
           user.email = 'invalid'
           user.valid?
           error = I18n.t('rails_jwt_auth.errors.email.invalid')
           expect(user.errors.messages[:email]).to include(error)
+        end
+      end
+
+      describe '#before_validation' do
+        it 'downcases email' do
+          user = FactoryGirl.create("#{orm.underscore}_user", email: 'MyEmail@email.com')
+          user.valid?
+          expect(user.email).to eq('myemail@email.com')
         end
       end
 
