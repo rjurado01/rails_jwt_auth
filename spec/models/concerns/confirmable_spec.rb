@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 describe RailsJwtAuth::Confirmable do
-  %w(ActiveRecord Mongoid).each do |orm|
+  %w[ActiveRecord Mongoid].each do |orm|
     let(:user) { FactoryGirl.create("#{orm.underscore}_user") }
     let(:unconfirmed_user) { FactoryGirl.create("#{orm.underscore}_unconfirmed_user") }
 
@@ -33,6 +33,20 @@ describe RailsJwtAuth::Confirmable do
             user.confirm!
             expect(user.reload.email).to eq('new@email.com')
             expect(user.confirmed?).to be_truthy
+          end
+        end
+
+        context 'when new_email confirmation token has expired' do
+          it 'adds expiration error' do
+            user.email = 'new@email.com'
+            user.save
+
+            Timecop.freeze(Date.today + 30) do
+              expect(user.confirm!).to be_falsey
+              expect(user.errors['confirmation_token']).to include(
+                I18n.t('rails_jwt_auth.errors.expired')
+              )
+            end
           end
         end
       end
@@ -139,21 +153,17 @@ describe RailsJwtAuth::Confirmable do
 
       describe '#validations' do
         context 'when confirmation token has expired' do
-          before do
-            RailsJwtAuth.confirmation_expiration_time = 1.second
-          end
+          context 'try to confirm user' do
+            it 'adds expiration error' do
+              unconfirmed_user.confirmed_at = Time.now
 
-          after do
-            RailsJwtAuth.confirmation_expiration_time = 1.day
-          end
-
-          it 'adds expiration error' do
-            unconfirmed_user.confirmed_at = Time.now
-            sleep 1
-            expect(unconfirmed_user.save).to be_falsey
-            expect(unconfirmed_user.errors['confirmation_token']).to include(
-              I18n.t('rails_jwt_auth.errors.expired')
-            )
+              Timecop.freeze(Date.today + 30) do
+                expect(unconfirmed_user.save).to be_falsey
+                expect(unconfirmed_user.errors['confirmation_token']).to include(
+                  I18n.t('rails_jwt_auth.errors.expired')
+                )
+              end
+            end
           end
         end
       end

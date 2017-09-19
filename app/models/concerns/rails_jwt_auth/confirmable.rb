@@ -59,7 +59,12 @@ module RailsJwtAuth
         if email_changed? && email_was && !confirmed_at_changed?
           self.unconfirmed_email = email
           self.email = email_was
-          send_confirmation_instructions
+
+          self.confirmation_token = SecureRandom.base58(24)
+          self.confirmation_sent_at = Time.now
+
+          mailer = Mailer.confirmation_instructions(self)
+          RailsJwtAuth.deliver_later ? mailer.deliver_later : mailer.deliver
         end
       end
     end
@@ -67,9 +72,9 @@ module RailsJwtAuth
     private
 
     def validate_confirmation
-      return true if !confirmed_at || email_changed?
+      return true unless confirmed_at
 
-      if confirmed_at_was
+      if confirmed_at_was && !email_changed?
         errors.add(:email, I18n.t('rails_jwt_auth.errors.already_confirmed'))
       elsif confirmation_sent_at &&
             (confirmation_sent_at < (Time.now - RailsJwtAuth.confirmation_expiration_time))
