@@ -7,9 +7,11 @@ module RailsJwtAuth
     end
 
     def self.included(base)
-      if defined?(Mongoid) && base.ancestors.include?(Mongoid::Document)
-        base.send(:field, :last_sign_in_at, type: Time)
-        base.send(:field, :last_sign_in_ip, type: String)
+      base.class_eval do
+        if defined?(Mongoid) && ancestors.include?(Mongoid::Document)
+          field :last_sign_in_at, type: Time
+          field :last_sign_in_ip, type: String
+        end
       end
     end
   end

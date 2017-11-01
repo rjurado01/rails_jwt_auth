@@ -37,34 +37,36 @@ module RailsJwtAuth
     end
 
     def self.included(base)
-      if base.ancestors.include? Mongoid::Document
-        # include GlobalID::Identification to use deliver_later method
-        # http://edgeguides.rubyonrails.org/active_job_basics.html#globalid
-        base.send(:include, GlobalID::Identification) if RailsJwtAuth.deliver_later
+      base.class_eval do
+        if ancestors.include? Mongoid::Document
+          # include GlobalID::Identification to use deliver_later method
+          # http://edgeguides.rubyonrails.org/active_job_basics.html#globalid
+          include GlobalID::Identification if RailsJwtAuth.deliver_later
 
-        base.send(:field, :email,                type: String)
-        base.send(:field, :unconfirmed_email,    type: String)
-        base.send(:field, :confirmation_token,   type: String)
-        base.send(:field, :confirmation_sent_at, type: Time)
-        base.send(:field, :confirmed_at,         type: Time)
-      end
+          field :email,                type: String
+          field :unconfirmed_email,    type: String
+          field :confirmation_token,   type: String
+          field :confirmation_sent_at, type: Time
+          field :confirmed_at,         type: Time
+        end
 
-      base.send(:validate, :validate_confirmation, if: :confirmed_at_changed?)
+        validate :validate_confirmation, if: :confirmed_at_changed?
 
-      base.send(:after_create) do
-        send_confirmation_instructions unless confirmed_at || confirmation_sent_at
-      end
+        after_create do
+          send_confirmation_instructions unless confirmed_at || confirmation_sent_at
+        end
 
-      base.send(:before_update) do
-        if email_changed? && email_was && !confirmed_at_changed?
-          self.unconfirmed_email = email
-          self.email = email_was
+        before_update do
+          if email_changed? && email_was && !confirmed_at_changed?
+            self.unconfirmed_email = email
+            self.email = email_was
 
-          self.confirmation_token = SecureRandom.base58(24)
-          self.confirmation_sent_at = Time.now
+            self.confirmation_token = SecureRandom.base58(24)
+            self.confirmation_sent_at = Time.now
 
-          mailer = Mailer.confirmation_instructions(self)
-          RailsJwtAuth.deliver_later ? mailer.deliver_later : mailer.deliver
+            mailer = Mailer.confirmation_instructions(self)
+            RailsJwtAuth.deliver_later ? mailer.deliver_later : mailer.deliver
+          end
         end
       end
     end

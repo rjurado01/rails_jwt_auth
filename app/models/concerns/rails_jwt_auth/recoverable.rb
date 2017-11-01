@@ -31,20 +31,22 @@ module RailsJwtAuth
     end
 
     def self.included(base)
-      if base.ancestors.include? Mongoid::Document
-        # include GlobalID::Identification to use deliver_later method
-        # http://edgeguides.rubyonrails.org/active_job_basics.html#globalid
-        base.send(:include, GlobalID::Identification) if RailsJwtAuth.deliver_later
+      base.class_eval do
+        if base.ancestors.include? Mongoid::Document
+          # include GlobalID::Identification to use deliver_later method
+          # http://edgeguides.rubyonrails.org/active_job_basics.html#globalid
+          include GlobalID::Identification if RailsJwtAuth.deliver_later
 
-        base.send(:field, :reset_password_token,   type: String)
-        base.send(:field, :reset_password_sent_at, type: Time)
-      end
+          field :reset_password_token,   type: String
+          field :reset_password_sent_at, type: Time
+        end
 
-      base.send(:validate, :validate_reset_password_token, if: :password_digest_changed?)
+        validate :validate_reset_password_token, if: :password_digest_changed?
 
-      base.send(:before_update) do
-        if password_digest_changed? && reset_password_token
-          self.reset_password_token = nil
+        before_update do
+          if password_digest_changed? && reset_password_token
+            self.reset_password_token = nil
+          end
         end
       end
     end
