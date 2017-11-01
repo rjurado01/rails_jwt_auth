@@ -1,4 +1,5 @@
 # RailsJwtAuth
+[![Gem Version](https://badge.fury.io/rb/rails_jwt_auth.svg)](https://badge.fury.io/rb/rails_jwt_auth)
 ![Build Status](https://travis-ci.org/rjurado01/rails_jwt_auth.svg?branch=master)
 
 Rails-API authentication solution based on Warden and JWT and inspired by Devise.
