@@ -11,12 +11,17 @@ describe RailsJwtAuth::Strategies::Jwt do
 
     let(:user) { FactoryGirl.create(:active_record_user) }
 
+    let(:jwt) do
+      session = user.create_session
+      RailsJwtAuth::Jwt::Manager.encode(session_id: session[:id])
+    end
+
+    let(:env) do
+      {'HTTP_AUTHORIZATION' => "Bearer #{jwt}"}
+    end
+
     context 'when jwt is valid' do
       it 'success!' do
-        token = user.regenerate_auth_token
-        jwt = RailsJwtAuth::Jwt::Manager.encode(auth_token: token)
-        env = {'HTTP_AUTHORIZATION' => "Bearer #{jwt}"}
-
         strategy = RailsJwtAuth::Strategies::Jwt.new(env)
         expect(strategy).to receive('success!')
         strategy.authenticate!
@@ -29,13 +34,9 @@ describe RailsJwtAuth::Strategies::Jwt do
       end
 
       it 'fail!' do
-        token = user.regenerate_auth_token
-        jwt = RailsJwtAuth::Jwt::Manager.encode(auth_token: token)
-        env = {'HTTP_AUTHORIZATION' => "Bearer #{jwt}"}
-
         strategy = RailsJwtAuth::Strategies::Jwt.new(env)
         expect(strategy).to receive('fail!')
-        RailsJwtAuth.jwt_issuer = 'invalid'
+        RailsJwtAuth.jwt_issuer = 'new_issuer'
         strategy.authenticate!
       end
     end
@@ -46,27 +47,22 @@ describe RailsJwtAuth::Strategies::Jwt do
       end
 
       it 'fail!' do
-        RailsJwtAuth.jwt_expiration_time = 1.second
-        token = user.regenerate_auth_token
-        jwt = RailsJwtAuth::Jwt::Manager.encode(auth_token: token)
-        env = {'HTTP_AUTHORIZATION' => "Bearer #{jwt}"}
-        sleep 2
+        RailsJwtAuth.jwt_expiration_time = 1.day
+        jwt
 
-        strategy = RailsJwtAuth::Strategies::Jwt.new(env)
-        expect(strategy).to receive('fail!')
-        strategy.authenticate!
+        Timecop.freeze(Date.today + 2) do
+          strategy = RailsJwtAuth::Strategies::Jwt.new(env)
+          expect(strategy).to receive('fail!')
+          strategy.authenticate!
+        end
       end
     end
 
-    context 'when user remove auth_token' do
+    context 'when user remove session' do
       it 'fail!' do
-        token = user.regenerate_auth_token
-        jwt = RailsJwtAuth::Jwt::Manager.encode(auth_token: token)
-        env = {'HTTP_AUTHORIZATION' => "Bearer #{jwt}"}
-
         strategy = RailsJwtAuth::Strategies::Jwt.new(env)
         expect(strategy).to receive('fail!')
-        user.regenerate_auth_token
+        user.destroy_session(user.sessions.last[:id])
         strategy.authenticate!
       end
     end

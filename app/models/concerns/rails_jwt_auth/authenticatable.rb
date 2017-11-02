@@ -2,26 +2,16 @@ include ActiveModel::SecurePassword
 
 module RailsJwtAuth
   module Authenticatable
-    def regenerate_auth_token(token = nil)
-      new_token = SecureRandom.base58(24)
-
-      if RailsJwtAuth.simultaneous_sessions > 1
-        tokens = ((auth_tokens || []) - [token]).last(RailsJwtAuth.simultaneous_sessions - 1)
-        update_attribute(:auth_tokens, (tokens + [new_token]).uniq)
-      else
-        update_attribute(:auth_tokens, [new_token])
-      end
-
-      new_token
+    def create_session(info={})
+      new_session = {id: SecureRandom.base58(24), created_at: Time.now.to_i}.merge(info)
+      self.sessions = ((sessions || []) + [new_session]).last(RailsJwtAuth.simultaneous_sessions)
+      save ? new_session : false
     end
 
-    def destroy_auth_token(token)
-      if RailsJwtAuth.simultaneous_sessions > 1
-        tokens = auth_tokens || []
-        update_attribute(:auth_tokens, tokens - [token])
-      else
-        update_attribute(:auth_tokens, [])
-      end
+    def destroy_session(session_id)
+      return false unless sessions
+      self.sessions = sessions.reject { |session| session[:id] == session_id }
+      save
     end
 
     def update_with_password(params)
@@ -39,11 +29,11 @@ module RailsJwtAuth
     end
 
     module ClassMethods
-      def get_by_token(token)
+      def get_by_session_id(id)
         if defined?(Mongoid) && ancestors.include?(Mongoid::Document)
-          where(auth_tokens: token).first
+          where('sessions.id' => id).first
         elsif defined?(ActiveRecord) && ancestors.include?(ActiveRecord::Base)
-          where('auth_tokens like ?', "%#{token}%").first
+          where('sessions like ?', "%id: #{id}%").first
         end
       end
     end
@@ -51,13 +41,13 @@ module RailsJwtAuth
     def self.included(base)
       base.extend(ClassMethods)
 
-      base.class_eval do 
+      base.class_eval do
         if defined?(Mongoid) && ancestors.include?(Mongoid::Document)
           field RailsJwtAuth.auth_field_name, type: String
           field :password_digest,             type: String
-          field :auth_tokens,                 type: Array
+          field :sessions,                    type: Array
         elsif defined?(ActiveRecord) && ancestors.include?(ActiveRecord::Base)
-          serialize :auth_tokens, Array
+          serialize :sessions, Array
         end
 
         validates RailsJwtAuth.auth_field_name, presence: true, uniqueness: true

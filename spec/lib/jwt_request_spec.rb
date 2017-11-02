@@ -19,76 +19,55 @@ describe RailsJwtAuth::Jwt::Request do
     Object.send(:remove_const, :Request)
   end
 
+  let(:jwt) do
+    session = user.create_session
+    RailsJwtAuth::Jwt::Manager.encode(session_id: session[:id])
+  end
+
+  let(:request) do
+    Request.new('HTTP_AUTHORIZATION' => "Bearer #{jwt}")
+  end
+
   describe '#valid?' do
     context 'when all is valid' do
       it 'returns true' do
-        token = user.regenerate_auth_token
-        jwt = RailsJwtAuth::Jwt::Manager.encode(auth_token: token)
-        request = Request.new('HTTP_AUTHORIZATION' => "Bearer #{jwt}")
-
         jwt_request = RailsJwtAuth::Jwt::Request.new(request)
         expect(jwt_request.valid?).to be_truthy
       end
     end
 
-    context 'when token is invalid' do
+    context 'when iss is invalid' do
       after do
         RailsJwtAuth.jwt_issuer = 'RailsJwtAuth'
       end
 
       it 'returns false' do
-        token = user.regenerate_auth_token
-        jwt = RailsJwtAuth::Jwt::Manager.encode(auth_token: token)
-        request = Request.new('HTTP_AUTHORIZATION' => "Bearer #{jwt}")
-
-        RailsJwtAuth.jwt_issuer = 'invalid'
         jwt_request = RailsJwtAuth::Jwt::Request.new(request)
+        RailsJwtAuth.jwt_issuer = 'new_issuer'
         expect(jwt_request.valid?).to be_falsey
       end
     end
 
-    context 'when token is expired' do
+    context 'when session is expired' do
       after do
         RailsJwtAuth.jwt_expiration_time = 7.days
       end
 
       it 'returns false' do
-        RailsJwtAuth.jwt_expiration_time = 1.second
-        token = user.regenerate_auth_token
-        jwt = RailsJwtAuth::Jwt::Manager.encode(auth_token: token)
-        request = Request.new('HTTP_AUTHORIZATION' => "Bearer #{jwt}")
-        sleep 2
+        RailsJwtAuth.jwt_expiration_time = 1.day
+        jwt
 
-        jwt_request = RailsJwtAuth::Jwt::Request.new(request)
-        expect(jwt_request.valid?).to be_falsey
+        Timecop.freeze(Date.today + 2) do
+          jwt_request = RailsJwtAuth::Jwt::Request.new(request)
+          expect(jwt_request.valid?).to be_falsey
+        end
       end
     end
 
     context 'when verification fails' do
-      after do
-        RailsJwtAuth.jwt_expiration_time = 7.days
-      end
-
       it 'returns false' do
-        invalid = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhdXRoX3Rva2VuIjoiZXc2bkN5RGZxQ3k5dEhzc2lCQUFmVVF0IiwiZXhwIjoxNDk5MDk4MTM0LCJpc3MiOiJSYWlsc0p3dEF1dGgifQ.V46G2lOT8CmzCGvToMfCAhB5C0t6eOa7XDO0J5eKsvL"
+        invalid = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhdXRoX3Rva2VuIjoiZXc2bkN5RGZxQ3k5dEhzc2lCQUFmVVF0IiwiZXhwIjoxNDk5MDk4MTM0LCJpc3MiOiJSYWlsc0p3dEF1dGgifQ.V46G2lOT8CmzCGvToMfCAhB5C0t6eOa7XDO0J5eKsvL'
         request = Request.new('HTTP_AUTHORIZATION' => "Bearer #{invalid}")
-
-        RailsJwtAuth.jwt_issuer = 'new_issuer'
-        jwt_request = RailsJwtAuth::Jwt::Request.new(request)
-        expect(jwt_request.valid?).to be_falsey
-      end
-    end
-
-    context 'when user does not exist' do
-      after do
-        RailsJwtAuth.jwt_issuer = 'RailsJwtAuth'
-      end
-
-      it 'returns false' do
-        jwt = RailsJwtAuth::Jwt::Manager.encode(auth_token: 'xxxxyyyyzzzz')
-        request = Request.new('HTTP_AUTHORIZATION' => "Bearer #{jwt}")
-
-        RailsJwtAuth.jwt_issuer = 'invalid'
         jwt_request = RailsJwtAuth::Jwt::Request.new(request)
         expect(jwt_request.valid?).to be_falsey
       end
@@ -97,36 +76,24 @@ describe RailsJwtAuth::Jwt::Request do
 
   describe '#payload' do
     it 'returns jwt payload' do
-      token = user.regenerate_auth_token
-      jwt = RailsJwtAuth::Jwt::Manager.encode(auth_token: token)
-      request = Request.new('HTTP_AUTHORIZATION' => "Bearer #{jwt}")
-
       jwt_request = RailsJwtAuth::Jwt::Request.new(request)
       expect(jwt_request.payload['iss']).to eq(RailsJwtAuth.jwt_issuer)
-      expect(user.auth_tokens).to include(jwt_request.payload['auth_token'])
+      expect(user.sessions.last[:id]).to eq(jwt_request.payload['session_id'])
       expect(jwt_request.payload['exp']).not_to be_nil
     end
   end
 
   describe '#header' do
     it 'returns jwt header' do
-      token = user.regenerate_auth_token
-      jwt = RailsJwtAuth::Jwt::Manager.encode(auth_token: token)
-      request = Request.new('HTTP_AUTHORIZATION' => "Bearer #{jwt}")
-
       jwt_request = RailsJwtAuth::Jwt::Request.new(request)
       expect(jwt_request.header).to eq('typ' => 'JWT', 'alg' => 'HS256')
     end
   end
 
-  describe '#auth_token' do
+  describe '#session_id' do
     it 'returns jwt payload auth_token' do
-      token = user.regenerate_auth_token
-      jwt = RailsJwtAuth::Jwt::Manager.encode(auth_token: token)
-      request = Request.new('HTTP_AUTHORIZATION' => "Bearer #{jwt}")
-
       jwt_request = RailsJwtAuth::Jwt::Request.new(request)
-      expect(user.auth_tokens).to include(jwt_request.auth_token)
+      expect(user.sessions.last[:id]).to eq(jwt_request.session_id)
     end
   end
 end

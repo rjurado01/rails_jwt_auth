@@ -23,15 +23,15 @@ module RailsJwtAuth
 
     def destroy
       authenticate!
-      current_user.destroy_auth_token Jwt::Request.new(request).auth_token
+      current_user.destroy_session Jwt::Request.new(request).session_id
       render_204
     end
 
     private
 
     def get_jwt(user)
-      token = user.regenerate_auth_token
-      RailsJwtAuth::Jwt::Manager.encode(auth_token: token)
+      session = user.create_session(user_agent: request.user_agent, ip: request.remote_ip)
+      RailsJwtAuth::Jwt::Manager.encode(session_id: session[:id])
     end
 
     def create_session_error

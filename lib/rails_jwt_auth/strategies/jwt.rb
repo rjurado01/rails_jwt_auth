@@ -6,7 +6,7 @@ module RailsJwtAuth
       def authenticate!
         jwt = RailsJwtAuth::Jwt::Request.new(request)
 
-        if jwt.valid? && (model = RailsJwtAuth.model.get_by_token(jwt.auth_token))
+        if jwt.valid? && (model = RailsJwtAuth.model.get_by_session_id(jwt.session_id))
           return success!(model)
         end
 

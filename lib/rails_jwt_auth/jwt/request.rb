@@ -26,8 +26,8 @@ module RailsJwtAuth
         @jwt_info ? @jwt_info[1] : nil
       end
 
-      def auth_token
-        payload ? payload['auth_token'] : nil
+      def session_id
+        payload ? payload['session_id'] : nil
       end
     end
   end

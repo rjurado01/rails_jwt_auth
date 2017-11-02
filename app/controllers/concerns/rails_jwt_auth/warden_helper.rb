@@ -4,12 +4,12 @@ module RailsJwtAuth
       !current_user.nil?
     end
 
-    def current_user
-      warden.user
-    end
-
     def warden
       request.env['warden']
+    end
+
+    def current_user
+      warden.user
     end
 
     def authenticate!

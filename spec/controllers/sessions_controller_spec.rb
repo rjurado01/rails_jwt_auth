@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 describe RailsJwtAuth::SessionsController do
-  %w(ActiveRecord Mongoid).each do |orm|
+  %w(Mongoid).each do |orm|
     context "when use #{orm}" do
       before :all do
         RailsJwtAuth.model_name = "#{orm}User"
@@ -23,8 +23,8 @@ describe RailsJwtAuth::SessionsController do
 
           it 'returns valid authentication token' do
             jwt = json['session']['jwt']
-            token = RailsJwtAuth::Jwt::Manager.decode(jwt)[0]['auth_token']
-            expect(token).to eq(user.reload.auth_tokens.last)
+            session_id = RailsJwtAuth::Jwt::Manager.decode(jwt)[0]['session_id']
+            expect(session_id).to eq(user.reload.sessions.last[:id])
           end
         end
 
@@ -90,7 +90,12 @@ describe RailsJwtAuth::SessionsController do
       describe 'Delete #destroy' do
         context 'when user is logged' do
           before do
-            sign_in(user)
+            session = user.create_session
+            jwt = RailsJwtAuth::Jwt::Manager.encode(session_id: session[:id])
+            @request.headers['HTTP_AUTHORIZATION'] = jwt
+
+            sign_in user
+
             delete :destroy
           end
 
@@ -99,13 +104,12 @@ describe RailsJwtAuth::SessionsController do
           end
 
           it 'removes user token' do
-            expect(user.reload.auth_tokens).to eq([])
+            expect(user.reload.sessions.size).to eq(0)
           end
         end
 
         context 'when user is not logged' do
           before do
-            sign_out
             delete :destroy
           end
 

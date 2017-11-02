@@ -23,6 +23,7 @@ module RailsJwtAuth
       # Default options to be encoded in the token
       def self.meta
         {
+          created_at: Time.now.to_i,
           exp: RailsJwtAuth.jwt_expiration_time.from_now.to_i,
           iss: RailsJwtAuth.jwt_issuer
         }
