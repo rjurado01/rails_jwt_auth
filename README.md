@@ -32,7 +32,7 @@ rails g rails_jwt_auth:install
 
 ## Configuration
 
-You can edit configuration options into `config/initializers/auth_token_auth.rb` file created by generator.
+You can edit configuration options into `config/initializers/rails_jwt_auth.rb` file created by generator.
 
 | Option                         | Default value     | Description                                                           |
 | ------------------------------ | ----------------- | --------------------------------------------------------------------- |
@@ -75,7 +75,7 @@ and create a migration to add authenticable fields to User model:
 create_table :users do |t|
   t.string :email
   t.string :password_digest
-  t.string :auth_tokens
+  t.string :sessions
 end
 ```
 
@@ -275,7 +275,7 @@ Session api is defined by RailsJwtAuth::SessionsController.
 {
   url: host/session,
   method: DELETE,
-  headers: { 'Authorization': 'Bearer auth_token'}
+  headers: { 'Authorization': 'Bearer jwt'}
 }
 ```
 
@@ -304,7 +304,7 @@ Registration api is defined by RailsJwtAuth::RegistrationsController.
 {
   url: host/registration,
   method: DELETE,
-  headers: { 'Authorization': 'Bearer auth_token'}
+  headers: { 'Authorization': 'Bearer jwt'}
 }
 ```
 
@@ -470,7 +470,7 @@ And then we can just call sign_in(user) to sign in as a user, or sign_out for ex
 ```ruby
   describe ExampleController
     it "blocks unauthenticated access" do
-      sign_out
+      sign_out # optional
       expect { get :index }.to raise_error(RailsJwtAuth::Errors::NotAuthorized)
     end
 
@@ -481,6 +481,8 @@ And then we can just call sign_in(user) to sign in as a user, or sign_out for ex
     end
   end
 ```
+
+This helpers need that warden helper `authenticate!` to be called in the controller.
 
 ## Locales
 
