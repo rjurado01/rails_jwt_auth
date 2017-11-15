@@ -50,6 +50,8 @@ You can edit configuration options into `config/initializers/auth_token_auth.rb`
 | reset_password_expiration_time | 1.day             | Confirmation token expiration time                                    |
 | set_password_url               | password_path     | Url used to create email link with set password token                 |
 | deliver_later                  | false             | Uses `deliver_later` method to send emails                            |
+| validate_user_agent            | false             | Validate that request user_agent match to session user_agent          |
+| validate_ip                    | false             | Validate that request ip match to session ip                          |
 
 ## Authenticatable
 

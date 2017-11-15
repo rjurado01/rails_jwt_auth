@@ -46,6 +46,12 @@ module RailsJwtAuth
   mattr_accessor :deliver_later
   @@deliver_later = false
 
+  mattr_accessor :validate_user_agent
+  @@validate_user_agent = false
+
+  mattr_accessor :validate_ip
+  @@validate_ip = false
+
   def self.model
     @@model_name.constantize
   end
