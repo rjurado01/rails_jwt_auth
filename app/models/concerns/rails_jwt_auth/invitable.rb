@@ -79,8 +79,6 @@ module RailsJwtAuth
     end
 
     def invite!
-      yield self if block_given?
-
       generate_invitation_token if invitation_token.nil?
       self.invitation_created_at = Time.now.utc
 
