@@ -10,3 +10,7 @@ gem 'mongoid'
 gem 'rspec-rails'
 gem 'sqlite3'
 gem 'timecop'
+
+group :development, :test do
+  gem 'pry-rails'
+end
