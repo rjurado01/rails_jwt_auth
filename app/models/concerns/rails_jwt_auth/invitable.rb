@@ -2,8 +2,6 @@ module RailsJwtAuth
   module Invitable
     extend ActiveSupport::Concern
 
-    attr_accessor :skip_invitation
-
     def self.included(base)
       base.extend ClassMethods
       base.class_eval do
@@ -17,38 +15,38 @@ module RailsJwtAuth
           field :invitation_accepted_at,   type: Time
           field :invitation_created_at,    type: Time
 
-          index({ invitation_token: 1 }, { unique: true })
+          index({invitation_token: 1}, {unique: true})
         end
       end
     end
 
     module ClassMethods
-      def invite!(attributes={}, &block)
-        attr_hash = ActiveSupport::HashWithIndifferentAccess.new(attributes.to_h)
-        _invite(attr_hash, &block).first
-      end
+      # Creates an user and sends an invitation to him.
+      # If the user is already invited and pending of completing registration
+      # the invitation is resent by email.
+      # If the user is already registered, it returns the user with a
+      # <tt>:taken</tt> on the email field.
+      #
+      # @param [Hash] attributes Hash containing user's attributes to be filled.
+      #               Must contain an email key.
+      #
+      #
+      # @return [user] The user created or found by email.
 
-      def invite_mail!(attributes={}, &block)
-        _invite(attributes, &block).last
-      end
-
-      # Creates an user and sends invitation to him,
-      # if the user already exists and it's confirmed, it returns the record with taken auth_field_name error.
-      # If the user exists and is already invited, resends the invitation.
-      def _invite(attributes={}, &block)
+      def invite!(attributes={})
+        attrs = ActiveSupport::HashWithIndifferentAccess.new(attributes.to_h)
         auth_field = RailsJwtAuth.auth_field_name
-        auth_attribute = attributes.delete(auth_field)
-        unless auth_attribute
-          raise ArgumentError
-        end
+        auth_attribute = attrs.delete(auth_field)
+
+        raise ArgumentError unless auth_attribute
 
         record = RailsJwtAuth.model.find_or_initialize_by(auth_field => auth_attribute)
-        record.assign_attributes(attributes)
+        record.assign_attributes(attrs)
         record.invitation_created_at = Time.now.utc if record.new_record?
 
         unless record.password || record.password_digest
           password = SecureRandom.base58(16)
-          record.password  = password
+          record.password = password
           record.password_confirmation = password
         end
 
@@ -58,10 +56,8 @@ module RailsJwtAuth
           record.errors.add(RailsJwtAuth.auth_field_name, :taken)
         end
 
-        yield record if block_given?
-
-        mail = record.invite! if record.errors.empty?
-        [record, mail]
+        record.invite! if record.errors.empty?
+        record
       end
     end
 
@@ -72,28 +68,23 @@ module RailsJwtAuth
     end
 
     def accept_invitation!
-      if self.invited?
-        if self.valid_invitation?
-          self.accept_invitation
-          # Override confirmable
-          self.confirmed_at = self.invitation_accepted_at if self.respond_to? :confirmed_at
-        else
-          self.errors.add(:invitation_token, :invalid)
-        end
+      return unless invited?
+      if valid_invitation?
+        accept_invitation
+        # Override confirmable
+        self.confirmed_at = invitation_accepted_at if respond_to? :confirmed_at
+      else
+        errors.add(:invitation_token, :invalid)
       end
     end
 
     def invite!
       yield self if block_given?
 
-      generate_invitation_token if self.invitation_token.nil?
-
+      generate_invitation_token if invitation_token.nil?
       self.invitation_created_at = Time.now.utc
-      self.invitation_sent_at = invitation_created_at unless skip_invitation
 
-      if save(:validate => false)
-        deliver_invitation unless skip_invitation
-      end
+      deliver_invitation if save(validate: false)
     end
 
     def invited?

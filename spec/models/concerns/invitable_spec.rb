@@ -16,7 +16,6 @@ describe RailsJwtAuth::Invitable do
       describe '#attributes' do
         subject { invited_user }
         it { is_expected.to have_attributes(invitation_token: invited_user.invitation_token) }
-        it { is_expected.to have_attributes(invitation_sent_at: invited_user.invitation_sent_at) }
         it { is_expected.to have_attributes(invitation_accepted_at: nil) }
         it { is_expected.to have_attributes(invitation_created_at: invited_user.invitation_created_at) }
 
@@ -35,24 +34,6 @@ describe RailsJwtAuth::Invitable do
           it 'sends the invitation mail' do
             subject
             expect(ActionMailer::Base.deliveries.count.zero?).to be false
-          end
-
-          context 'when skip invitation is true' do
-            subject do
-              RailsJwtAuth.model.invite!(email: "valid@example.com"){ |u| u.skip_invitation = true }
-            end
-
-            it 'creates a record' do
-              expect { subject }.to change { "#{orm}User".constantize.count }.by 1
-            end
-
-            it 'doesn\'t send the invitation mail' do
-              expect(ActionMailer::Base.deliveries.count.zero?).to be true
-            end
-
-            it 'doesn\'t set invitation_sent_at' do
-              expect(subject.invitation_sent_at).to be_nil
-            end
           end
 
           context 'with more fields than only email' do

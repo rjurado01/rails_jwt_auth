@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe RailsJwtAuth::InvitationsController do
-  %w(ActiveRecord Mongoid).each do |orm|
+  %w[ActiveRecord Mongoid].each do |orm|
     context "Using #{orm}" do
       before :all do
         RailsJwtAuth.model_name = "#{orm}User"
@@ -15,19 +15,20 @@ RSpec.describe RailsJwtAuth::InvitationsController do
         end
 
         context 'passing email as param' do
-          let(:email) { "valid@example.com" }
+          let(:email) { 'valid@example.com' }
+
           context 'without existing user' do
             it 'returns HTTP 201 Created' do
-              post :create, params: { invitation: { email: email } }
+              post :create, params: {invitation: {email: email}}
               expect(response).to have_http_status(:no_content)
             end
-
           end
 
           context 'with already invited user' do
-            let(:user) { RailsJwtAuth.model.invite! email: "test@example.com" }
+            let(:user) { RailsJwtAuth.model.invite! email: 'test@example.com' }
+
             it 'returns HTTP 201 Created' do
-              post :create, params: { invitation: { email: user.email } }
+              post :create, params: {invitation: {email: user.email}}
               expect(response).to have_http_status(:no_content)
             end
           end
@@ -35,8 +36,8 @@ RSpec.describe RailsJwtAuth::InvitationsController do
           context 'with already registered user' do
             let(:user) { FactoryGirl.create "#{orm.underscore}_user" }
 
-            it "returns HTTP 422 Unprocessable Entity" do
-              post :create, params: { invitation: { email: user.email } }
+            it 'returns HTTP 422 Unprocessable Entity' do
+              post :create, params: {invitation: {email: user.email}}
               expect(response).to have_http_status(:unprocessable_entity)
             end
           end
@@ -45,15 +46,14 @@ RSpec.describe RailsJwtAuth::InvitationsController do
 
       describe 'PUT #update' do
         context 'when invited user' do
-          let(:user) { RailsJwtAuth.model.invite! email: "valid@example.com" }
+          let(:user) { RailsJwtAuth.model.invite! email: 'valid@example.com' }
           context 'with all params' do
             before do
-              put :update, params: { accept_invitation: {
-                                       invitation_token: user.invitation_token,
-                                       password: "abcdef",
-                                       password_confirmation: "abcdef"
-                                      }
-                                  }
+              put :update, params: {accept_invitation: {
+                invitation_token: user.invitation_token,
+                password: 'abcdef',
+                password_confirmation: 'abcdef'
+              }}
             end
 
             it 'returns HTTP 204 No content' do
@@ -71,7 +71,7 @@ RSpec.describe RailsJwtAuth::InvitationsController do
 
           context 'with invitation token' do
             before do
-              put :update, params: { accept_invitation: { invitation_token: user.invitation_token } }
+              put :update, params: {accept_invitation: {invitation_token: user.invitation_token}}
             end
 
             it 'returns HTTP 204 No content' do
@@ -85,7 +85,7 @@ RSpec.describe RailsJwtAuth::InvitationsController do
 
           context 'without token' do
             before do
-              put :update, params: { accept_invitation: {} }
+              put :update, params: {accept_invitation: {}}
             end
 
             it 'returns HTTP 422 Unprocessable Entity' do
@@ -98,10 +98,12 @@ RSpec.describe RailsJwtAuth::InvitationsController do
           end
 
           context 'with expired invitation' do
-            let!(:invited_user) { RailsJwtAuth.model.invite! email: "test@example.com" }
+            let!(:invited_user) { RailsJwtAuth.model.invite! email: 'test@example.com' }
             it 'returns HTTP 422 Unprocessable Entity' do
               Timecop.travel(3.days.from_now) do
-                put :update, params: { accept_invitation: { invitation_token: invited_user.invitation_token } }
+                put :update, params: {accept_invitation: {
+                  invitation_token: invited_user.invitation_token
+                }}
               end
               expect(response).to have_http_status(:unprocessable_entity)
             end
@@ -109,10 +111,11 @@ RSpec.describe RailsJwtAuth::InvitationsController do
 
           context 'with mismatching passwords' do
             before do
-              put :update, params: { accept_invitation: {
-                                      invitation_token: user.invitation_token,
-                                      password: 'abcdef',
-                                      password_confirmation: '' } }
+              put :update, params: {accept_invitation: {
+                invitation_token: user.invitation_token,
+                password: 'abcdef',
+                password_confirmation: ''
+              }}
             end
 
             it 'returns HTTP 422 Unprocessable Entity' do
