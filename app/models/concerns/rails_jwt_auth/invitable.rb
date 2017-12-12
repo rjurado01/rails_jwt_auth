@@ -73,9 +73,13 @@ module RailsJwtAuth
 
     def accept_invitation!
       if self.invited?
-        self.accept_invitation
-        # Override confirmable
-        self.confirmed_at = self.invitation_accepted_at if self.respond_to? :confirmed_at
+        if self.valid_invitation?
+          self.accept_invitation
+          # Override confirmable
+          self.confirmed_at = self.invitation_accepted_at if self.respond_to? :confirmed_at
+        else
+          self.errors.add(:invitation_token, :invalid)
+        end
       end
     end
 
