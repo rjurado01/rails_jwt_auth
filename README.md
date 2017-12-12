@@ -52,6 +52,8 @@ You can edit configuration options into `config/initializers/rails_jwt_auth.rb` 
 | deliver_later                  | false             | Uses `deliver_later` method to send emails                            |
 | validate_user_agent            | false             | Validate that request user_agent match to session user_agent          |
 | validate_ip                    | false             | Validate that request ip match to session ip                          |
+| invitation_expiration_time     | 2.days            | Time an invitation is valid and can be accepted                       |
+| invitation_url                 | invitation_path   | URL used to create email link with invitation token                   |
 
 ## Authenticatable
 
@@ -448,7 +450,7 @@ Invitations api is provided by RailsJwtAuth::InvitationsController.
 }
 ```
 
-Note: To add more fields, see "Custom strong parameters" below. 
+Note: To add more fields, see "Custom strong parameters" below.
 
 ## Custom controllers
 
