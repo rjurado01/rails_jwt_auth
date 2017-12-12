@@ -51,6 +51,7 @@ GEM
     bcrypt (3.1.11)
     bson (4.2.1)
     builder (3.2.3)
+    coderay (1.1.2)
     concurrent-ruby (1.0.4)
     diff-lcs (1.2.5)
     erubis (2.7.0)
@@ -81,6 +82,11 @@ GEM
     nio4r (1.2.1)
     nokogiri (1.7.0.1)
       mini_portile2 (~> 2.1.0)
+    pry (0.11.0)
+      coderay (~> 1.1.0)
+      method_source (~> 0.8.1)
+    pry-rails (0.3.6)
+      pry (>= 0.10.4)
     rack (2.0.1)
     rack-test (0.6.3)
       rack (>= 1.0)
@@ -150,10 +156,11 @@ PLATFORMS
 DEPENDENCIES
   factory_girl_rails
   mongoid
+  pry-rails
   rails_jwt_auth!
   rspec-rails
   sqlite3
   timecop
 
 BUNDLED WITH
-   1.15.3
+   1.16.0

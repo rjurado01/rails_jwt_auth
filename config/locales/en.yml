@@ -7,6 +7,9 @@ en:
         subject: "Reset password instructions"
       set_password_instructions:
         subject: "Set password instructions"
+      send_invitation:
+        subject: "Someone has sent you an invitation!"
+
     errors:
       unconfirmed: "unconfirmed email"
       already_confirmed: "was already confirmed, please try signing in"
@@ -15,6 +18,7 @@ en:
       invalid: "invalid"
       blank: "blank"
       not_found: "not found"
+      missing: "is missing"
       email:
         invalid: "is not an email"
       current_password:

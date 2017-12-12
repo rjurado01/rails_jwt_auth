@@ -52,6 +52,12 @@ module RailsJwtAuth
   mattr_accessor :validate_ip
   @@validate_ip = false
 
+  mattr_accessor :invitation_expiration_time
+  @@invitation_expiration_time = 2.days
+
+  mattr_accessor :invitation_url
+  @@invitation_url = nil
+
   def self.model
     @@model_name.constantize
   end

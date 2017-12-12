@@ -26,5 +26,12 @@ ActiveRecord::Schema.define do
 
     t.datetime  'last_sign_in_at'
     t.string    'last_sign_in_ip'
+
+    t.string    'invitation_token'
+    t.datetime  'invitation_sent_at'
+    t.datetime  'invitation_accepted_at'
+    t.datetime  'invitation_created_at'
+
+    t.string 'name' # For invitable
   end
 end
