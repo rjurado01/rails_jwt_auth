@@ -11,5 +11,7 @@ class RailsJwtAuth::InstallGenerator < Rails::Generators::Base
 
     route "resource :confirmation, controller: 'rails_jwt_auth/confirmations', only: [:create, :update]"
     route "resource :password, controller: 'rails_jwt_auth/passwords', only: [:create, :update]"
+
+    route "resource :invitation, controller: 'rails_jwt_auth/invitations', only: [:create, :update]"
   end
 end
