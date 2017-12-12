@@ -1,0 +1,6 @@
+<p>Hello <%= @user.email %>!</p>
+
+<p>Someone has sent you an invitation to App.</p>
+<p>To complete registration setting a password, please click the following link.</p>
+
+<p><%= link_to "Accept invitation", @accept_invitation_url.html_safe %></p>

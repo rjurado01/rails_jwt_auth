@@ -50,6 +50,8 @@ You can edit configuration options into `config/initializers/auth_token_auth.rb`
 | reset_password_expiration_time | 1.day             | Confirmation token expiration time                                    |
 | set_password_url               | password_path     | Url used to create email link with set password token                 |
 | deliver_later                  | false             | Uses `deliver_later` method to send emails                            |
+| invitation_expiration_time     | 2.days            | Time an invitation is valid and can be accepted                       |
+| invitation_url                 | invitation_path   | URL used to create email link with invitation token                   |
 
 ## Authenticatable
 
@@ -213,6 +215,46 @@ class User
 end
 ```
 
+## Invitable
+
+This module allows you to invite an user to your application sending an invitation mail with a unique link and complete registration by setting user's password.
+
+### ActiveRecord
+
+Include `RailsJwtAuth::Invitable` module in your User model:
+
+```ruby
+# app/models/user.rb
+class User < ApplicationRecord
+  include RailsJwtAuth::Authenticatable
+  include RailsJwtAuth::Invitable
+end
+```
+
+And create the corresponding migration
+
+```ruby
+# Example migration
+change_table :users do |t|
+  t.string :invitation_token
+  t.datetime :invitation_sent_at
+  t.datetime :invitation_accepted_at
+  t.datetime :invitation_created_at
+end
+```
+
+### Mongoid
+
+Include `RailsJwtAuth::Invitable` module in your User model:
+
+```ruby
+# app/models/user.rb
+class User < ApplicationRecord
+  include RailsJwtAuth::Authenticatable
+  include RailsJwtAuth::Invitable
+end
+```
+
 ## Controller helpers
 
 RailsJwtAuth will create some helpers to use inside your controllers.
@@ -370,6 +412,44 @@ Password api is defined by RailsJwtAuth::PasswordsController.
 }
 ```
 
+### Invitations
+
+Invitations api is provided by RailsJwtAuth::InvitationsController.
+
+1.  Create an invitation and send email:
+
+```js
+{
+  url: host/invitation,
+  method: POST,
+  data: {
+    invitation: {
+      email: "user@example.com",
+      // More fields of your user
+    }
+  }
+}
+```
+
+2.  Accept an invitation:
+
+```js
+{
+  url: host/invitation,
+  method: PUT,
+  data: {
+    accept_invitation: {
+      invitation_token: "token",
+      password: '1234',
+      password_confirmation: '1234',
+      // More fields of your user...
+    }
+  }
+}
+```
+
+Note: To add more fields, see "Custom strong parameters" below.
+
 ## Custom controllers
 
 You can overwrite RailsJwtAuth controllers to edit actions, responses,
@@ -422,7 +502,7 @@ end
 
 ## Register users with random password
 
-This is a controller example that allows admins to register users with random password and send email to reset it.  
+This is a controller example that allows admins to register users with random password and send email to reset it.
 If registration is sucess it will send email to `set_password_url` with reset password token.
 
 ```ruby
