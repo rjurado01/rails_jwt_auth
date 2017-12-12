@@ -97,6 +97,16 @@ RSpec.describe RailsJwtAuth::InvitationsController do
             end
           end
 
+          context 'with expired invitation' do
+            let!(:invited_user) { RailsJwtAuth.model.invite! email: "test@example.com" }
+            it 'returns HTTP 422 Unprocessable Entity' do
+              Timecop.travel(3.days.from_now) do
+                put :update, params: { accept_invitation: { invitation_token: invited_user.invitation_token } }
+              end
+              expect(response).to have_http_status(:unprocessable_entity)
+            end
+          end
+
           context 'with mismatching passwords' do
             before do
               put :update, params: { accept_invitation: {

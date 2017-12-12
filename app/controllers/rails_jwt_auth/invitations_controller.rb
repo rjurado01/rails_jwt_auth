@@ -15,8 +15,7 @@ module RailsJwtAuth
       user = RailsJwtAuth.model.where(invitation_token: token).first
       user.assign_attributes attr_hash
       user.accept_invitation!
-      user.save
-      if user.errors.empty?
+      if user.errors.empty? && user.save
         return render_204
       else
         user.update_attribute :invitation_token, token

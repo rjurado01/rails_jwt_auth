@@ -118,7 +118,7 @@ module RailsJwtAuth
     def invitation_period_valid?
       time = invitation_sent_at || invitation_created_at
       expiration_time = RailsJwtAuth.invitation_expiration_time
-      time && (expiration_time.zero? || time.utc >= expiration_time.ago)
+      time && (expiration_time.to_i.zero? || time.utc >= expiration_time.ago)
     end
   end
 end
