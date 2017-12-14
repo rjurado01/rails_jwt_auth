@@ -25,6 +25,7 @@ module RailsJwtAuth
 
       if unconfirmed_email
         self.email = unconfirmed_email
+        self.email_confirmation = unconfirmed_email if respond_to?(:email_confirmation)
         self.unconfirmed_email = nil
       end
 
@@ -53,11 +54,13 @@ module RailsJwtAuth
         validate :validate_confirmation, if: :confirmed_at_changed?
 
         after_create do
-          send_confirmation_instructions unless confirmed_at || confirmation_sent_at
+          unless confirmed_at || confirmation_sent_at || self['invitation_token']
+            send_confirmation_instructions
+          end
         end
 
         before_update do
-          if email_changed? && email_was && !confirmed_at_changed?
+          if email_changed? && email_was && !confirmed_at_changed? && !self['invitation_token']
             self.unconfirmed_email = email
             self.email = email_was
 

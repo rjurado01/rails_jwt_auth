@@ -33,6 +33,7 @@ module RailsJwtAuth
       #
       # @return [user] The user created or found by email.
 
+      # rubocop:disable Metrics/AbcSize
       def invite!(attributes={})
         attrs = ActiveSupport::HashWithIndifferentAccess.new(attributes.to_h)
         auth_field = RailsJwtAuth.auth_field_name
@@ -52,13 +53,20 @@ module RailsJwtAuth
 
         record.valid?
 
+        # Users that are registered and were not invited are not reinvitable
         if !record.new_record? && !record.invited?
+          record.errors.add(RailsJwtAuth.auth_field_name, :taken)
+        end
+
+        # Users that have already accepted an invitation are not reinvitable
+        if !record.new_record? && record.invited? && record.invitation_accepted_at.present?
           record.errors.add(RailsJwtAuth.auth_field_name, :taken)
         end
 
         record.invite! if record.errors.empty?
         record
       end
+      # rubocop:enable Metrics/AbcSize
     end
 
     # Accept an invitation by clearing token and setting invitation_accepted_at
@@ -71,8 +79,7 @@ module RailsJwtAuth
       return unless invited?
       if valid_invitation?
         accept_invitation
-        # Override confirmable
-        self.confirmed_at = invitation_accepted_at if respond_to? :confirmed_at
+        self.confirmed_at = Time.now.utc if respond_to? :confirmed_at
       else
         errors.add(:invitation_token, :invalid)
       end
@@ -80,28 +87,32 @@ module RailsJwtAuth
 
     def invite!
       generate_invitation_token if invitation_token.nil?
-      self.invitation_created_at = Time.now.utc
+      self.invitation_sent_at = Time.now.utc
 
-      deliver_invitation if save(validate: false)
+      send_invitation_mail if save(validate: false)
     end
 
     def invited?
       (persisted? && invitation_token.present?)
     end
 
-    protected
-
-    def deliver_invitation
-      mailer = Mailer.send_invitation(self)
-      RailsJwtAuth.deliver_later ? mailer.deliver_later : mailer.deliver
+    def generate_invitation_token!
+      generate_invitation_token && save(validate: false)
     end
+
+    def valid_invitation?
+      invited? && invitation_period_valid?
+    end
+
+    protected
 
     def generate_invitation_token
       self.invitation_token = SecureRandom.base58(128)
     end
 
-    def valid_invitation?
-      invited? && invitation_period_valid?
+    def send_invitation_mail
+      mailer = Mailer.send_invitation(self)
+      RailsJwtAuth.deliver_later ? mailer.deliver_later : mailer.deliver
     end
 
     def invitation_period_valid?

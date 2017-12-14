@@ -17,7 +17,9 @@ describe RailsJwtAuth::Invitable do
         subject { invited_user }
         it { is_expected.to have_attributes(invitation_token: invited_user.invitation_token) }
         it { is_expected.to have_attributes(invitation_accepted_at: nil) }
-        it { is_expected.to have_attributes(invitation_created_at: invited_user.invitation_created_at) }
+        it do
+          is_expected.to have_attributes(invitation_created_at: invited_user.invitation_created_at)
+        end
 
         it 'has a random password' do
           expect(subject).to_not have_attributes(password_digest: nil)
@@ -26,23 +28,23 @@ describe RailsJwtAuth::Invitable do
 
       describe '.invite!' do # Class method
         context 'without existing user' do
-          subject { "#{orm}User".constantize.invite! email: "another@example.com" }
+          subject { "#{orm}User".constantize.invite! email: 'another@example.com' }
           it 'creates a record' do
             expect { subject }.to change { "#{orm}User".constantize.count }.by 1
           end
 
           it 'sends the invitation mail' do
             subject
-            expect(ActionMailer::Base.deliveries.count.zero?).to be false
+            expect(ActionMailer::Base.deliveries.count).to eq(1)
           end
 
           context 'with more fields than only email' do
             subject do
-              RailsJwtAuth.model.invite!(email: "valid@example.com", name: "TestName")
+              RailsJwtAuth.model.invite!(email: 'valid@example.com', name: 'TestName')
             end
 
             it 'has extra attributes assigned' do
-              expect(subject.name).to eq("TestName")
+              expect(subject.name).to eq('TestName')
             end
           end
         end
@@ -55,27 +57,37 @@ describe RailsJwtAuth::Invitable do
 
         context 'with existing user' do
           context 'with pending invitation' do
-            let(:user) { FactoryGirl.create "#{orm.underscore}_user", email: 'valid@example.com' }
+            let(:user) { "#{orm}User".constantize.invite! email: 'valid@example.com' }
+
+            before do
+              "#{orm}User".constantize.invite! email: 'valid@example.com'
+              ActionMailer::Base.deliveries.clear
+            end
 
             it 'doesn\'t change the users password' do
               expect(user.password_digest).to eq(user.reload.password_digest)
             end
 
-            it 'generates invitation' do
-              user = "#{orm}User".constantize.invite! email: "test@example.com"
+            it 'resets invitation_sent_at' do
+              Timecop.freeze(DateTime.now)
+              user = "#{orm}User".constantize.invite! email: 'test@example.com'
 
-              Timecop.freeze(Date.today + 30.days) do
+              Timecop.freeze(DateTime.now + 30.days) do
                 "#{orm}User".constantize.invite! email: user.email
-                expect(user.reload.invitation_created_at).to eq(Time.now.utc)
+                expect(user.reload.invitation_sent_at.to_datetime.to_i)
+                  .to eq(Time.now.utc.to_datetime.to_i)
               end
 
-              expect(user.reload.invitation_created_at).to_not eq(Time.now.utc)
-
+              expect(user.reload.invitation_sent_at.to_datetime.to_i)
+                .to_not eq(Time.now.utc.to_datetime.to_i)
+              expect(user.reload.invitation_sent_at.to_datetime.to_i)
+                .to eq((Time.now.utc.to_datetime + 30.days).to_datetime.to_i)
+              Timecop.return
             end
 
             it 'sends the invitation mail' do
-              user = "#{orm}User".constantize.invite! email: "test@example.com"
-              expect(ActionMailer::Base.deliveries.count.zero?).to be false
+              "#{orm}User".constantize.invite! email: 'test@example.com'
+              expect(ActionMailer::Base.deliveries.count).to eq(1)
             end
           end
 
@@ -86,7 +98,27 @@ describe RailsJwtAuth::Invitable do
 
             it 'has taken error on auth_field_name' do
               field = RailsJwtAuth.auth_field_name.to_sym
+              expect(subject.errors).to_not be_empty
               error = subject.errors.details[field].first.values.first
+              expect(error).to eq(:taken)
+            end
+          end
+
+          context 'when invitation already accepted' do
+            let(:email) { 'valid@example.com' }
+
+            before do
+              # invite and accept
+              user = "#{orm}User".constantize.invite! email: email
+              user.accept_invitation!
+              user.save
+            end
+
+            it 'has taken error on auth_field_name' do
+              field = RailsJwtAuth.auth_field_name.to_sym
+              user2 = "#{orm}User".constantize.invite! email: email
+              expect(user2.errors).to_not be_empty
+              error = user2.errors.details[field].first.values.first
               expect(error).to eq(:taken)
             end
           end
@@ -137,18 +169,17 @@ describe RailsJwtAuth::Invitable do
 
         context 'with token' do
           before do
-            user.invitation_token = "abcde"
+            user.invitation_token = 'abcde'
             user.invite!
           end
 
           it 'doesn\'t change actual token' do
-            expect(user.invitation_token).to eq("abcde")
+            expect(user.invitation_token).to eq('abcde')
           end
         end
 
         it 'delivers invitation' do
-          expect(user).to receive(:deliver_invitation)
-          # expect(RailsJwtAuth::Mailer).to receive(:send_invitation)
+          expect(user).to receive(:send_invitation_mail)
           user.invite!
         end
       end

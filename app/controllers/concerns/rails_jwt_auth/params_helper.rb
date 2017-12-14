@@ -29,7 +29,9 @@ module RailsJwtAuth
     end
 
     def invitation_update_params
-      params.require(:accept_invitation).permit(:invitation_token, :password, :password_confirmation)
+      params.require(:accept_invitation).permit(:invitation_token,
+                                                :password,
+                                                :password_confirmation)
     end
   end
 end
