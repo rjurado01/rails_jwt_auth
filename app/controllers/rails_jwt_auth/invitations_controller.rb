@@ -16,12 +16,9 @@ module RailsJwtAuth
       user.assign_attributes attr_hash
       user.accept_invitation!
 
-      if user.errors.empty? && user.save
-        return render_204
-      else
-        user.update_attribute :invitation_token, token
-        return render_422(user.errors)
-      end
+      return render_204 if user.errors.empty? && user.save
+
+      render_422(user.errors)
     end
   end
 end

@@ -51,7 +51,7 @@ module RailsJwtAuth
     def self.included(base)
       base.extend(ClassMethods)
 
-      base.class_eval do 
+      base.class_eval do
         if defined?(Mongoid) && ancestors.include?(Mongoid::Document)
           field RailsJwtAuth.auth_field_name, type: String
           field :password_digest,             type: String
