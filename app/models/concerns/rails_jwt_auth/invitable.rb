@@ -33,7 +33,6 @@ module RailsJwtAuth
       #
       # @return [user] The user created or found by email.
 
-      # rubocop:disable Metrics/AbcSize
       def invite!(attributes={})
         attrs = ActiveSupport::HashWithIndifferentAccess.new(attributes.to_h)
         auth_field = RailsJwtAuth.auth_field_name
@@ -43,30 +42,10 @@ module RailsJwtAuth
 
         record = RailsJwtAuth.model.find_or_initialize_by(auth_field => auth_attribute)
         record.assign_attributes(attrs)
-        record.invitation_created_at = Time.now.utc if record.new_record?
 
-        unless record.password || record.password_digest
-          password = SecureRandom.base58(16)
-          record.password = password
-          record.password_confirmation = password
-        end
-
-        record.valid?
-
-        # Users that are registered and were not invited are not reinvitable
-        if !record.new_record? && !record.invited?
-          record.errors.add(RailsJwtAuth.auth_field_name, :taken)
-        end
-
-        # Users that have already accepted an invitation are not reinvitable
-        if !record.new_record? && record.invited? && record.invitation_accepted_at.present?
-          record.errors.add(RailsJwtAuth.auth_field_name, :taken)
-        end
-
-        record.invite! if record.errors.empty?
+        record.invite!
         record
       end
-      # rubocop:enable Metrics/AbcSize
     end
 
     # Accept an invitation by clearing token and setting invitation_accepted_at
@@ -85,12 +64,37 @@ module RailsJwtAuth
       end
     end
 
+    # rubocop:disable Metrics/AbcSize
     def invite!
+      self.invitation_created_at = Time.now.utc if new_record?
+
+      unless password || password_digest
+        passw = SecureRandom.base58(16)
+        self.password = passw
+        self.password_confirmation = passw
+      end
+
+      valid?
+
+      # Users that are registered and were not invited are not reinvitable
+      if !new_record? && !invited?
+        errors.add(RailsJwtAuth.auth_field_name, :taken)
+      end
+
+      # Users that have already accepted an invitation are not reinvitable
+      if !new_record? && invited? && invitation_accepted_at.present?
+        errors.add(RailsJwtAuth.auth_field_name, :taken)
+      end
+
+      return self unless errors.empty?
+
       generate_invitation_token if invitation_token.nil?
       self.invitation_sent_at = Time.now.utc
 
       send_invitation_mail if save(validate: false)
+      self
     end
+    # rubocop:enable Metrics/AbcSize
 
     def invited?
       (persisted? && invitation_token.present?)
@@ -102,6 +106,10 @@ module RailsJwtAuth
 
     def valid_invitation?
       invited? && invitation_period_valid?
+    end
+
+    def accepted_invitation?
+      invitation_token.nil? && invitation_accepted_at.present?
     end
 
     protected
