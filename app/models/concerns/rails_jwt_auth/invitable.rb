@@ -14,8 +14,6 @@ module RailsJwtAuth
           field :invitation_sent_at,       type: Time
           field :invitation_accepted_at,   type: Time
           field :invitation_created_at,    type: Time
-
-          index({invitation_token: 1}, {unique: true})
         end
       end
     end
