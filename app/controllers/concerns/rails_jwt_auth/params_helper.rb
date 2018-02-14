@@ -12,8 +12,8 @@ module RailsJwtAuth
       params.require(:confirmation).permit(:email)
     end
 
-    def session_create_params
-      params.require(:session).permit(RailsJwtAuth.auth_field_name, :password)
+    def token_create_params
+      params.require(:token).permit(RailsJwtAuth.auth_field_name, :password)
     end
 
     def password_create_params

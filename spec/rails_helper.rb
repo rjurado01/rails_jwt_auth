@@ -6,7 +6,7 @@ abort('The Rails environment is running in production mode!') if Rails.env.produ
 require 'spec_helper'
 require 'rspec/rails'
 # Add additional requires below this line. Rails is not loaded until this point!
-require 'rails_jwt_auth/spec/helpers'
+require 'rails_jwt_auth/jwt_manager'
 
 Dir['spec/factories/**/*.rb'].each { |f| require "./#{f}" }
 
@@ -58,13 +58,18 @@ RSpec.configure do |config|
   # arbitrary gems may also be filtered via:
   # config.filter_gems_from_backtrace('gem name')
 
-  config.include RailsJwtAuth::Spec::Helpers
-
   config.before(:each) do
     MongoidUser.destroy_all
     ActiveRecordUser.destroy_all
 
-    RailsJwtAuth.simultaneous_sessions = 1
-    RailsJwtAuth.confirmation_url = nil
+    @default_values = RailsJwtAuth.class_variables.each_with_object({}) do |key, hash|
+      hash[key] = RailsJwtAuth.class_variable_get key
+    end
+  end
+
+  config.after(:each) do
+    @default_values.each do |key, value|
+      RailsJwtAuth.class_variable_set key, value
+    end
   end
 end

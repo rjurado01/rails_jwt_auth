@@ -1,5 +1,5 @@
 class ApplicationController < ActionController::Base
-  include RailsJwtAuth::WardenHelper
+  include RailsJwtAuth::AuthenticableHelper
 
   protect_from_forgery with: :exception
 
@@ -13,5 +13,9 @@ class ApplicationController < ActionController::Base
 
   rescue_from Mongoid::Errors::DocumentNotFound do
     render json: {}, status: 404
+  end
+
+  rescue_from RailsJwtAuth::NotAuthorized do
+    render json: {}, status: 401
   end
 end

@@ -1,6 +1,4 @@
-require 'warden'
 require 'bcrypt'
-
 require 'rails_jwt_auth/engine'
 
 module RailsJwtAuth
@@ -17,13 +15,10 @@ module RailsJwtAuth
   self.email_regex = /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\z/i
 
   mattr_accessor :jwt_expiration_time
-  self.jwt_expiration_time = 7.days
+  self.jwt_expiration_time = 1.days
 
   mattr_accessor :jwt_issuer
   self.jwt_issuer = 'RailsJwtAuth'
-
-  mattr_accessor :simultaneous_sessions
-  self.simultaneous_sessions = 2
 
   mattr_accessor :mailer_sender
   self.mailer_sender = 'initialize-mailer_sender@example.com'

@@ -42,7 +42,6 @@ You can edit configuration options into `config/initializers/auth_token_auth.rb`
 | email_regex                    | see config file   | Regex used to Validate email format                                   |
 | jwt_expiration_time            | 7.days            | Tokens expiration time                                                |
 | jwt_issuer                     | 'RailsJwtAuth'    | The "iss" (issuer) claim identifies the principal that issued the JWT |
-| simultaneous_sessions          | 2                 | Number of simultaneous sessions for an user                           |
 | mailer_sender                  |                   | E-mail address which will be shown in RailsJwtAuth::Mailer            |
 | confirmation_url               | confirmation_path | Url used to create email link with confirmation token                 |
 | confirmation_expiration_time   | 1.day             | Confirmation token expiration time                                    |
@@ -75,7 +74,6 @@ and create a migration to add authenticable fields to User model:
 create_table :users do |t|
   t.string :email
   t.string :password_digest
-  t.string :auth_tokens
 end
 ```
 
@@ -264,7 +262,7 @@ To use this helpers we need to include `WardenHelper` into `ApplicationControlle
 ```ruby
 # app/controllers/application_controller.rb
 class ApplicationController < ActionController::API
-  include RailsJwtAuth::WardenHelper
+  include RailsJwtAuth::AuthenticableHelper
 end
 ```
 
@@ -290,32 +288,22 @@ end
 
 ## Default Controllers API
 
-### Session
+### Tokens
 
-Session api is defined by RailsJwtAuth::SessionsController.
+Tokens api is defined by RailsJwtAuth::TokensController.
 
-1.  Get session token:
+1.  Get new token:
 
 ```js
 {
-  url: host/session,
+  url: host/tokens,
   method: POST,
   data: {
-    session: {
+    token: {
       email: "user@email.com",
       password: "12345678"
     }
   }
-}
-```
-
-2.  Delete session
-
-```js
-{
-  url: host/session,
-  method: DELETE,
-  headers: { 'Authorization': 'Bearer auth_token'}
 }
 ```
 
@@ -541,18 +529,24 @@ Require the RailsJwtAuth::Spec::Helpers helper module in `rails_helper.rb`.
   end
 ```
 
-And then we can just call sign_in(user) to sign in as a user, or sign_out for examples that have no user signed in. Here's two quick examples:
+And then we can just call sign_in(user) to sign in as a user, or get_jwt to get valid token. Here's two quick examples:
 
 ```ruby
   describe ExampleController
+    let(:user) { ... }
+
     it "blocks unauthenticated access" do
-      sign_out
       expect { get :index }.to raise_error(RailsJwtAuth::Errors::NotAuthorized)
     end
 
     it "allows authenticated access" do
-      sign_in
+      sign_in user
       get :index
+      expect(response).to be_success
+    end
+
+    it "allows authenticated access with token" do
+      get :index, headers: {'AUTHENTICATION' => get_jwt(user)}
       expect(response).to be_success
     end
   end

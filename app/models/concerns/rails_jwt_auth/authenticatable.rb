@@ -2,28 +2,6 @@ include ActiveModel::SecurePassword
 
 module RailsJwtAuth
   module Authenticatable
-    def regenerate_auth_token(token = nil)
-      new_token = SecureRandom.base58(24)
-
-      if RailsJwtAuth.simultaneous_sessions > 1
-        tokens = ((auth_tokens || []) - [token]).last(RailsJwtAuth.simultaneous_sessions - 1)
-        update_attribute(:auth_tokens, (tokens + [new_token]).uniq)
-      else
-        update_attribute(:auth_tokens, [new_token])
-      end
-
-      new_token
-    end
-
-    def destroy_auth_token(token)
-      if RailsJwtAuth.simultaneous_sessions > 1
-        tokens = auth_tokens || []
-        update_attribute(:auth_tokens, tokens - [token])
-      else
-        update_attribute(:auth_tokens, [])
-      end
-    end
-
     def update_with_password(params)
       if (current_password = params.delete(:current_password)).blank?
         errors.add(:current_password, I18n.t('rails_jwt_auth.errors.current_password.blank'))
@@ -38,13 +16,13 @@ module RailsJwtAuth
       errors.empty? ? update_attributes(params) : false
     end
 
+    def to_token_payload(_request=nil)
+      {sub: id.to_s}
+    end
+
     module ClassMethods
-      def get_by_token(token)
-        if defined?(Mongoid) && ancestors.include?(Mongoid::Document)
-          where(auth_tokens: token).first
-        elsif defined?(ActiveRecord) && ancestors.include?(ActiveRecord::Base)
-          where('auth_tokens like ?', "%#{token}%").first
-        end
+      def from_token_payload(payload)
+        find payload[:sub]
       end
     end
 
@@ -55,9 +33,6 @@ module RailsJwtAuth
         if defined?(Mongoid) && ancestors.include?(Mongoid::Document)
           field RailsJwtAuth.auth_field_name, type: String
           field :password_digest,             type: String
-          field :auth_tokens,                 type: Array
-        elsif defined?(ActiveRecord) && ancestors.include?(ActiveRecord::Base)
-          serialize :auth_tokens, Array
         end
 
         validates RailsJwtAuth.auth_field_name, presence: true, uniqueness: true
@@ -66,7 +41,8 @@ module RailsJwtAuth
         has_secure_password
 
         before_validation do
-          self.email = email.downcase if email
+          auth_field = RailsJwtAuth.auth_field_name
+          self[auth_field] = self[auth_field].downcase if self[auth_field]
         end
       end
     end

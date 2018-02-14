@@ -47,6 +47,7 @@ RSpec.describe RailsJwtAuth::InvitationsController do
       describe 'PUT #update' do
         context 'when invited user' do
           let(:user) { RailsJwtAuth.model.invite! email: 'valid@example.com' }
+
           context 'with all params' do
             before do
               put :update, params: {

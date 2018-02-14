@@ -13,7 +13,7 @@ en:
     errors:
       unconfirmed: "unconfirmed email"
       already_confirmed: "was already confirmed, please try signing in"
-      create_session: "invalid %{field} / password"
+      create_token: "invalid %{field} / password"
       expired: "has expired, please request a new one"
       invalid: "invalid"
       blank: "blank"

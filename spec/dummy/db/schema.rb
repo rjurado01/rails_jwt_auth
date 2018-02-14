@@ -14,7 +14,6 @@ ActiveRecord::Schema.define do
   create_table 'active_record_users', force: :cascade do |t|
     t.string  'email'
     t.string  'password_digest'
-    t.string  'auth_tokens'
 
     t.string    'unconfirmed_email'
     t.string    'confirmation_token'

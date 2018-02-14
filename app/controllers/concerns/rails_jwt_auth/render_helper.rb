@@ -1,8 +1,8 @@
 module RailsJwtAuth
   module RenderHelper
-    def render_session(jwt, user)
+    def render_token(token)
       auth_field = RailsJwtAuth.auth_field_name
-      render json: {session: {jwt: jwt, auth_field => user[auth_field]}}, status: 201
+      render json: {jwt: token}, status: 201
     end
 
     def render_registration(resource)
