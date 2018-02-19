@@ -18,7 +18,7 @@ RailsJwtAuth.setup do |config|
   #config.jwt_issuer = 'RailsJwtAuth'
 
   # number of simultaneously sessions for an user
-  #config.simultaneously_sessions = 2
+  #config.simultaneous_sessions = 2
 
   # mailer sender
   #config.mailer_sender = 'initialize-mailer_sender@example.com'
@@ -33,6 +33,7 @@ RailsJwtAuth.setup do |config|
   #config.reset_password_url = 'http://frontend.com/reset_password'
 
   # url used to create email link with set password token
+  # by set_and_send_password_instructions method
   #config.set_password_url = 'http://frontend.com/set_password'
 
   # expiration time for reset password tokens
@@ -41,11 +42,9 @@ RailsJwtAuth.setup do |config|
   # uses deliver_later to send emails instead of deliver method
   #config.deliver_later = false
 
-  # Invitable configuration
-  # 
-  # Time an invitation is valid after sent
+  # time an invitation is valid after sent
   # config.invitation_expiration_time = 2.days
-  #
-  # URL used to create email link to activate invitation
+
+  # url used to create email link with activation token parameter to accept invitation
   # config.accept_invitation_url = 'http://frontend.com/accept_invitation'
 end

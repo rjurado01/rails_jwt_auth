@@ -56,13 +56,13 @@ if defined?(ActionMailer)
     def send_invitation(user)
       @user = user
 
-      if RailsJwtAuth.invitation_url
-        url, params = RailsJwtAuth.invitation_url.split '?'
+      if RailsJwtAuth.accept_invitation_url
+        url, params = RailsJwtAuth.accept_invitation_url.split '?'
         params = params ? params.split('&') : []
         params.push("invitation_token=#{@user.invitation_token}")
         @accept_invitation_url = "#{url}?#{params.join('&')}"
       else
-        @accept_invitation_url = invitation_url(invitation_token: @user.invitation_token)
+        @accept_invitation_url = invitations_url(invitation_token: @user.invitation_token)
       end
 
       subject = I18n.t('rails_jwt_auth.mailer.send_invitation.subject')

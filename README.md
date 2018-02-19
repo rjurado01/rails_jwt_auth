@@ -51,7 +51,7 @@ You can edit configuration options into `config/initializers/auth_token_auth.rb`
 | set_password_url               | password_path     | Url used to create email link with set password token                 |
 | deliver_later                  | false             | Uses `deliver_later` method to send emails                            |
 | invitation_expiration_time     | 2.days            | Time an invitation is valid and can be accepted                       |
-| invitation_url                 | invitation_path   | URL used to create email link with invitation token                   |
+| accept_invitation_url          | invitations_path  | URL used to create email link with invitation token                   |
 
 ## Authenticatable
 
@@ -118,7 +118,7 @@ change_table :users do |t|
   t.string :unconfirmed_email
   t.string :confirmation_token
   t.datetime :confirmation_sent_at
-  t.datetime :confimed_at
+  t.datetime :confirmed_at
 end
 ```
 
@@ -420,7 +420,7 @@ Invitations api is provided by RailsJwtAuth::InvitationsController.
 
 ```js
 {
-  url: host/invitation,
+  url: host/invitations,
   method: POST,
   data: {
     invitation: {
@@ -435,14 +435,12 @@ Invitations api is provided by RailsJwtAuth::InvitationsController.
 
 ```js
 {
-  url: host/invitation,
+  url: host/invitations/:invitation_token,
   method: PUT,
   data: {
-    accept_invitation: {
-      invitation_token: "token",
+    invitation: {
       password: '1234',
-      password_confirmation: '1234',
-      // More fields of your user...
+      password_confirmation: '1234'
     }
   }
 }

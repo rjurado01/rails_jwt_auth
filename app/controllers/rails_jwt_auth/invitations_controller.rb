@@ -11,8 +11,7 @@ module RailsJwtAuth
 
     def update
       attr_hash = invitation_update_params
-      token = attr_hash.delete(:invitation_token)
-      user = RailsJwtAuth.model.where(invitation_token: token).first
+      user = RailsJwtAuth.model.where(invitation_token: params[:id]).first
       user.assign_attributes attr_hash
       user.accept_invitation!
 

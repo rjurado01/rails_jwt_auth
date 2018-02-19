@@ -49,8 +49,8 @@ module RailsJwtAuth
   mattr_accessor :invitation_expiration_time
   @@invitation_expiration_time = 2.days
 
-  mattr_accessor :invitation_url
-  @@invitation_url = nil
+  mattr_accessor :accept_invitation_url
+  @@accept_invitation_url = nil
 
   def self.model
     @@model_name.constantize
