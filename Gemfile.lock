@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    rails_jwt_auth (0.18.1)
+    rails_jwt_auth (0.19.0)
       bcrypt (~> 3.1)
       jwt (~> 1.5)
       rails (~> 5.0)
@@ -161,4 +161,4 @@ DEPENDENCIES
   timecop
 
 BUNDLED WITH
-   1.16.0
+   1.16.1
