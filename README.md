@@ -551,7 +551,7 @@ And then we can just call sign_in(user) to sign in as a user, or sign_out for ex
     end
 
     it "allows authenticated access" do
-      sign_in
+      sign_in user
       get :index
       expect(response).to be_success
     end
