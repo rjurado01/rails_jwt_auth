@@ -39,7 +39,7 @@ module RailsJwtAuth
 
     def self.included(base)
       base.class_eval do
-        if ancestors.include? Mongoid::Document
+        if defined?(Mongoid) && ancestors.include?(Mongoid::Document)
           # include GlobalID::Identification to use deliver_later method
           # http://edgeguides.rubyonrails.org/active_job_basics.html#globalid
           include GlobalID::Identification if RailsJwtAuth.deliver_later
