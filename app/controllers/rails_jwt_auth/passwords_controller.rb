@@ -4,7 +4,7 @@ module RailsJwtAuth
     include RenderHelper
 
     def create
-      user = RailsJwtAuth.model.where(email: password_create_params[:email]).first
+      user = RailsJwtAuth.model.where(email: password_create_params[:email].to_s.downcase).first
       return render_422(email: [I18n.t('rails_jwt_auth.errors.not_found')]) unless user
 
       user.send_reset_password_instructions ? render_204 : render_422(user.errors)

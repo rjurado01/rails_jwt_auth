@@ -12,6 +12,13 @@ describe RailsJwtAuth::PasswordsController do
       let(:unconfirmed_user) { FactoryGirl.create("#{orm.underscore}_unconfirmed_user") }
 
       describe 'POST #create' do
+        context 'when sends valid email upper case and down case are ignored' do
+          it 'returns 201 http status code' do
+            post :create, params: {password: {email: user.email.upcase}}
+            expect(response).to have_http_status(204)
+          end
+        end
+
         context 'when sends valid email' do
           it 'returns 201 http status code' do
             post :create, params: {password: {email: user.email}}
