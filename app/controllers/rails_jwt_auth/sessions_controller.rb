@@ -30,8 +30,7 @@ module RailsJwtAuth
     private
 
     def get_jwt(user)
-      token = user.regenerate_auth_token
-      RailsJwtAuth::Jwt::Manager.encode(auth_token: token)
+      RailsJwtAuth::Jwt::Manager.encode(user.to_token_payload(request))
     end
 
     def create_session_error

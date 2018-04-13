@@ -38,6 +38,10 @@ module RailsJwtAuth
       errors.empty? ? update_attributes(params) : false
     end
 
+    def to_token_payload(_request)
+      {auth_token: regenerate_auth_token}
+    end
+
     module ClassMethods
       def get_by_token(token)
         if defined?(Mongoid) && ancestors.include?(Mongoid::Document)

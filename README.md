@@ -453,17 +453,21 @@ Note: To add more fields, see "Custom strong parameters" below.
 You can overwrite RailsJwtAuth controllers to edit actions, responses,
 permitted parameters...
 
-For example, if we want to change registration strong parameters we
+For example, if we want to call custom method when user is created we need to
 create new registration controller inherited from default controller:
 
 ```ruby
 # app/controllers/registrations_controller.rb
 class RegistrationsController < RailsJwtAuth::RegistrationsController
-  private
+  ...
 
-  def create_params
-    params.require(:user).permit(:email, :name, :surname, :password, :password_confirmation)
+  def create
+    user = RailsJwtAuth.model.new(create_params)
+    user.do_something_custom
+    ...
   end
+
+  ...
 end
 ```
 
@@ -473,6 +477,32 @@ And edit route resource to use it:
 # config/routes.rb
 resource :registration, controller: 'registrations', only: [:create, :update, :destroy]
 ```
+
+## Custom payload
+
+If you need edit default payload used to generate jwt you can overwrite the method `to_token_payload` into your User class:
+
+```ruby
+class User < ApplicationRecord
+  include RailsJwtAuth::Authenticatable
+  ...
+
+  def to_token_payload(request)
+    {
+      auth_token: regenerate_auth_token,
+      # add here your custom info
+    }
+  end
+end
+```
+
+## Custom responses
+
+You can overwrite `RailsJwtAuth::RenderHelper` to customize controllers responses.
+
+## Custom strong parameters
+
+You can overwrite `RailsJwtAuth::ParamsHelper` to customize controllers strong parameters.
 
 ## Edit user information
 
@@ -519,14 +549,6 @@ class UsersController < ApplicationController
   end
 end
 ```
-
-## Custom responses
-
-You can overwrite `RailsJwtAuth::RenderHelper` to customize controllers responses.
-
-## Custom strong parameters
-
-You can overwrite `RailsJwtAuth::ParamsHelper` to customize controllers strong parameters.
 
 ## Testing (rspec)
 
