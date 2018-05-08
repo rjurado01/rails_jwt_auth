@@ -2,7 +2,7 @@ require 'rails_helper'
 
 describe RailsJwtAuth::Recoverable do
   %w(ActiveRecord Mongoid).each do |orm|
-    let(:user) { FactoryGirl.create("#{orm.underscore}_user") }
+    let(:user) { FactoryBot.create("#{orm.underscore}_user") }
 
     before :all do
       class Mock
@@ -50,7 +50,7 @@ describe RailsJwtAuth::Recoverable do
         end
 
         context 'when user is unconfirmed' do
-          let(:user) { FactoryGirl.create("#{orm.underscore}_unconfirmed_user") }
+          let(:user) { FactoryBot.create("#{orm.underscore}_unconfirmed_user") }
 
           it 'returns false' do
             expect(user.send_reset_password_instructions).to be_falsey
@@ -71,7 +71,7 @@ describe RailsJwtAuth::Recoverable do
       end
 
       describe '#set_and_send_password_instructions' do
-        let(:user) { FactoryGirl.build("#{orm.underscore}_user", password: nil) }
+        let(:user) { FactoryBot.build("#{orm.underscore}_user", password: nil) }
 
         it 'set password and confirm' do
           mock = Mock.new

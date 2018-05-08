@@ -9,7 +9,7 @@ describe RailsJwtAuth::Strategies::Jwt do
       RailsJwtAuth.simultaneous_sessions = 1
     end
 
-    let(:user) { FactoryGirl.create(:active_record_user) }
+    let(:user) { FactoryBot.create(:active_record_user) }
 
     context 'when jwt is valid' do
       it 'success!' do

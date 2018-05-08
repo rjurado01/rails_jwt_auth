@@ -5,7 +5,7 @@ source 'https://rubygems.org'
 # development dependencies will be added by default to the :development group.
 gemspec
 
-gem 'factory_girl_rails'
+gem 'factory_bot'
 gem 'mongoid'
 gem 'rspec-rails'
 gem 'sqlite3'

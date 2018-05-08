@@ -92,7 +92,7 @@ describe RailsJwtAuth::Invitable do
           end
 
           context 'when completely registered' do
-            let(:user) { FactoryGirl.create "#{orm.underscore}_user", email: 'valid@example.com' }
+            let(:user) { FactoryBot.create "#{orm.underscore}_user", email: 'valid@example.com' }
 
             subject { "#{orm}User".constantize.invite! email: user.email }
 
@@ -146,7 +146,7 @@ describe RailsJwtAuth::Invitable do
         end
 
         context 'with non-invited user' do
-          let(:user) { FactoryGirl.create "#{orm.underscore}_user" }
+          let(:user) { FactoryBot.create "#{orm.underscore}_user" }
           before do
             user.accept_invitation!
           end
@@ -158,7 +158,7 @@ describe RailsJwtAuth::Invitable do
       end
 
       describe '#invite!' do
-        let(:user) { FactoryGirl.build "#{orm.underscore}_user" }
+        let(:user) { FactoryBot.build "#{orm.underscore}_user" }
 
         context 'without invitation token' do
           it 'generates invitation_token' do

@@ -8,7 +8,7 @@ describe RailsJwtAuth::ConfirmationsController do
       end
 
       let(:json) { JSON.parse(response.body) }
-      let(:user) { FactoryGirl.create("#{orm.underscore}_unconfirmed_user") }
+      let(:user) { FactoryBot.create("#{orm.underscore}_unconfirmed_user") }
 
       describe 'POST #create' do
         context 'when sends valid email' do
@@ -81,7 +81,7 @@ describe RailsJwtAuth::ConfirmationsController do
 
         context 'when does not send confirmation token' do
           before do
-            FactoryGirl.create("#{orm.underscore}_user", password: '12345678')
+            FactoryBot.create("#{orm.underscore}_user", password: '12345678')
 
             put :update
           end

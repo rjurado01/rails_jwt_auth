@@ -8,8 +8,8 @@ describe RailsJwtAuth::SessionsController do
       end
 
       let(:json) { JSON.parse(response.body) }
-      let(:user) { FactoryGirl.create("#{orm.underscore}_user") }
-      let(:unconfirmed_user) { FactoryGirl.create("#{orm.underscore}_unconfirmed_user") }
+      let(:user) { FactoryBot.create("#{orm.underscore}_user") }
+      let(:unconfirmed_user) { FactoryBot.create("#{orm.underscore}_unconfirmed_user") }
 
       describe 'POST #create' do
         context 'when all is ok' do

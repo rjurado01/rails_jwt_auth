@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :mongoid_user, class: MongoidUser do
     email
     password '12345678'

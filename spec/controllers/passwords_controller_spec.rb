@@ -8,8 +8,8 @@ describe RailsJwtAuth::PasswordsController do
       end
 
       let(:json) { JSON.parse(response.body) }
-      let(:user) { FactoryGirl.create("#{orm.underscore}_user", password: '12345678') }
-      let(:unconfirmed_user) { FactoryGirl.create("#{orm.underscore}_unconfirmed_user") }
+      let(:user) { FactoryBot.create("#{orm.underscore}_user", password: '12345678') }
+      let(:unconfirmed_user) { FactoryBot.create("#{orm.underscore}_unconfirmed_user") }
 
       describe 'POST #create' do
         context 'when sends valid email upper case and down case are ignored' do
@@ -104,7 +104,7 @@ describe RailsJwtAuth::PasswordsController do
 
         context 'when does not send reset_password_token' do
           before do
-            FactoryGirl.create("#{orm.underscore}_user", password: '12345678')
+            FactoryBot.create("#{orm.underscore}_user", password: '12345678')
 
             put :update
           end

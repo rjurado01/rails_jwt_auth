@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :active_record_user, class: ActiveRecordUser do
     email
     password '12345678'

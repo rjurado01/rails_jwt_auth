@@ -34,7 +34,7 @@ RSpec.describe RailsJwtAuth::InvitationsController do
           end
 
           context 'with already registered user' do
-            let(:user) { FactoryGirl.create "#{orm.underscore}_user" }
+            let(:user) { FactoryBot.create "#{orm.underscore}_user" }
 
             it 'returns HTTP 422 Unprocessable Entity' do
               post :create, params: {invitation: {email: user.email}}

@@ -2,8 +2,8 @@ require 'rails_helper'
 
 describe RailsJwtAuth::Confirmable do
   %w[ActiveRecord Mongoid].each do |orm|
-    let(:user) { FactoryGirl.create("#{orm.underscore}_user") }
-    let(:unconfirmed_user) { FactoryGirl.create("#{orm.underscore}_unconfirmed_user") }
+    let(:user) { FactoryBot.create("#{orm.underscore}_user") }
+    let(:unconfirmed_user) { FactoryBot.create("#{orm.underscore}_unconfirmed_user") }
 
     context "when use #{orm}" do
       describe '#attributes' do
@@ -53,7 +53,7 @@ describe RailsJwtAuth::Confirmable do
 
       describe '#skip_confirmation!' do
         it 'skips user confirmation after create' do
-          new_user = FactoryGirl.build("#{orm.underscore}_user")
+          new_user = FactoryBot.build("#{orm.underscore}_user")
           new_user.skip_confirmation!
           new_user.save
           expect(new_user.confirmed?).to be_truthy
@@ -81,7 +81,7 @@ describe RailsJwtAuth::Confirmable do
 
         it 'sends confirmation email' do
           mock = Mock.new
-          new_user = FactoryGirl.build("#{orm.underscore}_unconfirmed_user")
+          new_user = FactoryBot.build("#{orm.underscore}_unconfirmed_user")
           allow(RailsJwtAuth::Mailer).to receive(:confirmation_instructions).and_return(mock)
           expect(mock).to receive(:deliver)
           new_user.send_confirmation_instructions
@@ -93,7 +93,7 @@ describe RailsJwtAuth::Confirmable do
 
           it 'uses deliver_later method to send email' do
             mock = Mock.new
-            new_user = FactoryGirl.build("#{orm.underscore}_unconfirmed_user")
+            new_user = FactoryBot.build("#{orm.underscore}_unconfirmed_user")
             allow(RailsJwtAuth::Mailer).to receive(:confirmation_instructions).and_return(mock)
             expect(mock).to receive(:deliver_later)
             new_user.send_confirmation_instructions
@@ -130,7 +130,7 @@ describe RailsJwtAuth::Confirmable do
 
       describe '#after_create' do
         it 'sends confirmation instructions' do
-          new_user = FactoryGirl.build("#{orm.underscore}_user")
+          new_user = FactoryBot.build("#{orm.underscore}_user")
           expect(new_user).to receive(:send_confirmation_instructions)
           new_user.save
         end
