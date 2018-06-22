@@ -42,7 +42,7 @@ describe RailsJwtAuth::ConfirmationsController do
           end
 
           it 'returns not found error' do
-            expect(json['errors']['email']).to include(I18n.t('rails_jwt_auth.errors.not_found'))
+            expect(json['errors']['email'].first['error']).to eq 'not_found'
           end
         end
 
@@ -57,9 +57,7 @@ describe RailsJwtAuth::ConfirmationsController do
           end
 
           it 'returns expiration confirmation error message' do
-            expect(json['errors']['email'].first).to(
-              eq(I18n.t('rails_jwt_auth.errors.already_confirmed'))
-            )
+            expect(json['errors']['email'].first['error']).to eq 'already_confirmed'
           end
         end
       end
@@ -95,9 +93,7 @@ describe RailsJwtAuth::ConfirmationsController do
           end
 
           it 'returns error message' do
-            expect(json['errors']['confirmation_token']).to(
-              include(I18n.t('rails_jwt_auth.errors.not_found'))
-            )
+            expect(json['errors']['confirmation_token'].first['error']).to eq 'not_found'
           end
         end
 
@@ -115,15 +111,13 @@ describe RailsJwtAuth::ConfirmationsController do
           end
 
           it 'returns error message' do
-            expect(json['errors']['confirmation_token']).to(
-              include(I18n.t('rails_jwt_auth.errors.not_found'))
-            )
+            expect(json['errors']['confirmation_token'].first['error']).to eq 'not_found'
           end
         end
 
         context 'when sends expired confirmation token' do
           before do
-            user.update_attribute(:confirmation_sent_at, Time.now - 1.month)
+            user.update(confirmation_sent_at: Time.now - 1.month)
             put :update, params: {confirmation_token: user.confirmation_token}
           end
 
@@ -132,9 +126,7 @@ describe RailsJwtAuth::ConfirmationsController do
           end
 
           it 'returns expiration confirmation error message' do
-            expect(json['errors']['confirmation_token'].first).to(
-              eq(I18n.t('rails_jwt_auth.errors.expired'))
-            )
+            expect(json['errors']['confirmation_token'].first['error']).to eq 'expired'
           end
 
           it 'does not confirm user' do

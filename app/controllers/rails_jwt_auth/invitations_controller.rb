@@ -6,7 +6,7 @@ module RailsJwtAuth
     def create
       attr_hash = invitation_create_params
       user = RailsJwtAuth.model.invite!(attr_hash)
-      user.errors.empty? ? render_204 : render_422(user.errors)
+      user.errors.empty? ? render_204 : render_422(user.errors.details)
     end
 
     def update
@@ -17,7 +17,7 @@ module RailsJwtAuth
 
       return render_204 if user.errors.empty? && user.save
 
-      render_422(user.errors)
+      render_422(user.errors.details)
     end
   end
 end

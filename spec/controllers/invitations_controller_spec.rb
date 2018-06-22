@@ -9,9 +9,9 @@ RSpec.describe RailsJwtAuth::InvitationsController do
 
       describe 'POST #create' do
         context 'without passing email as param' do
-          subject { post :create, params: {} }
-
-          it { is_expected.to have_http_status(:unprocessable_entity) }
+          it 'raises ActiveRecord::ParameterMissing' do
+            expect { post :create, params: {} }.to raise_error ActionController::ParameterMissing
+          end
         end
 
         context 'passing email as param' do
@@ -87,10 +87,15 @@ RSpec.describe RailsJwtAuth::InvitationsController do
 
           context 'with expired invitation' do
             let!(:invited_user) { RailsJwtAuth.model.invite! email: 'test@example.com' }
+
             it 'returns HTTP 422 Unprocessable Entity' do
               Timecop.travel(3.days.from_now) do
-                put :update, params: {id: user.invitation_token}
+                put :update, params: {
+                  id: invited_user.invitation_token,
+                  invitation: {password: 'abcdef', password_confirmation: 'abcdef'}
+                }
               end
+
               expect(response).to have_http_status(:unprocessable_entity)
             end
           end

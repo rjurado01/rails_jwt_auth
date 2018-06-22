@@ -11,13 +11,13 @@ module RailsJwtAuth
         session_create_params[RailsJwtAuth.auth_field_name].to_s.downcase).first
 
       if !user
-        render_422 session: [create_session_error]
+        render_422 session: [{error: :invalid_session}]
       elsif user.respond_to?('confirmed?') && !user.confirmed?
-        render_422 session: [I18n.t('rails_jwt_auth.errors.unconfirmed')]
+        render_422 session: [{error: :unconfirmed}]
       elsif user.authenticate(session_create_params[:password])
         render_session get_jwt(user), user
       else
-        render_422 session: [create_session_error]
+        render_422 session: [{error: :invalid_session}]
       end
     end
 
@@ -31,10 +31,6 @@ module RailsJwtAuth
 
     def get_jwt(user)
       RailsJwtAuth::Jwt::Manager.encode(user.to_token_payload(request))
-    end
-
-    def create_session_error
-      I18n.t('rails_jwt_auth.errors.create_session', field: RailsJwtAuth.auth_field_name)
     end
   end
 end

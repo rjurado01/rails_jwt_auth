@@ -2,7 +2,7 @@ module RailsJwtAuth
   module Recoverable
     def send_reset_password_instructions
       if self.class.ancestors.include?(RailsJwtAuth::Confirmable) && !confirmed?
-        errors.add(:email, I18n.t('rails_jwt_auth.errors.unconfirmed'))
+        errors.add(:email, :unconfirmed)
         return false
       end
 
@@ -56,7 +56,7 @@ module RailsJwtAuth
     def validate_reset_password_token
       if reset_password_sent_at &&
          (reset_password_sent_at < (Time.now - RailsJwtAuth.reset_password_expiration_time))
-        errors.add(:reset_password_token, I18n.t('rails_jwt_auth.errors.expired'))
+        errors.add(:reset_password_token, :expired)
       end
     end
   end

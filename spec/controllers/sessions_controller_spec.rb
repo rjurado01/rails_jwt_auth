@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 describe RailsJwtAuth::SessionsController do
-  %w(ActiveRecord Mongoid).each do |orm|
+  %w[ActiveRecord Mongoid].each do |orm|
     context "when use #{orm}" do
       before :all do
         RailsJwtAuth.model_name = "#{orm}User"
@@ -29,16 +29,8 @@ describe RailsJwtAuth::SessionsController do
         end
 
         context 'when parameters are blank' do
-          before do
-            post :create, params: {}
-          end
-
-          it 'returns 422 status code' do
-            expect(response.status).to eq(422)
-          end
-
-          it 'returns error message' do
-            expect(json).to eq('session' => 'is required')
+          it 'raises ActionController::ParameterMissing' do
+            expect { post :create, params: {} }.to raise_error ActionController::ParameterMissing
           end
         end
 
@@ -52,8 +44,7 @@ describe RailsJwtAuth::SessionsController do
           end
 
           it 'returns error message' do
-            error = I18n.t('rails_jwt_auth.errors.create_session', field: RailsJwtAuth.auth_field_name)
-            expect(json['errors']['session']).to include(error)
+            expect(json['errors']['session'].first['error']).to eq 'invalid_session'
           end
         end
 
@@ -67,14 +58,13 @@ describe RailsJwtAuth::SessionsController do
           end
 
           it 'returns error message' do
-            error = I18n.t('rails_jwt_auth.errors.create_session', field: RailsJwtAuth.auth_field_name)
-            expect(json['errors']['session']).to include(error)
+            expect(json['errors']['session'].first['error']).to eq 'invalid_session'
           end
         end
 
         context 'when user is not confirmed' do
           before do
-            post :create, params: {email: unconfirmed_user.email, password: '12345678'}
+            post :create, params: {session: {email: unconfirmed_user.email, password: '12345678'}}
           end
 
           it 'returns 422 status code' do
@@ -82,7 +72,7 @@ describe RailsJwtAuth::SessionsController do
           end
 
           it 'returns error message' do
-            expect(json).to eq('session' => 'is required')
+            expect(json['errors']['session'].first['error']).to eq 'unconfirmed'
           end
         end
       end

@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 describe RailsJwtAuth::RegistrationsController do
-  %w(ActiveRecord Mongoid).each do |orm|
+  %w[ActiveRecord Mongoid].each do |orm|
     context "when use #{orm}" do
       before :all do
         RailsJwtAuth.model_name = "#{orm}User"
@@ -31,8 +31,8 @@ describe RailsJwtAuth::RegistrationsController do
           end
 
           it 'returns errors messages' do
-            expect(json['email']).to include('can\'t be blank')
-            expect(json['password']).to include('can\'t be blank')
+            expect(json['email'].first['error']).to eq 'blank'
+            expect(json['password'].first['error']).to eq 'blank'
           end
         end
 
