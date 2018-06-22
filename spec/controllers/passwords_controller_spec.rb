@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 describe RailsJwtAuth::PasswordsController do
-  %w(ActiveRecord Mongoid).each do |orm|
+  %w[ActiveRecord Mongoid].each do |orm|
     context "when use #{orm}" do
       before :all do
         RailsJwtAuth.model_name = "#{orm}User"
@@ -47,7 +47,7 @@ describe RailsJwtAuth::PasswordsController do
 
             it 'returns unconfirmed error message' do
               post :create, params: {password: {email: unconfirmed_user.email}}
-              expect(json['errors']['email']).to include(I18n.t('rails_jwt_auth.errors.unconfirmed'))
+              expect(json['errors']['email'].first['error']).to eq 'unconfirmed'
             end
           end
         end
@@ -62,7 +62,7 @@ describe RailsJwtAuth::PasswordsController do
           end
 
           it 'returns not found error' do
-            expect(json['errors']['email']).to include(I18n.t('rails_jwt_auth.errors.not_found'))
+            expect(json['errors']['email'].first['error']).to eq 'not_found'
           end
         end
       end
@@ -96,9 +96,7 @@ describe RailsJwtAuth::PasswordsController do
           end
 
           it 'returns error message' do
-            expect(json['errors']['reset_password_token']).to(
-              include(I18n.t('rails_jwt_auth.errors.not_found'))
-            )
+            expect(json['errors']['reset_password_token'].first['error']).to eq 'not_found'
           end
         end
 
@@ -114,9 +112,7 @@ describe RailsJwtAuth::PasswordsController do
           end
 
           it 'returns error message' do
-            expect(json['errors']['reset_password_token']).to(
-              include(I18n.t('rails_jwt_auth.errors.not_found'))
-            )
+            expect(json['errors']['reset_password_token'].first['error']).to eq 'not_found'
           end
         end
 
@@ -134,9 +130,7 @@ describe RailsJwtAuth::PasswordsController do
           end
 
           it 'returns confirmation error message' do
-            expect(json['errors']['password_confirmation']).to include(
-              I18n.t('errors.messages.confirmation', attribute: 'Password')
-            )
+            expect(json['errors']['password_confirmation'].first['error']).to eq 'confirmation'
           end
         end
 
@@ -154,9 +148,7 @@ describe RailsJwtAuth::PasswordsController do
           end
 
           it 'returns blank error message' do
-            expect(json['errors']['password']).to include(
-              I18n.t('rails_jwt_auth.errors.password.blank')
-            )
+            expect(json['errors']['password'].first['error']).to eq 'blank'
           end
         end
       end
