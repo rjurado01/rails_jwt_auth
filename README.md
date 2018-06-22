@@ -539,7 +539,7 @@ class UsersController < ApplicationController
 
   def create
     user = User.new(create_params)
-    user.set_and_send_password_instructions ? render_204 : render_422(user.errors)
+    user.set_and_send_password_instructions ? render_204 : render_422(user.errors.details)
   end
 
   private
