@@ -2,7 +2,7 @@ module RailsJwtAuth
   module Confirmable
     def send_confirmation_instructions
       if confirmed? && !unconfirmed_email
-        errors.add(:email, I18n.t('rails_jwt_auth.errors.already_confirmed'))
+        errors.add(:email, :already_confirmed)
         return false
       end
 
@@ -80,10 +80,10 @@ module RailsJwtAuth
       return true unless confirmed_at
 
       if confirmed_at_was && !email_changed?
-        errors.add(:email, I18n.t('rails_jwt_auth.errors.already_confirmed'))
+        errors.add(:email, :already_confirmed)
       elsif confirmation_sent_at &&
             (confirmation_sent_at < (Time.now - RailsJwtAuth.confirmation_expiration_time))
-        errors.add(:confirmation_token, I18n.t('rails_jwt_auth.errors.expired'))
+        errors.add(:confirmation_token, :expired)
       end
     end
   end
