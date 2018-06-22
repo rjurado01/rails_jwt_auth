@@ -144,9 +144,7 @@ describe RailsJwtAuth::Recoverable do
 
             user.password = 'newpassword'
             expect(user.save).to be_falsey
-            expect(user.errors['reset_password_token']).to include(
-              I18n.t('rails_jwt_auth.errors.expired')
-            )
+            expect(user.errors.details[:reset_password_token].first[:error]).to eq :expired
           end
         end
       end
