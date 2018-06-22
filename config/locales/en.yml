@@ -9,20 +9,3 @@ en:
         subject: "Set password instructions"
       send_invitation:
         subject: "Someone has sent you an invitation!"
-
-    errors:
-      unconfirmed: "unconfirmed email"
-      already_confirmed: "was already confirmed, please try signing in"
-      create_session: "invalid %{field} / password"
-      expired: "has expired, please request a new one"
-      invalid: "invalid"
-      blank: "blank"
-      not_found: "not found"
-      missing: "is missing"
-      email:
-        invalid: "is not an email"
-      current_password:
-        blank: "blank"
-        invalid: "invalid"
-      password:
-        blank: "blank"
