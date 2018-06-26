@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 describe RailsJwtAuth::Authenticatable do
-  %w(ActiveRecord Mongoid).each do |orm|
+  %w[ActiveRecord Mongoid].each do |orm|
     let(:user) { FactoryBot.create("#{orm.underscore}_user", auth_tokens: %w[abcd]) }
 
     context "when use #{orm}" do
@@ -16,8 +16,8 @@ describe RailsJwtAuth::Authenticatable do
         it 'validates email' do
           user.email = 'invalid'
           user.valid?
-          error = I18n.t('rails_jwt_auth.errors.email.invalid')
-          expect(user.errors.messages[:email]).to include(error)
+
+          expect(user.errors.messages[:email].first).to eq 'invalid'
         end
       end
 
@@ -47,9 +47,7 @@ describe RailsJwtAuth::Authenticatable do
 
           it 'addd blank error message' do
             user.update_with_password(password: 'new_password')
-            expect(user.errors.messages[:current_password]).to include(
-              I18n.t('rails_jwt_auth.errors.current_password.blank')
-            )
+            expect(user.errors.messages[:current_password].first).to eq 'blank'
           end
 
           it "don't updates password" do
@@ -65,9 +63,7 @@ describe RailsJwtAuth::Authenticatable do
 
           it 'addd blank error message' do
             user.update_with_password(current_password: 'invalid')
-            expect(user.errors.messages[:current_password]).to include(
-              I18n.t('rails_jwt_auth.errors.current_password.invalid')
-            )
+            expect(user.errors.messages[:current_password].first).to eq 'invalid'
           end
 
           it "don't updates password" do
@@ -153,7 +149,7 @@ describe RailsJwtAuth::Authenticatable do
 
       describe '.get_by_token' do
         it 'returns user with specified token' do
-          user = FactoryBot.create(:active_record_user, auth_tokens: %w(abcd efgh))
+          user = FactoryBot.create(:active_record_user, auth_tokens: %w[abcd efgh])
           expect(user.class.get_by_token('aaaa')).to eq(nil)
           expect(user.class.get_by_token('abcd')).to eq(user)
         end

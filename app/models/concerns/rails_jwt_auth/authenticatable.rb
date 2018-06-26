@@ -26,13 +26,13 @@ module RailsJwtAuth
 
     def update_with_password(params)
       if (current_password = params.delete(:current_password)).blank?
-        errors.add(:current_password, I18n.t('rails_jwt_auth.errors.current_password.blank'))
+        errors.add(:current_password, 'blank')
       elsif !authenticate(current_password)
-        errors.add(:current_password, I18n.t('rails_jwt_auth.errors.current_password.invalid'))
+        errors.add(:current_password, 'invalid')
       end
 
       if params[:password].blank?
-        errors.add(:password, I18n.t('rails_jwt_auth.errors.password.blank'))
+        errors.add(:password, 'blank')
       end
 
       errors.empty? ? update_attributes(params) : false
