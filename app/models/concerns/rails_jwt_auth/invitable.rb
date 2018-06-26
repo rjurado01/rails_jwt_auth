@@ -28,9 +28,7 @@ module RailsJwtAuth
       # @param [Hash] attributes Hash containing user's attributes to be filled.
       #               Must contain an email key.
       #
-      #
       # @return [user] The user created or found by email.
-
       def invite!(attributes={})
         attrs = ActiveSupport::HashWithIndifferentAccess.new(attributes.to_h)
         auth_field = RailsJwtAuth.auth_field_name
@@ -54,6 +52,7 @@ module RailsJwtAuth
 
     def accept_invitation!
       return unless invited?
+
       if valid_invitation?
         accept_invitation
         self.confirmed_at = Time.now.utc if respond_to? :confirmed_at
@@ -62,7 +61,6 @@ module RailsJwtAuth
       end
     end
 
-    # rubocop:disable Metrics/AbcSize
     def invite!
       self.invitation_created_at = Time.now.utc if new_record?
 
@@ -74,12 +72,12 @@ module RailsJwtAuth
 
       valid?
 
-      # Users that are registered and were not invited are not reinvitable
+      # users that are registered and were not invited are not reinvitable
       if !new_record? && !invited?
         errors.add(RailsJwtAuth.auth_field_name, :taken)
       end
 
-      # Users that have already accepted an invitation are not reinvitable
+      # users that have already accepted an invitation are not reinvitable
       if !new_record? && invited? && invitation_accepted_at.present?
         errors.add(RailsJwtAuth.auth_field_name, :taken)
       end
@@ -92,7 +90,6 @@ module RailsJwtAuth
       send_invitation_mail if save(validate: false)
       self
     end
-    # rubocop:enable Metrics/AbcSize
 
     def invited?
       (persisted? && invitation_token.present?)
