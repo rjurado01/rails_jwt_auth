@@ -12,6 +12,9 @@ module RailsJwtAuth
     def update
       attr_hash = invitation_update_params
       user = RailsJwtAuth.model.where(invitation_token: params[:id]).first
+
+      return render_404 if user.blank?
+
       user.assign_attributes attr_hash
       user.accept_invitation!
 

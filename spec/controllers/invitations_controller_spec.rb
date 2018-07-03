@@ -68,6 +68,19 @@ RSpec.describe RailsJwtAuth::InvitationsController do
             end
           end
 
+          context 'with invalid token' do
+            before do
+              put :update, params: {
+                id: 'invalid_token',
+                invitation: {password: 'abcdef', password_confirmation: 'abcdef'}
+              }
+            end
+
+            it 'returns HTTP 404' do
+              expect(response).to have_http_status(404)
+            end
+          end
+
           context 'with invitation token' do
             before do
               put :update, params: {
