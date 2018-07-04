@@ -5,7 +5,7 @@ module RailsJwtAuth
     end
 
     def current_user
-      warden.user
+      warden&.user
     end
 
     def warden
