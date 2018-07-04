@@ -13,6 +13,10 @@ module RailsJwtAuth
       render json: {}, status: 204
     end
 
+    def render_404
+      render json: {}, status: 404
+    end
+
     def render_422(errors)
       render json: {errors: errors}, status: 422
     end
