@@ -1,4 +1,5 @@
 require 'rails_helper'
+require 'rails_jwt_auth/jwt_manager'
 
 describe RailsJwtAuth::SessionsController do
   %w[ActiveRecord Mongoid].each do |orm|
@@ -23,7 +24,7 @@ describe RailsJwtAuth::SessionsController do
 
           it 'returns valid authentication token' do
             jwt = json['session']['jwt']
-            token = RailsJwtAuth::Jwt::Manager.decode(jwt)[0]['auth_token']
+            token = RailsJwtAuth::JwtManager.decode(jwt)[0]['auth_token']
             expect(token).to eq(user.reload.auth_tokens.last)
           end
         end
@@ -80,7 +81,13 @@ describe RailsJwtAuth::SessionsController do
       describe 'Delete #destroy' do
         context 'when user is logged' do
           before do
-            sign_in(user)
+            user.regenerate_auth_token
+            jwt_info = [{auth_token: user.auth_tokens.first}]
+
+            allow(controller).to receive(:current_user).and_return(user)
+            allow(controller).to receive(:authenticate!).and_return(true)
+            allow(RailsJwtAuth::JwtManager).to receive(:decode_from_request).and_return(jwt_info)
+
             delete :destroy
           end
 
@@ -94,13 +101,8 @@ describe RailsJwtAuth::SessionsController do
         end
 
         context 'when user is not logged' do
-          before do
-            sign_out
-            delete :destroy
-          end
-
-          it 'returns 401 status code' do
-            expect(response.status).to eq(401)
+          it 'raises RailsJwtAuth::NotAuthorized exception' do
+            expect { delete :destroy }.to raise_error RailsJwtAuth::NotAuthorized
           end
         end
       end

@@ -1,5 +1,4 @@
-require 'rails_jwt_auth/jwt/manager'
-require 'rails_jwt_auth/jwt/request'
+require 'rails_jwt_auth/jwt_manager'
 
 module RailsJwtAuth
   class SessionsController < ApplicationController
@@ -23,14 +22,15 @@ module RailsJwtAuth
 
     def destroy
       authenticate!
-      current_user.destroy_auth_token Jwt::Request.new(request).auth_token
+      payload = JwtManager.decode_from_request(request)&.first
+      current_user.destroy_auth_token payload['auth_token']
       render_204
     end
 
     private
 
     def get_jwt(user)
-      RailsJwtAuth::Jwt::Manager.encode(user.to_token_payload(request))
+      JwtManager.encode(user.to_token_payload(request))
     end
   end
 end

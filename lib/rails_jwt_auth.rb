@@ -1,4 +1,3 @@
-require 'warden'
 require 'bcrypt'
 
 require 'rails_jwt_auth/engine'

@@ -2,7 +2,7 @@
 [![Gem Version](https://badge.fury.io/rb/rails_jwt_auth.svg)](https://badge.fury.io/rb/rails_jwt_auth)
 ![Build Status](https://travis-ci.org/rjurado01/rails_jwt_auth.svg?branch=master)
 
-Rails-API authentication solution based on Warden and JWT and inspired by Devise.
+Rails-API authentication solution based on JWT and inspired by Devise.
 
 ## Installation
 
@@ -259,12 +259,12 @@ end
 
 RailsJwtAuth will create some helpers to use inside your controllers.
 
-To use this helpers we need to include `WardenHelper` into `ApplicationController`:
+To use this helpers we need to include `AuthenticableHelper` into `ApplicationController`:
 
 ```ruby
 # app/controllers/application_controller.rb
 class ApplicationController < ActionController::API
-  include RailsJwtAuth::WardenHelper
+  include RailsJwtAuth::AuthenticableHelper
 end
 ```
 
@@ -555,7 +555,7 @@ end
 Require the RailsJwtAuth::Spec::Helpers helper module in `rails_helper.rb`.
 
 ```ruby
-  require 'rails_jwt_auth/spec/helpers'
+  require 'rails_jwt_auth/spec_helpers'
   ...
   RSpec.configure do |config|
     ...
@@ -563,12 +563,11 @@ Require the RailsJwtAuth::Spec::Helpers helper module in `rails_helper.rb`.
   end
 ```
 
-And then we can just call sign_in(user) to sign in as a user, or sign_out for examples that have no user signed in. Here's two quick examples:
+And then we can just call sign_in(user) to sign in as a user:
 
 ```ruby
   describe ExampleController
     it "blocks unauthenticated access" do
-      sign_out
       expect { get :index }.to raise_error(RailsJwtAuth::Errors::NotAuthorized)
     end
 
