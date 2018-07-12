@@ -155,6 +155,19 @@ describe RailsJwtAuth::Invitable do
             expect(user.reload.invitation_accepted_at).to be_nil
           end
         end
+
+        context 'with already confirmed user' do
+          before do
+            @invited_user = "#{orm}User".constantize.invite! email: 'valid@example.com'
+            @invited_user.confirm!
+            @invited_user.accept_invitation!
+            @invited_user.save
+          end
+
+          it 'doesn\'t include already_confirmed in errors' do
+            expect(@invited_user.errors).to be_empty
+          end
+        end
       end
 
       describe '#invite!' do

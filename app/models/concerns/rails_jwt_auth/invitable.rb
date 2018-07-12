@@ -55,7 +55,7 @@ module RailsJwtAuth
 
       if valid_invitation?
         accept_invitation
-        self.confirmed_at = Time.now.utc if respond_to? :confirmed_at
+        self.confirmed_at = Time.now.utc if respond_to?(:confirmed_at) && confirmed_at.nil?
       else
         errors.add(:invitation_token, :invalid)
       end
