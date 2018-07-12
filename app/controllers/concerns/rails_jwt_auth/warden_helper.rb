@@ -19,6 +19,8 @@ module RailsJwtAuth
     def self.included(base)
       return unless Rails.env.test? && base.name == 'ApplicationController'
 
+      return unless defined?(RailsJwtAuth::Spec::NotAuthorized)
+
       base.send(:rescue_from, RailsJwtAuth::Spec::NotAuthorized) do
         render json: {}, status: 401
       end
