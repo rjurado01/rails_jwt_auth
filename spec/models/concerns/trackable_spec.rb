@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe RailsJwtAuth::Authenticatable do
+describe RailsJwtAuth::Trackable do
   %w[ActiveRecord Mongoid].each do |orm|
     let(:user) do
       FactoryBot.create(
@@ -35,17 +35,6 @@ describe RailsJwtAuth::Authenticatable do
           user.update_tracked_fields!(request)
           expect(user.last_sign_in_at).not_to eq(Time.now)
           expect(user.last_sign_in_ip).to eq('127.0.0.1')
-        end
-      end
-
-      describe 'hook' do
-        it 'calls update_tracked_fields! after_set_user' do
-          user = FactoryBot.create(:active_record_user)
-          expect(user).to receive(:update_tracked_fields!)
-
-          manager = Warden::Manager.new(nil, &Rails.application.config.middleware.detect{|m| m.name == 'Warden::Manager'}.block)
-          warden = Warden::Proxy.new({}, manager)
-          warden.set_user(user, store: false)
         end
       end
     end
