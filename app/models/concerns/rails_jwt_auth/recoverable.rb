@@ -7,7 +7,7 @@ module RailsJwtAuth
       end
 
       self.reset_password_token = SecureRandom.base58(24)
-      self.reset_password_sent_at = Time.now
+      self.reset_password_sent_at = Time.current
       return false unless save
 
       mailer = Mailer.reset_password_instructions(self)
@@ -22,7 +22,7 @@ module RailsJwtAuth
       self.skip_confirmation! if self.class.ancestors.include?(RailsJwtAuth::Confirmable)
 
       self.reset_password_token = SecureRandom.base58(24)
-      self.reset_password_sent_at = Time.now
+      self.reset_password_sent_at = Time.current
       return false unless save
 
       mailer = Mailer.set_password_instructions(self)
@@ -55,7 +55,7 @@ module RailsJwtAuth
 
     def validate_reset_password_token
       if reset_password_sent_at &&
-         (reset_password_sent_at < (Time.now - RailsJwtAuth.reset_password_expiration_time))
+         (reset_password_sent_at < (Time.current - RailsJwtAuth.reset_password_expiration_time))
         errors.add(:reset_password_token, :expired)
       end
     end

@@ -4,7 +4,7 @@ RSpec.describe RailsJwtAuth::Mailer, type: :mailer do
   describe 'confirmation_instructions' do
     let(:user) do
       FactoryBot.create(:active_record_unconfirmed_user,
-                         confirmation_token: 'abcd', confirmation_sent_at: Time.now)
+                         confirmation_token: 'abcd', confirmation_sent_at: Time.current)
     end
 
     let(:mail) { described_class.confirmation_instructions(user).deliver_now }
@@ -55,7 +55,7 @@ RSpec.describe RailsJwtAuth::Mailer, type: :mailer do
   describe 'reset_password_instructions' do
     let(:user) do
       FactoryBot.create(:active_record_user,
-                         reset_password_token: 'abcd', reset_password_sent_at: Time.now)
+                         reset_password_token: 'abcd', reset_password_sent_at: Time.current)
     end
 
     let(:mail) { described_class.reset_password_instructions(user).deliver_now }
@@ -94,7 +94,7 @@ RSpec.describe RailsJwtAuth::Mailer, type: :mailer do
   describe 'set_password_instructions' do
     let(:user) do
       FactoryBot.create(:active_record_user,
-                         reset_password_token: 'abcd', reset_password_sent_at: Time.now)
+                         reset_password_token: 'abcd', reset_password_sent_at: Time.current)
     end
 
     let(:mail) { described_class.set_password_instructions(user).deliver_now }
@@ -133,7 +133,7 @@ RSpec.describe RailsJwtAuth::Mailer, type: :mailer do
   describe 'send_invitation' do
     let(:user) do
       FactoryBot.create(:active_record_user,
-                         invitation_token: 'abcd', invitation_created_at: Time.now)
+                         invitation_token: 'abcd', invitation_created_at: Time.current)
     end
 
     let(:mail) { described_class.send_invitation(user).deliver_now }
