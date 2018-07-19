@@ -5,7 +5,7 @@ describe RailsJwtAuth::Trackable do
     let(:user) do
       FactoryBot.create(
         "#{orm.underscore}_user",
-        last_sign_in_at: Time.now,
+        last_sign_in_at: Time.current,
         last_sign_in_ip: '127.0.0.1'
       )
     end
@@ -33,7 +33,7 @@ describe RailsJwtAuth::Trackable do
           request = Request.new
           allow(request).to receive(:remote_ip).and_return('127.0.0.1')
           user.update_tracked_fields!(request)
-          expect(user.last_sign_in_at).not_to eq(Time.now)
+          expect(user.last_sign_in_at).not_to eq(Time.current)
           expect(user.last_sign_in_ip).to eq('127.0.0.1')
         end
       end

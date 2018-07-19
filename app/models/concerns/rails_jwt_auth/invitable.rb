@@ -46,7 +46,7 @@ module RailsJwtAuth
 
     # Accept an invitation by clearing token and setting invitation_accepted_at
     def accept_invitation
-      self.invitation_accepted_at = Time.now.utc
+      self.invitation_accepted_at = Time.current
       self.invitation_token = nil
     end
 
@@ -55,14 +55,14 @@ module RailsJwtAuth
 
       if valid_invitation?
         accept_invitation
-        self.confirmed_at = Time.now.utc if respond_to?(:confirmed_at) && confirmed_at.nil?
+        self.confirmed_at = Time.current if respond_to?(:confirmed_at) && confirmed_at.nil?
       else
         errors.add(:invitation_token, :invalid)
       end
     end
 
     def invite!
-      self.invitation_created_at = Time.now.utc if new_record?
+      self.invitation_created_at = Time.current if new_record?
 
       unless password || password_digest
         passw = SecureRandom.base58(16)
@@ -85,7 +85,7 @@ module RailsJwtAuth
       return self unless errors.empty?
 
       generate_invitation_token if invitation_token.nil?
-      self.invitation_sent_at = Time.now.utc
+      self.invitation_sent_at = Time.current
 
       send_invitation_mail if save(validate: false)
       self
@@ -121,7 +121,7 @@ module RailsJwtAuth
     def invitation_period_valid?
       time = invitation_sent_at || invitation_created_at
       expiration_time = RailsJwtAuth.invitation_expiration_time
-      time && (expiration_time.to_i.zero? || time.utc >= expiration_time.ago)
+      time && (expiration_time.to_i.zero? || time >= expiration_time.ago)
     end
   end
 end

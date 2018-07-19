@@ -69,19 +69,19 @@ describe RailsJwtAuth::Invitable do
             end
 
             it 'resets invitation_sent_at' do
-              Timecop.freeze(DateTime.now)
+              Timecop.freeze(Time.current)
               user = "#{orm}User".constantize.invite! email: 'test@example.com'
 
-              Timecop.freeze(DateTime.now + 30.days) do
+              Timecop.freeze(Time.current + 30.days) do
                 "#{orm}User".constantize.invite! email: user.email
                 expect(user.reload.invitation_sent_at.to_datetime.to_i)
-                  .to eq(Time.now.utc.to_datetime.to_i)
+                  .to eq(Time.current.to_datetime.to_i)
               end
 
               expect(user.reload.invitation_sent_at.to_datetime.to_i)
-                .to_not eq(Time.now.utc.to_datetime.to_i)
+                .to_not eq(Time.current.to_datetime.to_i)
               expect(user.reload.invitation_sent_at.to_datetime.to_i)
-                .to eq((Time.now.utc.to_datetime + 30.days).to_datetime.to_i)
+                .to eq((Time.current.to_datetime + 30.days).to_datetime.to_i)
               Timecop.return
             end
 
@@ -141,7 +141,7 @@ describe RailsJwtAuth::Invitable do
           end
 
           it 'sets invitation_accepted_at' do
-            expect(invited_user.invitation_accepted_at).to eq(Time.now.utc)
+            expect(invited_user.invitation_accepted_at).to eq(Time.current)
           end
         end
 

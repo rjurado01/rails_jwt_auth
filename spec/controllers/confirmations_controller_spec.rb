@@ -117,7 +117,7 @@ describe RailsJwtAuth::ConfirmationsController do
 
         context 'when sends expired confirmation token' do
           before do
-            user.update(confirmation_sent_at: Time.now - 1.month)
+            user.update(confirmation_sent_at: Time.current - 1.month)
             put :update, params: {confirmation_token: user.confirmation_token}
           end
 

@@ -115,7 +115,7 @@ describe RailsJwtAuth::Recoverable do
         context 'when updates password' do
           it 'cleans reset password token' do
             user.reset_password_token = 'abcd'
-            user.reset_password_sent_at = Time.now
+            user.reset_password_sent_at = Time.current
             user.save
             expect(user.reload.reset_password_token).not_to be_nil
 
@@ -138,7 +138,7 @@ describe RailsJwtAuth::Recoverable do
 
           it 'adds expiration error' do
             user.reset_password_token = 'abcd'
-            user.reset_password_sent_at = Time.now
+            user.reset_password_sent_at = Time.current
             user.save
             sleep 1
 

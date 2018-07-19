@@ -153,7 +153,7 @@ describe RailsJwtAuth::Confirmable do
         context 'when confirmation token has expired' do
           context 'try to confirm user' do
             it 'adds expiration error' do
-              unconfirmed_user.confirmed_at = Time.now
+              unconfirmed_user.confirmed_at = Time.current
 
               Timecop.freeze(Date.today + 30) do
                 expect(unconfirmed_user.save).to be_falsey
