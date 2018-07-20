@@ -3,17 +3,17 @@ require 'bcrypt'
 require 'rails_jwt_auth/engine'
 
 module RailsJwtAuth
+  InvalidEmailField = Class.new(StandardError)
+  InvalidAuthField = Class.new(StandardError)
+
   mattr_accessor :model_name
   self.model_name = 'User'
 
   mattr_accessor :auth_field_name
   self.auth_field_name = 'email'
 
-  mattr_accessor :auth_field_email
-  self.auth_field_email = true
-
-  mattr_accessor :email_regex
-  self.email_regex = /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\z/i
+  mattr_accessor :email_field_name
+  self.email_field_name = 'email'
 
   mattr_accessor :jwt_expiration_time
   self.jwt_expiration_time = 7.days
@@ -57,5 +57,31 @@ module RailsJwtAuth
 
   def self.setup
     yield self
+  end
+
+  def self.auth_field_name!
+    field_name = RailsJwtAuth.auth_field_name
+    klass = RailsJwtAuth.model
+
+    unless field_name.present? &&
+           (klass.respond_to?(:column_names) && klass.column_names.include?(field_name) ||
+            klass.respond_to?(:fields) && klass.fields[field_name])
+      raise RailsJwtAuth::InvalidAuthField
+    end
+
+    field_name
+  end
+
+  def self.email_field_name!
+    field_name = RailsJwtAuth.email_field_name
+    klass = RailsJwtAuth.model
+
+    unless field_name.present? &&
+           (klass.respond_to?(:column_names) && klass.column_names.include?(field_name) ||
+            klass.respond_to?(:fields) && klass.fields[field_name])
+      raise RailsJwtAuth::InvalidEmailField
+    end
+
+    field_name
   end
 end

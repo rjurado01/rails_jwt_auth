@@ -6,15 +6,14 @@ module RailsJwtAuth
     include RenderHelper
 
     def create
-      user = RailsJwtAuth.model.where(RailsJwtAuth.auth_field_name =>
-        session_create_params[RailsJwtAuth.auth_field_name].to_s.downcase).first
+      user = find_user
 
       if !user
         render_422 session: [{error: :invalid_session}]
       elsif user.respond_to?('confirmed?') && !user.confirmed?
         render_422 session: [{error: :unconfirmed}]
       elsif user.authenticate(session_create_params[:password])
-        render_session get_jwt(user), user
+        render_session generate_jwt(user), user
       else
         render_422 session: [{error: :invalid_session}]
       end
@@ -29,8 +28,13 @@ module RailsJwtAuth
 
     private
 
-    def get_jwt(user)
+    def generate_jwt(user)
       JwtManager.encode(user.to_token_payload(request))
+    end
+
+    def find_user
+      auth_field = RailsJwtAuth.auth_field_name!
+      RailsJwtAuth.model.where(auth_field => session_create_params[auth_field]).first
     end
   end
 end

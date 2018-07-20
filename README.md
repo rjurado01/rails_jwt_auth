@@ -88,10 +88,12 @@ Include `RailsJwtAuth::Authenticatable` module into your User class:
 class User
   include Mongoid::Document
   include RailsJwtAuth::Authenticatable
+
+  field :email, type: String
 end
 ```
 
-Fields are added automatically.
+Gem fields are added automatically.
 
 ## Confirmable
 

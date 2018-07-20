@@ -57,21 +57,13 @@ module RailsJwtAuth
 
       base.class_eval do
         if defined?(Mongoid) && ancestors.include?(Mongoid::Document)
-          field RailsJwtAuth.auth_field_name, type: String
-          field :password_digest,             type: String
-          field :auth_tokens,                 type: Array
+          field :password_digest,               type: String
+          field :auth_tokens,                   type: Array
         elsif defined?(ActiveRecord) && ancestors.include?(ActiveRecord::Base)
           serialize :auth_tokens, Array
         end
 
-        validates RailsJwtAuth.auth_field_name, presence: true, uniqueness: true
-        validates RailsJwtAuth.auth_field_name, email: true if RailsJwtAuth.auth_field_email
-
         has_secure_password
-
-        before_validation do
-          self.email = email.downcase if email
-        end
       end
     end
   end

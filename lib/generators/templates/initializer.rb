@@ -5,11 +5,8 @@ RailsJwtAuth.setup do |config|
   # field name used to authentication with password
   #config.auth_field_name = 'email'
 
-  # set to true to validate auth_field email format
-  #config.auth_field_email = true
-
-  # regex used to Validate email format
-  #config.email_regex = /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\z/i
+  # define email field name used to send emails
+  #config.email_field_name = 'email'
 
   # expiration time for generated tokens
   #config.jwt_expiration_time = 7.days

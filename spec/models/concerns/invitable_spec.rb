@@ -2,16 +2,11 @@ require 'rails_helper'
 
 describe RailsJwtAuth::Invitable do
   %w[ActiveRecord Mongoid].each do |orm|
-    let(:invited_user) { "#{orm}User".constantize.invite! email: 'valid@example.com' }
-
     context "Using #{orm}" do
-      before :all do
-        RailsJwtAuth.model_name = "#{orm}User"
-      end
+      before(:all) { RailsJwtAuth.model_name = "#{orm}User" }
+      before(:each) { ActionMailer::Base.deliveries.clear }
 
-      before :each do
-        ActionMailer::Base.deliveries.clear
-      end
+      let(:invited_user) { "#{orm}User".constantize.invite! email: 'valid@example.com' }
 
       describe '#attributes' do
         subject { invited_user }
@@ -27,8 +22,19 @@ describe RailsJwtAuth::Invitable do
       end
 
       describe '.invite!' do # Class method
+        context 'when auth field config is invalid' do
+          it 'throws InvalidAuthField an exception' do
+            allow(RailsJwtAuth).to receive(:auth_field_name).and_return(:invalid)
+
+            expect {
+              RailsJwtAuth.model.invite! email: 'user@example.com'
+            }.to raise_error(RailsJwtAuth::InvalidAuthField)
+          end
+        end
+
         context 'without existing user' do
-          subject { "#{orm}User".constantize.invite! email: 'another@example.com' }
+          subject { RailsJwtAuth.model.invite! email: 'another@example.com' }
+
           it 'creates a record' do
             expect { subject }.to change { "#{orm}User".constantize.count }.by 1
           end
@@ -40,11 +46,11 @@ describe RailsJwtAuth::Invitable do
 
           context 'with more fields than only email' do
             subject do
-              RailsJwtAuth.model.invite!(email: 'valid@example.com', name: 'TestName')
+              RailsJwtAuth.model.invite!(email: 'valid@example.com', username: 'TestName')
             end
 
             it 'has extra attributes assigned' do
-              expect(subject.name).to eq('TestName')
+              expect(subject.username).to eq('TestName')
             end
           end
         end
@@ -172,6 +178,13 @@ describe RailsJwtAuth::Invitable do
 
       describe '#invite!' do
         let(:user) { FactoryBot.build "#{orm.underscore}_user" }
+
+        context 'when email field config is invalid' do
+          it 'throws InvalidEmailField exception' do
+            allow(RailsJwtAuth).to receive(:email_field_name).and_return(:invalid)
+            expect { user.invite! }.to raise_error(RailsJwtAuth::InvalidEmailField)
+          end
+        end
 
         context 'without invitation token' do
           it 'generates invitation_token' do

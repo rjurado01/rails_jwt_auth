@@ -16,7 +16,7 @@ if defined?(ActionMailer)
       end
 
       subject = I18n.t('rails_jwt_auth.mailer.confirmation_instructions.subject')
-      mail(to: @user.unconfirmed_email || @user.email, subject: subject)
+      mail(to: @user.unconfirmed_email || @user[RailsJwtAuth.email_field_name], subject: subject)
     end
 
     def reset_password_instructions(user)
@@ -33,7 +33,7 @@ if defined?(ActionMailer)
       end
 
       subject = I18n.t('rails_jwt_auth.mailer.reset_password_instructions.subject')
-      mail(to: @user.email, subject: subject)
+      mail(to: @user[RailsJwtAuth.email_field_name], subject: subject)
     end
 
     def set_password_instructions(user)
@@ -50,7 +50,7 @@ if defined?(ActionMailer)
       end
 
       subject = I18n.t('rails_jwt_auth.mailer.set_password_instructions.subject')
-      mail(to: @user.email, subject: subject)
+      mail(to: @user[RailsJwtAuth.email_field_name], subject: subject)
     end
 
     def send_invitation(user)
@@ -66,7 +66,7 @@ if defined?(ActionMailer)
       end
 
       subject = I18n.t('rails_jwt_auth.mailer.send_invitation.subject')
-      mail(to: @user.email, subject: subject)
+      mail(to: @user[RailsJwtAuth.email_field_name], subject: subject)
     end
   end
 end

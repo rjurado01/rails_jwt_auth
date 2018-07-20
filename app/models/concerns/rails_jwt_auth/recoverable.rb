@@ -1,8 +1,29 @@
 module RailsJwtAuth
   module Recoverable
+    def self.included(base)
+      base.class_eval do
+        if defined?(Mongoid) && base.ancestors.include?(Mongoid::Document)
+          # include GlobalID::Identification to use deliver_later method
+          # http://edgeguides.rubyonrails.org/active_job_basics.html#globalid
+          include GlobalID::Identification if RailsJwtAuth.deliver_later
+
+          field :reset_password_token,   type: String
+          field :reset_password_sent_at, type: Time
+        end
+
+        validate :validate_reset_password_token, if: :password_digest_changed?
+
+        before_update do
+          self.reset_password_token = nil if password_digest_changed? && reset_password_token
+        end
+      end
+    end
+
     def send_reset_password_instructions
+      email_field = RailsJwtAuth.email_field_name! # ensure email field es valid
+
       if self.class.ancestors.include?(RailsJwtAuth::Confirmable) && !confirmed?
-        errors.add(:email, :unconfirmed)
+        errors.add(email_field, :unconfirmed)
         return false
       end
 
@@ -15,6 +36,7 @@ module RailsJwtAuth
     end
 
     def set_and_send_password_instructions
+      RailsJwtAuth.email_field_name! # ensure email field es valid
       return if password.present?
 
       self.password = SecureRandom.base58(48)
@@ -30,28 +52,7 @@ module RailsJwtAuth
       true
     end
 
-    def self.included(base)
-      base.class_eval do
-        if defined?(Mongoid) && base.ancestors.include?(Mongoid::Document)
-          # include GlobalID::Identification to use deliver_later method
-          # http://edgeguides.rubyonrails.org/active_job_basics.html#globalid
-          include GlobalID::Identification if RailsJwtAuth.deliver_later
-
-          field :reset_password_token,   type: String
-          field :reset_password_sent_at, type: Time
-        end
-
-        validate :validate_reset_password_token, if: :password_digest_changed?
-
-        before_update do
-          if password_digest_changed? && reset_password_token
-            self.reset_password_token = nil
-          end
-        end
-      end
-    end
-
-    private
+    protected
 
     def validate_reset_password_token
       if reset_password_sent_at &&
