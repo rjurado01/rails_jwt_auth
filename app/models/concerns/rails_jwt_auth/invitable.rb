@@ -1,7 +1,5 @@
 module RailsJwtAuth
   module Invitable
-    extend ActiveSupport::Concern
-
     def self.included(base)
       base.extend ClassMethods
       base.class_eval do
@@ -31,7 +29,7 @@ module RailsJwtAuth
       # @return [user] The user created or found by email.
       def invite!(attributes={})
         attrs = ActiveSupport::HashWithIndifferentAccess.new(attributes.to_h)
-        auth_field = RailsJwtAuth.auth_field_name
+        auth_field = RailsJwtAuth.auth_field_name!
         auth_attribute = attrs.delete(auth_field)
 
         raise ArgumentError unless auth_attribute
@@ -74,12 +72,12 @@ module RailsJwtAuth
 
       # users that are registered and were not invited are not reinvitable
       if !new_record? && !invited?
-        errors.add(RailsJwtAuth.auth_field_name, :taken)
+        errors.add(RailsJwtAuth.auth_field_name!, :taken)
       end
 
       # users that have already accepted an invitation are not reinvitable
       if !new_record? && invited? && invitation_accepted_at.present?
-        errors.add(RailsJwtAuth.auth_field_name, :taken)
+        errors.add(RailsJwtAuth.auth_field_name!, :taken)
       end
 
       return self unless errors.empty?
@@ -114,6 +112,7 @@ module RailsJwtAuth
     end
 
     def send_invitation_mail
+      RailsJwtAuth.email_field_name! # ensure email field es valid
       mailer = Mailer.send_invitation(self)
       RailsJwtAuth.deliver_later ? mailer.deliver_later : mailer.deliver
     end

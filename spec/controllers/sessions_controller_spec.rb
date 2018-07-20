@@ -29,6 +29,16 @@ describe RailsJwtAuth::SessionsController do
           end
         end
 
+        context 'when use diferent auth_field' do
+          before { RailsJwtAuth.auth_field_name = 'username' }
+          after { RailsJwtAuth.auth_field_name = 'email' }
+
+          it 'returns 201 status code' do
+            post :create, params: {session: {username: user.username, password: '12345678'}}
+            expect(response.status).to eq(201)
+          end
+        end
+
         context 'when parameters are blank' do
           it 'raises ActionController::ParameterMissing' do
             expect { post :create, params: {} }.to raise_error ActionController::ParameterMissing

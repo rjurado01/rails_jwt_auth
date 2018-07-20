@@ -11,6 +11,8 @@ describe RailsJwtAuth::Trackable do
     end
 
     context "when use #{orm}" do
+      before(:all) { RailsJwtAuth.model_name = "#{orm}User" }
+
       describe '#attributes' do
         it { expect(user).to have_attributes(last_sign_in_at: user.last_sign_in_at) }
         it { expect(user).to have_attributes(last_sign_in_ip: user.last_sign_in_ip) }

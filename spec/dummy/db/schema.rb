@@ -12,7 +12,9 @@
 
 ActiveRecord::Schema.define do
   create_table 'active_record_users', force: :cascade do |t|
+    t.string  'username'
     t.string  'email'
+
     t.string  'password_digest'
     t.string  'auth_tokens'
 
@@ -31,7 +33,5 @@ ActiveRecord::Schema.define do
     t.datetime  'invitation_sent_at'
     t.datetime  'invitation_accepted_at'
     t.datetime  'invitation_created_at'
-
-    t.string 'name' # For invitable
   end
 end

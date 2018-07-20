@@ -6,6 +6,8 @@ describe RailsJwtAuth::Confirmable do
     let(:unconfirmed_user) { FactoryBot.create("#{orm.underscore}_unconfirmed_user") }
 
     context "when use #{orm}" do
+      before(:all) { RailsJwtAuth.model_name = "#{orm}User" }
+
       describe '#attributes' do
         it { expect(user).to have_attributes(confirmation_token: user.confirmation_token) }
         it { expect(user).to have_attributes(confirmation_sent_at: user.confirmation_sent_at) }
@@ -122,6 +124,16 @@ describe RailsJwtAuth::Confirmable do
               expect(user.unconfirmed_email).to eq('new@email.com')
               expect(user.send_confirmation_instructions).to eq(true)
             end
+          end
+        end
+
+        context 'when email field config is invalid' do
+          it 'throws InvalidEmailField exception' do
+            allow(RailsJwtAuth).to receive(:email_field_name).and_return(:invalid)
+
+            expect {
+              user.send_confirmation_instructions
+            }.to raise_error(RailsJwtAuth::InvalidEmailField)
           end
         end
       end

@@ -15,6 +15,8 @@ describe RailsJwtAuth::Recoverable do
     end
 
     context "when use #{orm}" do
+      before(:all) { RailsJwtAuth.model_name = "#{orm}User" }
+
       describe '#attributes' do
         it { expect(user).to respond_to(:reset_password_token) }
         it { expect(user).to respond_to(:reset_password_sent_at) }
@@ -66,6 +68,16 @@ describe RailsJwtAuth::Recoverable do
           it 'doe not send reset password email' do
             expect(RailsJwtAuth::Mailer).not_to receive(:reset_password_instructions)
             user.send_reset_password_instructions
+          end
+        end
+
+        context 'when email field config is invalid' do
+          it 'throws InvalidEmailField exception' do
+            allow(RailsJwtAuth).to receive(:email_field_name).and_return(:invalid)
+
+            expect {
+              user.send_reset_password_instructions
+            }.to raise_error(RailsJwtAuth::InvalidEmailField)
           end
         end
       end
