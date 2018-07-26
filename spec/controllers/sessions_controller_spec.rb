@@ -29,6 +29,18 @@ describe RailsJwtAuth::SessionsController do
           end
         end
 
+        context 'when simultaneous sessions are 0' do
+          it 'returns id instead of token' do
+            allow(RailsJwtAuth).to receive(:simultaneous_sessions).and_return(0)
+            post :create, params: {session: {email: user.email, password: '12345678'}}
+
+            jwt = json['session']['jwt']
+            payload = RailsJwtAuth::JwtManager.decode(jwt)[0]
+            expect(payload['auth_token']).to be_nil
+            expect(payload['id']).to eq(user.id.to_s)
+          end
+        end
+
         context 'when use diferent auth_field' do
           before { RailsJwtAuth.auth_field_name = 'username' }
           after { RailsJwtAuth.auth_field_name = 'email' }
@@ -113,6 +125,15 @@ describe RailsJwtAuth::SessionsController do
         context 'when user is not logged' do
           it 'raises RailsJwtAuth::NotAuthorized exception' do
             expect { delete :destroy }.to raise_error RailsJwtAuth::NotAuthorized
+          end
+        end
+
+        context 'when simultaneous sessions are 0' do
+          it 'returns 404 status code' do
+            allow(RailsJwtAuth).to receive(:simultaneous_sessions).and_return(0)
+
+            delete :destroy
+            expect(response.status).to eq(404)
           end
         end
       end

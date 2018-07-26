@@ -19,7 +19,7 @@ module RailsJwtAuth
         unauthorize!
       end
 
-      if !@current_user = RailsJwtAuth.model.get_by_token(payload['auth_token'])
+      if !@current_user = RailsJwtAuth.model.from_token_payload(payload)
         unauthorize!
       elsif @current_user.respond_to? :update_tracked_fields!
         @current_user.update_tracked_fields!(request)

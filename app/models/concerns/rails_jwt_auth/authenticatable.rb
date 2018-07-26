@@ -2,6 +2,21 @@ include ActiveModel::SecurePassword
 
 module RailsJwtAuth
   module Authenticatable
+    def self.included(base)
+      base.extend(ClassMethods)
+
+      base.class_eval do
+        if defined?(Mongoid) && ancestors.include?(Mongoid::Document)
+          field :password_digest, type: String
+          field :auth_tokens, type: Array if RailsJwtAuth.simultaneous_sessions > 0
+        elsif defined?(ActiveRecord) && ancestors.include?(ActiveRecord::Base)
+          serialize :auth_tokens, Array
+        end
+
+        has_secure_password
+      end
+    end
+
     def regenerate_auth_token(token = nil)
       new_token = SecureRandom.base58(24)
 
@@ -38,32 +53,29 @@ module RailsJwtAuth
       errors.empty? ? update_attributes(params) : false
     end
 
-    def to_token_payload(_request)
-      {auth_token: regenerate_auth_token}
+    def to_token_payload(_request=nil)
+      if RailsJwtAuth.simultaneous_sessions > 0
+        {auth_token: regenerate_auth_token}
+      else
+        {id: id.to_s}
+      end
     end
 
     module ClassMethods
+      def from_token_payload(payload)
+        if RailsJwtAuth.simultaneous_sessions > 0
+          get_by_token(payload['auth_token'])
+        else
+          where(id: payload['id']).first
+        end
+      end
+
       def get_by_token(token)
         if defined?(Mongoid) && ancestors.include?(Mongoid::Document)
           where(auth_tokens: token).first
         elsif defined?(ActiveRecord) && ancestors.include?(ActiveRecord::Base)
           where('auth_tokens like ?', "%#{token}%").first
         end
-      end
-    end
-
-    def self.included(base)
-      base.extend(ClassMethods)
-
-      base.class_eval do
-        if defined?(Mongoid) && ancestors.include?(Mongoid::Document)
-          field :password_digest,               type: String
-          field :auth_tokens,                   type: Array
-        elsif defined?(ActiveRecord) && ancestors.include?(ActiveRecord::Base)
-          serialize :auth_tokens, Array
-        end
-
-        has_secure_password
       end
     end
   end

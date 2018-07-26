@@ -20,6 +20,8 @@ module RailsJwtAuth
     end
 
     def destroy
+      return render_404 unless RailsJwtAuth.simultaneous_sessions > 0
+
       authenticate!
       payload = JwtManager.decode_from_request(request)&.first
       current_user.destroy_auth_token payload['auth_token']

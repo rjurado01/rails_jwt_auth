@@ -130,6 +130,43 @@ describe RailsJwtAuth::Authenticatable do
         end
       end
 
+      describe '#to_token_payload' do
+        context 'when use simultaneous sessions' do
+          it 'returns payload with auth_token' do
+            payload = user.to_token_payload
+            expect(payload[:auth_token]).to eq(user.auth_tokens.first)
+          end
+        end
+
+        context 'when simultaneous sessions are 0' do
+          it 'returns payload with user id' do
+            allow(RailsJwtAuth).to receive(:simultaneous_sessions).and_return(0)
+            payload = user.to_token_payload
+            expect(payload[:auth_token]).to be_nil
+            expect(payload[:id]).to eq(user.id.to_s)
+          end
+        end
+      end
+
+      describe '.from_token_payload' do
+        context 'when use simultaneous sessions' do
+          it 'returns user by auth token' do
+            user.regenerate_auth_token
+
+            expect(
+              RailsJwtAuth.model.from_token_payload({'auth_token' => user.auth_tokens.last})
+            ).to eq(user)
+          end
+        end
+
+        context 'when simultaneous sessions are 0' do
+          it 'returns user by id' do
+            allow(RailsJwtAuth).to receive(:simultaneous_sessions).and_return(0)
+            expect(RailsJwtAuth.model.from_token_payload({'id' => user.id.to_s})).to eq(user)
+          end
+        end
+      end
+
       describe '.get_by_token' do
         it 'returns user with specified token' do
           user = FactoryBot.create(:active_record_user, auth_tokens: %w[abcd efgh])
