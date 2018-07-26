@@ -34,24 +34,24 @@ rails g rails_jwt_auth:install
 
 You can edit configuration options into `config/initializers/auth_token_auth.rb` file created by generator.
 
-| Option                         | Default value     | Description                                                           |
-| ------------------------------ | ----------------- | --------------------------------------------------------------------- |
-| model_name                     | 'User'            | Authentication model name                                             |
-| auth_field_name                | 'email'           | Field used to authenticate user with password                         |
-| auth_field_email               | true              | Validate auth field email format                                      |
-| email_regex                    | see config file   | Regex used to Validate email format                                   |
-| jwt_expiration_time            | 7.days            | Tokens expiration time                                                |
-| jwt_issuer                     | 'RailsJwtAuth'    | The "iss" (issuer) claim identifies the principal that issued the JWT |
-| simultaneous_sessions          | 2                 | Number of simultaneous sessions for an user                           |
-| mailer_sender                  |                   | E-mail address which will be shown in RailsJwtAuth::Mailer            |
-| confirmation_url               | confirmation_path | Url used to create email link with confirmation token                 |
-| confirmation_expiration_time   | 1.day             | Confirmation token expiration time                                    |
-| reset_password_url             | password_path     | Url used to create email link with reset password token               |
-| reset_password_expiration_time | 1.day             | Confirmation token expiration time                                    |
-| set_password_url               | password_path     | Url used to create email link with set password token                 |
-| deliver_later                  | false             | Uses `deliver_later` method to send emails                            |
-| invitation_expiration_time     | 2.days            | Time an invitation is valid and can be accepted                       |
-| accept_invitation_url          | invitations_path  | URL used to create email link with invitation token                   |
+| Option                         | Default value     | Description                                                            |
+| ------------------------------ | ----------------- | ---------------------------------------------------------------------- |
+| model_name                     | 'User'            | Authentication model name                                              |
+| auth_field_name                | 'email'           | Field used to authenticate user with password                          |
+| auth_field_email               | true              | Validate auth field email format                                       |
+| email_regex                    | see config file   | Regex used to Validate email format                                    |
+| jwt_expiration_time            | 7.days            | Tokens expiration time                                                 |
+| jwt_issuer                     | 'RailsJwtAuth'    | The "iss" (issuer) claim identifies the principal that issued the JWT  |
+| simultaneous_sessions          | 2                 | Number of simultaneous sessions for an user. Set 0 to disable sessions |
+| mailer_sender                  |                   | E-mail address which will be shown in RailsJwtAuth::Mailer             |
+| confirmation_url               | confirmation_path | Url used to create email link with confirmation token                  |
+| confirmation_expiration_time   | 1.day             | Confirmation token expiration time                                     |
+| reset_password_url             | password_path     | Url used to create email link with reset password token                |
+| reset_password_expiration_time | 1.day             | Confirmation token expiration time                                     |
+| set_password_url               | password_path     | Url used to create email link with set password token                  |
+| deliver_later                  | false             | Uses `deliver_later` method to send emails                             |
+| invitation_expiration_time     | 2.days            | Time an invitation is valid and can be accepted                        |
+| accept_invitation_url          | invitations_path  | URL used to create email link with invitation token                    |
 
 ## Authenticatable
 
