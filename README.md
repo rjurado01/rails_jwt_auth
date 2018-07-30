@@ -1,4 +1,5 @@
 # RailsJwtAuth
+
 [![Gem Version](https://badge.fury.io/rb/rails_jwt_auth.svg)](https://badge.fury.io/rb/rails_jwt_auth)
 ![Build Status](https://travis-ci.org/rjurado01/rails_jwt_auth.svg?branch=master)
 
@@ -30,6 +31,12 @@ Finally execute:
 rails g rails_jwt_auth:install
 ```
 
+Only for ActiveRecord, generate migrations:
+
+```bash
+rails g rails_jwt_auth:migrate
+```
+
 ## Configuration
 
 You can edit configuration options into `config/initializers/auth_token_auth.rb` file created by generator.
@@ -38,8 +45,7 @@ You can edit configuration options into `config/initializers/auth_token_auth.rb`
 | ------------------------------ | ----------------- | ---------------------------------------------------------------------- |
 | model_name                     | 'User'            | Authentication model name                                              |
 | auth_field_name                | 'email'           | Field used to authenticate user with password                          |
-| auth_field_email               | true              | Validate auth field email format                                       |
-| email_regex                    | see config file   | Regex used to Validate email format                                    |
+| email_auth_field               | 'email'           | Field used to send emails                                              |
 | jwt_expiration_time            | 7.days            | Tokens expiration time                                                 |
 | jwt_issuer                     | 'RailsJwtAuth'    | The "iss" (issuer) claim identifies the principal that issued the JWT  |
 | simultaneous_sessions          | 2                 | Number of simultaneous sessions for an user. Set 0 to disable sessions |
@@ -53,207 +59,55 @@ You can edit configuration options into `config/initializers/auth_token_auth.rb`
 | invitation_expiration_time     | 2.days            | Time an invitation is valid and can be accepted                        |
 | accept_invitation_url          | invitations_path  | URL used to create email link with invitation token                    |
 
-## Authenticatable
+## Modules
 
-Hashes and stores a password in the database to validate the authenticity of a user while signing in.
+| Module        | Description                                                                                                     |
+| ------------- | --------------------------------------------------------------------------------------------------------------- |
+| Authenticable | Hashes and stores a password in the database to validate the authenticity of a user while signing in            |
+| Confirmable   | Sends emails with confirmation instructions and verifies whether an account is already confirmed during sign in |
+| Recoverable   | Resets the user password and sends reset instructions                                                           |
+| Trackable     | Tracks sign in timestamps and IP address                                                                        |
+| Invitable     | Allows you to invite an user to your application sending an invitation mail                                     |
 
-### ActiveRecord
+### Examples
 
-Include `RailsJwtAuth::Authenticatable` module into your User class:
+For next examples `auth_field_name` and `email_field_name` are configured to use the field `email`.
+
+**ActiveRecord**
 
 ```ruby
 # app/models/user.rb
 class User < ApplicationRecord
   include RailsJwtAuth::Authenticatable
+  include RailsJwtAuth::Confirmable
+  include RailsJwtAuth::Recoverable
+  include RailsJwtAuth::Trackable
+  include RailsJwtAuth::Invitable
+
+  validates :email, presence: true,
+                    uniqueness: true,
+                    format: /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\z/i
 end
 ```
 
-and create a migration to add authenticable fields to User model:
+Ensure you have executed migrate task: `rails g rails_jwt_auth:migrate` and you have uncomented all modules fields.
+
+**Mongoid**
 
 ```ruby
-# example migration
-create_table :users do |t|
-  t.string :email
-  t.string :password_digest
-  t.string :auth_tokens
-end
-```
-
-### Mongoid
-
-Include `RailsJwtAuth::Authenticatable` module into your User class:
-
-```ruby
-# app/models/user.rb
 class User
   include Mongoid::Document
   include RailsJwtAuth::Authenticatable
+  include RailsJwtAuth::Confirmable
+  include RailsJwtAuth::Recoverable
+  include RailsJwtAuth::Trackable
+  include RailsJwtAuth::Invitable
 
   field :email, type: String
-end
-```
 
-Gem fields are added automatically.
-
-## Confirmable
-
-Sends emails with confirmation instructions and verifies whether an account is already confirmed during sign in.
-
-### ActiveRecord
-
-Include `RailsJwtAuth::Confirmable` module into your User class:
-
-```ruby
-# app/models/user.rb
-class User < ApplicationRecord
-  include RailsJwtAuth::Authenticatable
-  include RailsJwtAuth::Confirmable
-end
-```
-
-and create a migration to add confirmation fields to User model:
-
-```ruby
-# example migration
-change_table :users do |t|
-  t.string :email # if it doesn't exist yet
-  t.string :unconfirmed_email
-  t.string :confirmation_token
-  t.datetime :confirmation_sent_at
-  t.datetime :confirmed_at
-end
-```
-
-### Mongoid
-
-Include `RailsJwtAuth::Confirmable` module into your User class:
-
-```ruby
-# app/models/user.rb
-class User
-  include Mongoid::Document
-  include RailsJwtAuth::Authenticatable
-  include RailsJwtAuth::Confirmable
-end
-```
-
-This module needs that model has `email` field.
-
-## Recoverable
-
-Resets the user password and sends reset instructions
-
-### ActiveRecord
-
-Include `RailsJwtAuth::Recoverable` module into your User class:
-
-```ruby
-# app/models/user.rb
-class User < ApplicationRecord
-  include RailsJwtAuth::Authenticatable
-  include RailsJwtAuth::Recoverable
-end
-```
-
-and create a migration to add recoverable fields to User model:
-
-```ruby
-# example migration
-change_table :users do |t|
-  t.string :reset_password_token
-  t.datetime :reset_password_sent_at
-end
-```
-
-### Mongoid
-
-Include `RailsJwtAuth::Recoverable` module into your User class:
-
-```ruby
-# app/models/user.rb
-class User
-  include Mongoid::Document
-  include RailsJwtAuth::Authenticatable
-  include RailsJwtAuth::Recoverable
-end
-```
-
-## Trackable
-
-Tracks sign in timestamps and IP address.
-
-### ActiveRecord
-
-Include `RailsJwtAuth::Trackable` module into your User class:
-
-```ruby
-# app/models/user.rb
-class User < ApplicationRecord
-  include RailsJwtAuth::Authenticatable
-  include RailsJwtAuth::Trackable
-end
-```
-
-and create a migration to add recoverable fields to User model:
-
-```ruby
-# example migration
-change_table :users do |t|
-  t.string :last_sign_in_ip
-  t.datetime :last_sign_in_at
-end
-```
-
-### Mongoid
-
-Include `RailsJwtAuth::Trackable` module into your User class:
-
-```ruby
-# app/models/user.rb
-class User
-  include Mongoid::Document
-  include RailsJwtAuth::Authenticatable
-  include RailsJwtAuth::Trackable
-end
-```
-
-## Invitable
-
-This module allows you to invite an user to your application sending an invitation mail with a unique link and complete registration by setting user's password.
-
-### ActiveRecord
-
-Include `RailsJwtAuth::Invitable` module in your User model:
-
-```ruby
-# app/models/user.rb
-class User < ApplicationRecord
-  include RailsJwtAuth::Authenticatable
-  include RailsJwtAuth::Invitable
-end
-```
-
-And create the corresponding migration
-
-```ruby
-# Example migration
-change_table :users do |t|
-  t.string :invitation_token
-  t.datetime :invitation_sent_at
-  t.datetime :invitation_accepted_at
-  t.datetime :invitation_created_at
-end
-```
-
-### Mongoid
-
-Include `RailsJwtAuth::Invitable` module in your User model:
-
-```ruby
-# app/models/user.rb
-class User < ApplicationRecord
-  include RailsJwtAuth::Authenticatable
-  include RailsJwtAuth::Invitable
+  validates :email, presence: true,
+                    uniqueness: true,
+                    format: /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\z/i
 end
 ```
 
@@ -294,7 +148,7 @@ end
 
 ### Session
 
-Session api is defined by RailsJwtAuth::SessionsController.
+Session api is defined by `RailsJwtAuth::SessionsController`.
 
 1.  Get session token:
 
@@ -323,7 +177,7 @@ Session api is defined by RailsJwtAuth::SessionsController.
 
 ### Registration
 
-Registration api is defined by RailsJwtAuth::RegistrationsController.
+Registration api is defined by `RailsJwtAuth::RegistrationsController`.
 
 1.  Register user:
 
@@ -352,7 +206,7 @@ Registration api is defined by RailsJwtAuth::RegistrationsController.
 
 ### Confirmation
 
-Confirmation api is defined by RailsJwtAuth::ConfirmationsController.
+Confirmation api is defined by `RailsJwtAuth::ConfirmationsController`.
 
 1.  Confirm user:
 
@@ -382,7 +236,7 @@ Confirmation api is defined by RailsJwtAuth::ConfirmationsController.
 
 ### Password
 
-Password api is defined by RailsJwtAuth::PasswordsController.
+Password api is defined by `RailsJwtAuth::PasswordsController`.
 
 1.  Send reset password email:
 
@@ -416,7 +270,7 @@ Password api is defined by RailsJwtAuth::PasswordsController.
 
 ### Invitations
 
-Invitations api is provided by RailsJwtAuth::InvitationsController.
+Invitations api is provided by `RailsJwtAuth::InvitationsController`.
 
 1.  Create an invitation and send email:
 
@@ -557,28 +411,28 @@ end
 Require the RailsJwtAuth::Spec::Helpers helper module in `rails_helper.rb`.
 
 ```ruby
-  require 'rails_jwt_auth/spec_helpers'
+require 'rails_jwt_auth/spec_helpers'
+...
+RSpec.configure do |config|
   ...
-  RSpec.configure do |config|
-    ...
-    config.include RailsJwtAuth::Spec::Helpers, :type => :controller
-  end
+  config.include RailsJwtAuth::Spec::Helpers, :type => :controller
+end
 ```
 
 And then we can just call sign_in(user) to sign in as a user:
 
 ```ruby
-  describe ExampleController
-    it "blocks unauthenticated access" do
-      expect { get :index }.to raise_error(RailsJwtAuth::Errors::NotAuthorized)
-    end
-
-    it "allows authenticated access" do
-      sign_in user
-      get :index
-      expect(response).to be_success
-    end
+describe ExampleController
+  it "blocks unauthenticated access" do
+    expect { get :index }.to raise_error(RailsJwtAuth::Errors::NotAuthorized)
   end
+
+  it "allows authenticated access" do
+    sign_in user
+    get :index
+    expect(response).to be_success
+  end
+end
 ```
 
 ## Locales
