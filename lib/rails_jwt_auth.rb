@@ -55,6 +55,10 @@ module RailsJwtAuth
     model_name.constantize
   end
 
+  def self.table_name
+    model_name.underscore.pluralize
+  end
+
   def self.setup
     yield self
   end
