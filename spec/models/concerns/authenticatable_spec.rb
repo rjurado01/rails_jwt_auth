@@ -67,6 +67,68 @@ describe RailsJwtAuth::Authenticatable do
             expect(user.authenticate('new_password')).to be_truthy
           end
         end
+
+        context 'when RailsJwtAuth::Authenticable is used with RailsJwtAuth::Recoverable' do
+          let(:current_password) { '12345678' }
+          let(:new_password) { 'new_password' }
+
+          context 'when reset_password_sent_at is expired' do
+            before do
+              @user = FactoryBot.create(:active_record_user,
+                                        password: current_password,
+                                        reset_password_token: '12345678',
+                                        reset_password_sent_at: Time.zone.now)
+              Timecop.travel(Time.zone.now + RailsJwtAuth.reset_password_expiration_time)
+            end
+
+            after do
+              Timecop.return
+            end
+
+            it 'reset recoverable fields' do
+              @user.update_with_password(current_password: current_password, password: new_password)
+              @user.reload
+              expect(@user.reset_password_sent_at).to be_nil
+              expect(@user.reset_password_token).to be_nil
+            end
+
+            it 'updates password' do
+              expect(
+                @user.update_with_password(
+                  current_password: current_password,
+                  password: new_password
+                )
+              ).to be_truthy
+              expect(@user.reload.authenticate(new_password)).to be_truthy
+            end
+          end
+
+          context 'when reset_password_sent_at is valid' do
+            before do
+              @user = FactoryBot.create(:active_record_user,
+                                        password: current_password,
+                                        reset_password_token: '12345678',
+                                        reset_password_sent_at: Time.zone.now)
+            end
+
+            it 'reset recoverable fields' do
+              @user.update_with_password(current_password: current_password, password: new_password)
+              @user.reload
+              expect(@user.reset_password_sent_at).to be_nil
+              expect(@user.reset_password_token).to be_nil
+            end
+
+            it 'updates password' do
+              expect(
+                @user.update_with_password(
+                  current_password: current_password,
+                  password: new_password
+                )
+              ).to be_truthy
+              expect(@user.reload.authenticate(new_password)).to be_truthy
+            end
+          end
+        end
       end
 
       describe '#regenerate_auth_token' do
