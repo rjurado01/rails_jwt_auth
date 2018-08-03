@@ -50,6 +50,8 @@ module RailsJwtAuth
         errors.add(:password, 'blank')
       end
 
+      params.merge!(reset_password_token: nil, reset_password_sent_at: nil) if reset_password_token
+
       errors.empty? ? update_attributes(params) : false
     end
 
