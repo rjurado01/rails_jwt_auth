@@ -77,8 +77,8 @@ describe RailsJwtAuth::Authenticatable do
               @user = FactoryBot.create(:active_record_user,
                                         password: current_password,
                                         reset_password_token: '12345678',
-                                        reset_password_sent_at: Time.zone.now)
-              Timecop.travel(Time.zone.now + RailsJwtAuth.reset_password_expiration_time)
+                                        reset_password_sent_at: Time.current)
+              Timecop.travel(Time.current + RailsJwtAuth.reset_password_expiration_time)
             end
 
             after do
@@ -108,7 +108,7 @@ describe RailsJwtAuth::Authenticatable do
               @user = FactoryBot.create(:active_record_user,
                                         password: current_password,
                                         reset_password_token: '12345678',
-                                        reset_password_sent_at: Time.zone.now)
+                                        reset_password_sent_at: Time.current)
             end
 
             it 'reset recoverable fields' do
