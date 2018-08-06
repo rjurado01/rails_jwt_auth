@@ -65,6 +65,9 @@ RSpec.configure do |config|
     ActiveRecordUser.destroy_all
 
     RailsJwtAuth.simultaneous_sessions = 1
-    RailsJwtAuth.confirmation_url = nil
+    RailsJwtAuth.confirmations_url = 'http://example.com/confirmations'
+    RailsJwtAuth.invitations_url = 'http://example.com/invitations'
+    RailsJwtAuth.reset_passwords_url = 'http://example.com/reset_passwords'
+    RailsJwtAuth.set_passwords_url = 'http://example.com/set_passwords'
   end
 end

@@ -50,14 +50,14 @@ You can edit configuration options into `config/initializers/auth_token_auth.rb`
 | jwt_issuer                     | 'RailsJwtAuth'    | The "iss" (issuer) claim identifies the principal that issued the JWT  |
 | simultaneous_sessions          | 2                 | Number of simultaneous sessions for an user. Set 0 to disable sessions |
 | mailer_sender                  |                   | E-mail address which will be shown in RailsJwtAuth::Mailer             |
-| confirmation_url               | confirmation_path | Url used to create email link with confirmation token                  |
 | confirmation_expiration_time   | 1.day             | Confirmation token expiration time                                     |
-| reset_password_url             | password_path     | Url used to create email link with reset password token                |
 | reset_password_expiration_time | 1.day             | Confirmation token expiration time                                     |
-| set_password_url               | password_path     | Url used to create email link with set password token                  |
 | deliver_later                  | false             | Uses `deliver_later` method to send emails                             |
 | invitation_expiration_time     | 2.days            | Time an invitation is valid and can be accepted                        |
-| accept_invitation_url          | invitations_path  | URL used to create email link with invitation token                    |
+| confirmations_url              | nil               | Url used to create email link with confirmation token                  |
+| reset_passwords_url            | nil               | Url used to create email link with reset password token                |
+| set_passwords_url              | nil               | Url used to create email link with set password token                  |
+| invitationss_url               | nil               | Url used to create email link with invitation token                    |
 
 ## Modules
 

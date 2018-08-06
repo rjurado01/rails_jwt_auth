@@ -5,6 +5,10 @@ require 'rails_jwt_auth/engine'
 module RailsJwtAuth
   InvalidEmailField = Class.new(StandardError)
   InvalidAuthField = Class.new(StandardError)
+  NotConfirmationsUrl = Class.new(StandardError)
+  NotInvitationsUrl = Class.new(StandardError)
+  NotResetPasswordsUrl = Class.new(StandardError)
+  NotSetPasswordsUrl = Class.new(StandardError)
 
   mattr_accessor :model_name
   self.model_name = 'User'
@@ -27,29 +31,29 @@ module RailsJwtAuth
   mattr_accessor :mailer_sender
   self.mailer_sender = 'initialize-mailer_sender@example.com'
 
-  mattr_accessor :confirmation_url
-  self.confirmation_url = nil
-
   mattr_accessor :confirmation_expiration_time
   self.confirmation_expiration_time = 1.day
-
-  mattr_accessor :reset_password_url
-  self.reset_password_url = nil
-
-  mattr_accessor :set_password_url
-  self.set_password_url = nil
 
   mattr_accessor :reset_password_expiration_time
   self.reset_password_expiration_time = 1.day
 
-  mattr_accessor :deliver_later
-  self.deliver_later = false
-
   mattr_accessor :invitation_expiration_time
   self.invitation_expiration_time = 2.days
 
-  mattr_accessor :accept_invitation_url
-  self.accept_invitation_url = nil
+  mattr_accessor :confirmations_url
+  self.confirmations_url = nil
+
+  mattr_accessor :reset_passwords_url
+  self.reset_passwords_url = nil
+
+  mattr_accessor :set_passwords_url
+  self.set_passwords_url = nil
+
+  mattr_accessor :invitations_url
+  self.invitations_url = nil
+
+  mattr_accessor :deliver_later
+  self.deliver_later = false
 
   def self.model
     model_name.constantize
