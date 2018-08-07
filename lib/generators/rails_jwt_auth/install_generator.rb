@@ -6,12 +6,11 @@ class RailsJwtAuth::InstallGenerator < Rails::Generators::Base
   end
 
   def create_routes
-    route "resource :session, controller: 'rails_jwt_auth/sessions', only: [:create, :destroy]"
-    route "resource :registration, controller: 'rails_jwt_auth/registrations', only: [:create, :update, :destroy]"
+    route "resources :session, controller: 'rails_jwt_auth/sessions', only: [:create, :destroy]"
+    route "resources :registration, controller: 'rails_jwt_auth/registrations', only: [:create, :update, :destroy]"
 
-    route "resource :confirmation, controller: 'rails_jwt_auth/confirmations', only: [:create, :update]"
-    route "resource :password, controller: 'rails_jwt_auth/passwords', only: [:create, :update]"
-
+    route "resources :confirmations, controller: 'rails_jwt_auth/confirmations', only: [:create, :update]"
+    route "resources :passwords, controller: 'rails_jwt_auth/passwords', only: [:create, :update]"
     route "resources :invitations, controller: 'rails_jwt_auth/invitations', only: [:create, :update]"
   end
 end

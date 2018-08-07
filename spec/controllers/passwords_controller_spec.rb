@@ -72,7 +72,7 @@ describe RailsJwtAuth::PasswordsController do
           before do
             user.send_reset_password_instructions
             put :update, params: {
-              reset_password_token: user.reset_password_token,
+              id: user.reset_password_token,
               password: {password: 'new_password'}
             }
           end
@@ -88,31 +88,11 @@ describe RailsJwtAuth::PasswordsController do
 
         context 'when reset_password_token is invalid' do
           before do
-            put :update, params: {reset_password_token: 'invalid'}
+            put :update, params: {id: 'invalid'}
           end
 
-          it 'returns 422 http status code' do
-            expect(response).to have_http_status 422
-          end
-
-          it 'returns error message' do
-            expect(json['errors']['reset_password_token'].first['error']).to eq 'not_found'
-          end
-        end
-
-        context 'when does not send reset_password_token' do
-          before do
-            FactoryBot.create("#{orm.underscore}_user", password: '12345678')
-
-            put :update
-          end
-
-          it 'returns 422 http status code' do
-            expect(response).to have_http_status 422
-          end
-
-          it 'returns error message' do
-            expect(json['errors']['reset_password_token'].first['error']).to eq 'not_found'
+          it 'returns 404 http status code' do
+            expect(response).to have_http_status 404
           end
         end
 
@@ -120,7 +100,7 @@ describe RailsJwtAuth::PasswordsController do
           before do
             user.send_reset_password_instructions
             put :update, params: {
-              reset_password_token: user.reset_password_token,
+              id: user.reset_password_token,
               password: {password: 'a', password_confirmation: 'b'}
             }
           end
@@ -138,7 +118,7 @@ describe RailsJwtAuth::PasswordsController do
           before do
             user.send_reset_password_instructions
             put :update, params: {
-              reset_password_token: user.reset_password_token,
+              id: user.reset_password_token,
               password: {password: ''}
             }
           end

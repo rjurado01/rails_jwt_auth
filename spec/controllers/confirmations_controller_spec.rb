@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 describe RailsJwtAuth::ConfirmationsController do
-  %w(ActiveRecord Mongoid).each do |orm|
+  %w[ActiveRecord Mongoid].each do |orm|
     context "when use #{orm}" do
       before :all do
         RailsJwtAuth.model_name = "#{orm}User"
@@ -65,7 +65,7 @@ describe RailsJwtAuth::ConfirmationsController do
       describe 'PUT #update' do
         context 'when sends valid confirmation token' do
           before do
-            put :update, params: {confirmation_token: user.confirmation_token}
+            put :update, params: {id: user.confirmation_token}
           end
 
           it 'returns 204 http status code' do
@@ -77,48 +77,20 @@ describe RailsJwtAuth::ConfirmationsController do
           end
         end
 
-        context 'when does not send confirmation token' do
-          before do
-            FactoryBot.create("#{orm.underscore}_user", password: '12345678')
-
-            put :update
-          end
-
-          it 'returns 422 http status code' do
-            expect(response).to have_http_status(422)
-          end
-
-          it 'does not confirm user' do
-            expect(user.reload.confirmed?).to be_falsey
-          end
-
-          it 'returns error message' do
-            expect(json['errors']['confirmation_token'].first['error']).to eq 'not_found'
-          end
-        end
-
         context 'when sends invalid confirmation token' do
           before do
-            put :update, params: {confirmation_token: 'invalid'}
+            put :update, params: {id: 'invalid'}
           end
 
-          it 'returns 422 http status code' do
-            expect(response).to have_http_status(422)
-          end
-
-          it 'does not confirm user' do
-            expect(user.reload.confirmed?).to be_falsey
-          end
-
-          it 'returns error message' do
-            expect(json['errors']['confirmation_token'].first['error']).to eq 'not_found'
+          it 'returns 404 http status code' do
+            expect(response).to have_http_status(404)
           end
         end
 
         context 'when sends expired confirmation token' do
           before do
             user.update(confirmation_sent_at: Time.current - 1.month)
-            put :update, params: {confirmation_token: user.confirmation_token}
+            put :update, params: {id: user.confirmation_token}
           end
 
           it 'returns 422 http status code' do

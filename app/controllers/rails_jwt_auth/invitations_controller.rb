@@ -4,20 +4,17 @@ module RailsJwtAuth
     include RenderHelper
 
     def create
-      attr_hash = invitation_create_params
-      user = RailsJwtAuth.model.invite!(attr_hash)
+      user = RailsJwtAuth.model.invite!(invitation_create_params)
       user.errors.empty? ? render_204 : render_422(user.errors.details)
     end
 
     def update
-      attr_hash = invitation_update_params
-      user = RailsJwtAuth.model.where(invitation_token: params[:id]).first
+      return render_404 unless
+        params[:id] &&
+        (user = RailsJwtAuth.model.where(invitation_token: params[:id]).first)
 
-      return render_404 if user.blank?
-
-      user.assign_attributes attr_hash
+      user.assign_attributes invitation_update_params
       user.accept_invitation!
-
       return render_204 if user.errors.empty? && user.save
 
       render_422(user.errors.details)
