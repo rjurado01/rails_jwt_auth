@@ -4,7 +4,10 @@ module RailsJwtAuth
 
     def registration_create_params
       params.require(RailsJwtAuth.model_name.underscore).permit(
-        RailsJwtAuth.auth_field_name, :password, :password_confirmation
+        RailsJwtAuth.auth_field_name,
+        :password,
+        :password_confirmation,
+        RailsJwtAuth.additional_registration_params
       )
     end
 

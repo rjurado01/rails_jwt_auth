@@ -11,6 +11,10 @@ RailsJwtAuth.setup do |config|
   # regex used to Validate email format
   #config.email_regex = /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\z/i
 
+  #config.additional_registration_params = []
+  # user can add additional params in registration precess like:
+  #config.additional_registration_params = [:first_name, :last_name]
+
   # expiration time for generated tokens
   #config.jwt_expiration_time = 7.days
 
