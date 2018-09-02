@@ -28,6 +28,9 @@ module RailsJwtAuth
   mattr_accessor :mailer_sender
   self.mailer_sender = 'initialize-mailer_sender@example.com'
 
+  mattr_accessor :additional_registration_params
+  self.additional_registration_params = []
+
   mattr_accessor :confirmation_url
   self.confirmation_url = nil
 
