@@ -1,5 +1,3 @@
-require 'rails_jwt_auth/jwt_manager'
-
 module RailsJwtAuth
   NotAuthorized = Class.new(StandardError)
 
