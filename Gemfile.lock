@@ -5,7 +5,6 @@ PATH
       bcrypt (~> 3.1)
       jwt (~> 2.1)
       rails (~> 5.0)
-      warden (~> 1.2)
 
 GEM
   remote: https://rubygems.org/
@@ -150,8 +149,6 @@ GEM
     timecop (0.9.1)
     tzinfo (1.2.5)
       thread_safe (~> 0.1)
-    warden (1.2.7)
-      rack (>= 1.0)
     websocket-driver (0.7.0)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.3)
