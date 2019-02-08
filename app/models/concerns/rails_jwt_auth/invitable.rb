@@ -114,7 +114,7 @@ module RailsJwtAuth
     end
 
     def send_invitation_mail
-      mailer = Mailer.send_invitation(self)
+      mailer = Mailer.send_invitation(id)
       RailsJwtAuth.deliver_later ? mailer.deliver_later : mailer.deliver
     end
 

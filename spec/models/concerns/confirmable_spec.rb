@@ -2,6 +2,10 @@ require 'rails_helper'
 
 describe RailsJwtAuth::Confirmable do
   %w[ActiveRecord Mongoid].each do |orm|
+    before :all do
+      RailsJwtAuth.model_name = "#{orm}User"
+    end
+
     let(:user) { FactoryBot.create("#{orm.underscore}_user") }
     let(:unconfirmed_user) { FactoryBot.create("#{orm.underscore}_unconfirmed_user") }
 

@@ -15,6 +15,10 @@ describe RailsJwtAuth::Recoverable do
     end
 
     context "when use #{orm}" do
+      before :all do
+        RailsJwtAuth.model_name = "#{orm}User"
+      end
+
       describe '#attributes' do
         it { expect(user).to respond_to(:reset_password_token) }
         it { expect(user).to respond_to(:reset_password_sent_at) }
