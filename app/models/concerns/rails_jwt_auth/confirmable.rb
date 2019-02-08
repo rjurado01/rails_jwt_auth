@@ -10,7 +10,7 @@ module RailsJwtAuth
       self.confirmation_sent_at = Time.now
       return false unless save
 
-      mailer = Mailer.confirmation_instructions(self)
+      mailer = Mailer.confirmation_instructions(id)
       RailsJwtAuth.deliver_later ? mailer.deliver_later : mailer.deliver
       true
     end
@@ -67,7 +67,7 @@ module RailsJwtAuth
             self.confirmation_token = SecureRandom.base58(24)
             self.confirmation_sent_at = Time.now
 
-            mailer = Mailer.confirmation_instructions(self)
+            mailer = Mailer.confirmation_instructions(id)
             RailsJwtAuth.deliver_later ? mailer.deliver_later : mailer.deliver
           end
         end

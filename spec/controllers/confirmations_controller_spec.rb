@@ -24,7 +24,7 @@ describe RailsJwtAuth::ConfirmationsController do
             end
 
             expect(RailsJwtAuth::Mailer).to receive(:confirmation_instructions)
-              .with(user).and_return(Mock.new)
+              .with(user.id).and_return(Mock.new)
 
             old_token = user.confirmation_token
             post :create, params: {confirmation: {email: user.email}}
