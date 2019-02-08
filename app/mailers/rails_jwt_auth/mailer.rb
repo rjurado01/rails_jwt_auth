@@ -2,8 +2,8 @@ if defined?(ActionMailer)
   class RailsJwtAuth::Mailer < ApplicationMailer
     default from: RailsJwtAuth.mailer_sender
 
-    def confirmation_instructions(user)
-      @user = user
+    def confirmation_instructions(id)
+      @user = RailsJwtAuth.model.find(id)
 
       if RailsJwtAuth.confirmation_url
         url, params = RailsJwtAuth.confirmation_url.split('?')
@@ -19,8 +19,8 @@ if defined?(ActionMailer)
       mail(to: @user.unconfirmed_email || @user.email, subject: subject)
     end
 
-    def reset_password_instructions(user)
-      @user = user
+    def reset_password_instructions(id)
+      @user = RailsJwtAuth.model.find(id)
 
       if RailsJwtAuth.reset_password_url
         url, params = RailsJwtAuth.reset_password_url.split('?')
@@ -36,8 +36,8 @@ if defined?(ActionMailer)
       mail(to: @user.email, subject: subject)
     end
 
-    def set_password_instructions(user)
-      @user = user
+    def set_password_instructions(id)
+      @user = RailsJwtAuth.model.find(id)
 
       if RailsJwtAuth.set_password_url
         url, params = RailsJwtAuth.set_password_url.split('?')
@@ -53,8 +53,8 @@ if defined?(ActionMailer)
       mail(to: @user.email, subject: subject)
     end
 
-    def send_invitation(user)
-      @user = user
+    def send_invitation(id)
+      @user = RailsJwtAuth.model.find(id)
 
       if RailsJwtAuth.accept_invitation_url
         url, params = RailsJwtAuth.accept_invitation_url.split '?'
