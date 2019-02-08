@@ -32,7 +32,7 @@ describe RailsJwtAuth::PasswordsController do
             end
 
             expect(RailsJwtAuth::Mailer).to receive(:reset_password_instructions)
-              .with(user.id).and_return(Mock.new)
+              .with(user.id.to_s).and_return(Mock.new)
 
             old_token = user.reset_password_token
             post :create, params: {password: {email: user.email}}
