@@ -418,7 +418,7 @@ require 'rails_jwt_auth/spec_helpers'
 ...
 RSpec.configure do |config|
   ...
-  config.include RailsJwtAuth::Spec::Helpers, :type => :controller
+  config.include RailsJwtAuth::SpecHelpers, :type => :controller
 end
 ```
 
