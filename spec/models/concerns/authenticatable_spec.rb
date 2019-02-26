@@ -33,9 +33,14 @@ describe RailsJwtAuth::Authenticatable do
             expect(user.errors.messages[:current_password].first).to eq 'blank'
           end
 
+          it 'validates other fields' do
+            user.update_with_password(password: 'new_password', email: '')
+            expect(user.errors.messages[:email].first).not_to be 'nil'
+          end
+
           it "don't updates password" do
             user.update_with_password(password: 'new_password')
-            expect(user.authenticate('new_password')).to be_falsey
+            expect(user.reload.authenticate('new_password')).to be_falsey
           end
         end
 
