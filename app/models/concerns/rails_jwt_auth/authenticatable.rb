@@ -40,19 +40,20 @@ module RailsJwtAuth
     end
 
     def update_with_password(params)
-      if (current_password = params.delete(:current_password)).blank?
-        errors.add(:current_password, 'blank')
-      elsif !authenticate(current_password)
-        errors.add(:current_password, 'invalid')
-      end
+      current_password_error = if (current_password = params.delete(:current_password)).blank?
+                                 'blank'
+                               elsif !authenticate(current_password)
+                                 'invalid'
+                               end
 
-      if params[:password].blank?
-        errors.add(:password, 'blank')
-      end
+      # abort reset password if exists to allow save
+      self.reset_password_token = self.reset_password_sent_at = nil if reset_password_token
 
-      params.merge!(reset_password_token: nil, reset_password_sent_at: nil) if reset_password_token
+      assign_attributes(params)
+      valid? # validates first other fields
+      errors.add(:current_password, current_password_error) if current_password_error
 
-      errors.empty? ? update_attributes(params) : false
+      errors.empty? ? save : false
     end
 
     def to_token_payload(_request=nil)
