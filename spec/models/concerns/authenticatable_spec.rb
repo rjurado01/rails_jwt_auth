@@ -73,6 +73,13 @@ describe RailsJwtAuth::Authenticatable do
           end
         end
 
+        context 'when password is blank' do
+          it 'addd blank error message' do
+            user.update_with_password(password: '')
+            expect(user.errors.messages[:password].first).to eq 'blank'
+          end
+        end
+
         context 'when RailsJwtAuth::Authenticable is used with RailsJwtAuth::Recoverable' do
           let(:current_password) { '12345678' }
           let(:new_password) { 'new_password' }
