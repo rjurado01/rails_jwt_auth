@@ -52,6 +52,7 @@ module RailsJwtAuth
       assign_attributes(params)
       valid? # validates first other fields
       errors.add(:current_password, current_password_error) if current_password_error
+      errors.add(:password, 'blank') if params[:password].blank?
 
       errors.empty? ? save : false
     end
