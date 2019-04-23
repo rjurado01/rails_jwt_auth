@@ -138,7 +138,20 @@ end
     end
     ```
 
-    This helper expect that token has been into **AUTHORIZATION** header.
+    This helper expect that token has been into **AUTHORIZATION** header.  
+    Raises `RailsJwtAuth::NotAuthorized` exception when it fails.
+
+-   **authenticate**
+
+    Authenticate your controllers:
+
+    ```ruby
+    class MyController < ApplicationController
+      before_action :authenticate
+    end
+    ```
+
+    This helper is like `authenticate!` but it not raises exception
 
 -   **current_user**
 

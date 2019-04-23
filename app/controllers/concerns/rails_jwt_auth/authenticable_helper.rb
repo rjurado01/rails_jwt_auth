@@ -24,6 +24,19 @@ module RailsJwtAuth
       end
     end
 
+    def authenticate
+      begin
+        payload = RailsJwtAuth::JwtManager.decode_from_request(request).first
+        @current_user = RailsJwtAuth.model.from_token_payload(payload)
+      rescue JWT::ExpiredSignature, JWT::VerificationError, JWT::DecodeError
+        @current_user = nil
+      end
+
+      if @current_user&.respond_to? :update_tracked_fields!
+        @current_user.update_tracked_fields!(request)
+      end
+    end
+
     def unauthorize!
       raise NotAuthorized
     end
