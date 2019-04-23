@@ -15,6 +15,12 @@ if defined?(ActionMailer)
       mail(to: @user.unconfirmed_email || @user[RailsJwtAuth.email_field_name], subject: subject)
     end
 
+    def email_changed(user)
+      @user = user
+      subject = I18n.t('rails_jwt_auth.mailer.email_changed.subject')
+      mail(to: @user[RailsJwtAuth.email_field_name!], subject: subject)
+    end
+
     def reset_password_instructions(user)
       raise RailsJwtAuth::NotResetPasswordsUrl unless RailsJwtAuth.reset_passwords_url.present?
       @user = user
