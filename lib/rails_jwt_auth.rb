@@ -32,6 +32,9 @@ module RailsJwtAuth
   mattr_accessor :mailer_sender
   self.mailer_sender = 'initialize-mailer_sender@example.com'
 
+  mattr_accessor :send_email_changed_notification
+  self.send_email_changed_notification = true
+
   mattr_accessor :confirmation_expiration_time
   self.confirmation_expiration_time = 1.day
 

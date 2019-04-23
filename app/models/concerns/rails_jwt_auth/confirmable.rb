@@ -36,6 +36,11 @@ module RailsJwtAuth
 
             mailer = Mailer.confirmation_instructions(self)
             RailsJwtAuth.deliver_later ? mailer.deliver_later : mailer.deliver
+
+            if RailsJwtAuth.send_email_changed_notification
+              mailer = Mailer.email_changed(self)
+              RailsJwtAuth.deliver_later ? mailer.deliver_later : mailer.deliver
+            end
           end
         end
       end

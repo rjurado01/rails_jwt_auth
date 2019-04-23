@@ -9,3 +9,5 @@ en:
         subject: "Set password instructions"
       send_invitation:
         subject: "Someone has sent you an invitation!"
+      email_changed:
+        subject: "Email changed"

@@ -148,15 +148,39 @@ describe RailsJwtAuth::Confirmable do
 
       describe '#before_update' do
         context 'when email is updated' do
-          it 'fills in unconfirmed_email field' do
+          before do
             ActionMailer::Base.deliveries.clear
+          end
+
+          it 'fills in unconfirmed_email field' do
             old_email = user.email
             user.email = 'new@email.com'
             user.save
             user.reload
             expect(user.unconfirmed_email).to eq('new@email.com')
             expect(user.email).to eq(old_email)
-            expect(ActionMailer::Base.deliveries.count).to eq(1)
+          end
+
+          context 'when send_email_changed_notification option is false' do
+            it 'sends only confirmation email' do
+              allow(RailsJwtAuth).to receive(:send_email_changed_notification).and_return(false)
+              user.update(email: 'new@email.com')
+              expect(ActionMailer::Base.deliveries.count).to eq(1)
+              expect(ActionMailer::Base.deliveries.first.subject).to eq('Confirmation instructions')
+              expect(ActionMailer::Base.deliveries.first.to).to eq(['new@email.com'])
+            end
+          end
+
+          context 'when send_email_changed_notification option is true' do
+            it 'sends confirmation and nofication email' do
+              allow(RailsJwtAuth).to receive(:send_email_changed_notification).and_return(true)
+              old_email = user.email
+              user.update(email: 'new@email.com')
+              expect(ActionMailer::Base.deliveries.first.subject).to eq('Confirmation instructions')
+              expect(ActionMailer::Base.deliveries.first.to).to eq(['new@email.com'])
+              expect(ActionMailer::Base.deliveries.last.subject).to eq('Email changed')
+              expect(ActionMailer::Base.deliveries.last.to).to eq([old_email])
+            end
           end
         end
       end
