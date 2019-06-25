@@ -13,6 +13,7 @@ Rails-API authentication solution based on JWT and inspired by Devise.
 - [Installation](#installation)
 - [Configuration](#configuration)
 - [Modules](#modules)
+- [ORMs support](#orms-support)
 - [Controller helpers](#controller-helpers)
 - [Default Controllers API](#default-controllers-api)
 - [Customize]()
@@ -90,6 +91,8 @@ It's composed of 5 modules:
 | Recoverable   | Resets the user password and sends reset instructions                                                           |
 | Trackable     | Tracks sign in timestamps and IP address                                                                        |
 | Invitable     | Allows you to invite an user to your application sending an invitation mail                                     |
+
+# ORMs support
 
 RailsJwtAuth support both Mongoid and ActiveRecord.
 
