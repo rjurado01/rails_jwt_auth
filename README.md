@@ -8,6 +8,23 @@ Rails-API authentication solution based on JWT and inspired by Devise.
 > This is documentation for version `1.x`. If you are using `0.x` version use this
 [link](https://github.com/rjurado01/rails_jwt_auth/tree/0.x)
 
+## Table of Contents
+
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Modules](#modules)
+- [ORMs support](#orms-support)
+- [Controller helpers](#controller-helpers)
+- [Default Controllers API](#default-controllers-api)
+- [Customize]()
+    + [Controllers](#custom-controllers)
+    + [Payload](#custom-payload)
+    + [Responses](#custom-responses)
+    + [Strong parameters](#custom-strong-parameters)
+- [Examples](#examples)
+- [Testing](#testing-rspec)
+- [License](#license)
+
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -65,6 +82,8 @@ You can edit configuration options into `config/initializers/auth_token_auth.rb`
 
 ## Modules
 
+It's composed of 5 modules:
+
 | Module        | Description                                                                                                     |
 | ------------- | --------------------------------------------------------------------------------------------------------------- |
 | Authenticable | Hashes and stores a password in the database to validate the authenticity of a user while signing in            |
@@ -73,7 +92,9 @@ You can edit configuration options into `config/initializers/auth_token_auth.rb`
 | Trackable     | Tracks sign in timestamps and IP address                                                                        |
 | Invitable     | Allows you to invite an user to your application sending an invitation mail                                     |
 
-### Examples
+## ORMs support
+
+RailsJwtAuth support both Mongoid and ActiveRecord.
 
 For next examples `auth_field_name` and `email_field_name` are configured to use the field `email`.
 
@@ -90,11 +111,11 @@ class User < ApplicationRecord
 
   validates :email, presence: true,
                     uniqueness: true,
-                    format: /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\z/i
+                    format: URI::MailTo::EMAIL_REGEXP
 end
 ```
 
-Ensure you have executed migrate task: `rails g rails_jwt_auth:migrate` and you have uncomented all modules fields.
+Ensure you have executed migrate task: `rails g rails_jwt_auth:migrate` and you have uncomented all modules fields into generated [migration file](https://github.com/rjurado01/rails_jwt_auth/blob/master/lib/generators/templates/migration.rb).
 
 **Mongoid**
 
@@ -111,7 +132,7 @@ class User
 
   validates :email, presence: true,
                     uniqueness: true,
-                    format: /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\z/i
+                    format: URI::MailTo::EMAIL_REGEXP
 end
 ```
 
@@ -321,7 +342,11 @@ Invitations api is provided by `RailsJwtAuth::InvitationsController`.
 
 Note: To add more fields, see "Custom strong parameters" below.
 
-## Custom controllers
+## Customize
+
+RailsJwtAuth offers an easy way to customize certain parts.
+
+### Custom controllers
 
 You can overwrite RailsJwtAuth controllers to edit actions, responses,
 permitted parameters...
@@ -351,7 +376,7 @@ And edit route resource to use it:
 resource :registration, controller: 'registrations', only: [:create, :update, :destroy]
 ```
 
-## Custom payload
+### Custom payload
 
 If you need edit default payload used to generate jwt you can overwrite the method `to_token_payload` into your User class:
 
@@ -369,15 +394,17 @@ class User < ApplicationRecord
 end
 ```
 
-## Custom responses
+### Custom responses
 
 You can overwrite `RailsJwtAuth::RenderHelper` to customize controllers responses.
 
-## Custom strong parameters
+### Custom strong parameters
 
 You can overwrite `RailsJwtAuth::ParamsHelper` to customize controllers strong parameters.
 
-## Edit user information
+## Examples
+
+### Edit user information
 
 This is a controller example that allows users to edit their `email` and `password`.
 
@@ -401,7 +428,7 @@ class CurrentUserController < ApplicationController
 end
 ```
 
-## Register users with random password
+### Register users with random password
 
 This is a controller example that allows admins to register users with random password and send email to reset it.
 If registration is sucess it will send email to `set_password_url` with reset password token.
