@@ -92,7 +92,7 @@ It's composed of 5 modules:
 | Trackable     | Tracks sign in timestamps and IP address                                                                        |
 | Invitable     | Allows you to invite an user to your application sending an invitation mail                                     |
 
-# ORMs support
+## ORMs support
 
 RailsJwtAuth support both Mongoid and ActiveRecord.
 
