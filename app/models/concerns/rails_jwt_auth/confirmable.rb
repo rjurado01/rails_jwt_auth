@@ -44,7 +44,8 @@ module RailsJwtAuth
           # http://edgeguides.rubyonrails.org/active_job_basics.html#globalid
           include GlobalID::Identification if RailsJwtAuth.deliver_later
 
-          field :email,                type: String
+          field(:email, type: String) unless fields['email'] # avoid overwriting
+
           field :unconfirmed_email,    type: String
           field :confirmation_token,   type: String
           field :confirmation_sent_at, type: Time
