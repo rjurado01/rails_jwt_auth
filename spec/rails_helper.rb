@@ -69,5 +69,13 @@ RSpec.configure do |config|
     RailsJwtAuth.invitations_url = 'http://example.com/invitations'
     RailsJwtAuth.reset_passwords_url = 'http://example.com/reset_passwords'
     RailsJwtAuth.set_passwords_url = 'http://example.com/set_passwords'
+
+    # Configuration for Lockable module
+    RailsJwtAuth.maximum_attempts = 3
+    RailsJwtAuth.lock_strategy = :failed_attempts
+    RailsJwtAuth.unlock_strategy = :both
+    RailsJwtAuth.unlock_in = 60.minutes
+    RailsJwtAuth.reset_attempts_in = 60.minutes
+    RailsJwtAuth.unlock_url = 'http://example.com/unlock-account'
   end
 end

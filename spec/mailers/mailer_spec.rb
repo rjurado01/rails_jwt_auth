@@ -126,4 +126,36 @@ RSpec.describe RailsJwtAuth::Mailer, type: :mailer do
       end
     end
   end
+
+  describe 'send_unlock_instructions' do
+    let(:user) do
+      FactoryBot.create(
+        :active_record_user,
+        locked_at: 2.minutes.ago,
+        unlock_token: SecureRandom.base58(24)
+      )
+    end
+
+    let(:mail) { described_class.send_unlock_instructions(user).deliver_now }
+    let(:url) { "#{RailsJwtAuth.unlock_url}?unlock_token=#{user.unlock_token}" }
+
+    it 'sends email with correct info' do
+      expect { mail }.to change { ActionMailer::Base.deliveries.count }.by(1)
+      expect(mail.subject).to eq(I18n.t('rails_jwt_auth.mailer.send_unlock_instructions.subject'))
+      expect(mail.to).to include(user.email)
+      expect(mail.from).to include(RailsJwtAuth.mailer_sender)
+      expect(mail.body).to include(url)
+    end
+
+    context 'when unlock_url option is defined with hash url' do
+      before do
+        RailsJwtAuth.unlock_url = 'http://www.host.com/#/url?param=value'
+      end
+
+      it 'uses this to generate unlock url' do
+        url = "#{RailsJwtAuth.unlock_url}&unlock_token=#{user.unlock_token}"
+        expect(mail.body).to include(url)
+      end
+    end
+  end
 end

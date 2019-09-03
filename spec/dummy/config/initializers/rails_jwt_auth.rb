@@ -43,5 +43,23 @@ RailsJwtAuth.setup do |config|
   # config.invitation_expiration_time = 2.days
 
   # url used to create email link with activation token parameter to accept invitation
-  # config.invitations_url = 'http://frontend.com/accept_invitation'
+  #config.invitations_url = 'http://frontend.com/accept_invitation'
+
+  # maximum login attempts before lock an account
+  #config.maximum_attempts = 3
+
+  # strategy to lock an account: :none or :failed_attempts
+  #config.lock_strategy = :failed_attempts
+
+  # strategy to use when unlocking accounts: :time, :email or :both
+  #config.unlock_strategy = :time
+
+  # interval to unlock an account if unlock_strategy is :time
+  #config.unlock_in = 60.minutes
+
+  # interval after which to reset failed attempts counter of an account
+  #config.reset_attempts_in = 60.minutes
+
+  # url used to create email link with unlock token
+  #config.unlock_url = 'http://frontend.com/unlock-account'
 end

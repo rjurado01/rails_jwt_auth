@@ -4,6 +4,7 @@ class ActiveRecordUser < ApplicationRecord
   include RailsJwtAuth::Recoverable
   include RailsJwtAuth::Trackable
   include RailsJwtAuth::Invitable
+  include RailsJwtAuth::Lockable
 
   validates :email, presence: true,
                     uniqueness: true,

@@ -11,6 +11,7 @@ describe RailsJwtAuth::SessionsController do
       let(:json) { JSON.parse(response.body) }
       let(:user) { FactoryBot.create("#{orm.underscore}_user") }
       let(:unconfirmed_user) { FactoryBot.create("#{orm.underscore}_unconfirmed_user") }
+      let(:locked_user) { FactoryBot.create("#{orm.underscore}_user", locked_at: 2.minutes.ago) }
 
       describe 'POST #create' do
         context 'when all is ok' do
@@ -96,6 +97,20 @@ describe RailsJwtAuth::SessionsController do
 
           it 'returns error message' do
             expect(json['errors']['session'].first['error']).to eq 'unconfirmed'
+          end
+        end
+
+        context 'when user is locked' do
+          before do
+            post :create, params: {session: {email: locked_user.email, password: '12345678'}}
+          end
+
+          it 'returns 422 status code' do
+            expect(response.status).to eq(422)
+          end
+
+          it 'returns error message' do
+            expect(json['errors']['session'].first['error']).to eq 'locked'
           end
         end
       end

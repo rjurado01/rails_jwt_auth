@@ -27,6 +27,12 @@ module RailsJwtAuth
         return false
       end
 
+      if self.class.ancestors.include?(RailsJwtAuth::Lockable) &&
+         lock_strategy_enabled?(:failed_attempts) && access_locked?
+        errors.add(email_field, :locked)
+        return false
+      end
+
       self.reset_password_token = SecureRandom.base58(24)
       self.reset_password_sent_at = Time.current
       return false unless save

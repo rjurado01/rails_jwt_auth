@@ -5,6 +5,7 @@ class MongoidUser
   include RailsJwtAuth::Recoverable
   include RailsJwtAuth::Trackable
   include RailsJwtAuth::Invitable
+  include RailsJwtAuth::Lockable
 
   field :username,      type: String
   field :email,         type: String

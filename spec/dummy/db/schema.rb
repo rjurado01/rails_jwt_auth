@@ -33,5 +33,10 @@ ActiveRecord::Schema.define do
     t.datetime  'invitation_sent_at'
     t.datetime  'invitation_accepted_at'
     t.datetime  'invitation_created_at'
+
+    t.integer   'failed_attempts'
+    t.string    'unlock_token'
+    t.datetime  'first_failed_attempt_at'
+    t.datetime  'locked_at'
   end
 end

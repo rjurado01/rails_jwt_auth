@@ -10,10 +10,10 @@ module RailsJwtAuth
         render_422 session: [{error: :invalid_session}]
       elsif user.respond_to?('confirmed?') && !user.confirmed?
         render_422 session: [{error: :unconfirmed}]
-      elsif user.authenticate(session_create_params[:password])
+      elsif user.authentication?(session_create_params[:password])
         render_session generate_jwt(user), user
       else
-        render_422 session: [{error: :invalid_session}]
+        render_422 session: [user.unauthenticated_error]
       end
     end
 
