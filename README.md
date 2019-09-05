@@ -79,7 +79,7 @@ You can edit configuration options into `config/initializers/auth_token_auth.rb`
 | reset_passwords_url             | nil               | Url used to create email link with reset password token                |
 | set_passwords_url               | nil               | Url used to create email link with set password token                  |
 | invitations_url                 | nil               | Url used to create email link with invitation token                    |
-| maximum_attempts                | 3                 | Number of failed login attempts before lock an account                 |
+| maximum_attempts                | 3                 | Number of failed login attempts before locking an account              |
 | lock_strategy                   | :none             | Strategy to be used to lock an account: `:none` or `:failed_attempts`  |
 | unlock_strategy                 | :time             | Strategy to use when unlocking accounts: `:time`, `:email` or `:both`  |
 | unlock_in                       | 60.minutes        | Interval to unlock an account if `unlock_strategy` is `:time`          |

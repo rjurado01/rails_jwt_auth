@@ -15,54 +15,50 @@ module RailsJwtAuth
 
     def lock_access!
       self.locked_at = Time.now.utc
-      save(validate: false)
-
-      send_unlock_instructions if unlock_strategy_enabled?(:email)
+      save(validate: false).tap do |result|
+        send_unlock_instructions if result && unlock_strategy_enabled?(:email)
+      end
     end
 
     def unlock_access!
       self.locked_at = nil
-      self.failed_attempts = 0 if respond_to?(:failed_attempts=)
-      self.first_failed_attempt_at = nil if respond_to?(:first_failed_attempt_at=)
-      self.unlock_token = nil if respond_to?(:unlock_token=)
+      self.failed_attempts = 0
+      self.first_failed_attempt_at = nil
+      self.unlock_token = nil
       save(validate: false)
     end
 
     def reset_attempts!
-      self.failed_attempts = 0 if respond_to?(:failed_attempts=)
-      self.first_failed_attempt_at = nil if respond_to?(:first_failed_attempt_at=)
+      self.failed_attempts = 0
+      self.first_failed_attempt_at = nil
       save(validate: false)
     end
 
     def authentication?(pass)
-      if lock_strategy_enabled?(:failed_attempts)
-        reset_attempts! if !access_locked? && attempts_expired?
-        unlock_access! if lock_expired?
+      return super(pass) unless lock_strategy_enabled?(:failed_attempts)
 
-        if access_locked?
-          false
-        elsif super(pass)
-          unlock_access!
-          self
-        else
-          failed_attempt!
-          lock_access! if attempts_exceeded?
-          false
-        end
+      reset_attempts! if !access_locked? && attempts_expired?
+      unlock_access! if lock_expired?
+
+      if access_locked?
+        false
+      elsif super(pass)
+        unlock_access!
+        self
       else
-        super(pass)
+        failed_attempt!
+        lock_access! if attempts_exceeded?
+        false
       end
     end
 
     def unauthenticated_error
-      if lock_strategy_enabled?(:failed_attempts)
-        if access_locked?
-          {error: :locked}
-        else
-          {error: :invalid_session, remaining_attempts: remaining_attempts}
-        end
+      return super unless lock_strategy_enabled?(:failed_attempts)
+
+      if access_locked?
+        {error: :locked}
       else
-        super
+        {error: :invalid_session, remaining_attempts: remaining_attempts}
       end
     end
 

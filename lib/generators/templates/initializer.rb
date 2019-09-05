@@ -45,7 +45,7 @@ RailsJwtAuth.setup do |config|
   # uses deliver_later to send emails instead of deliver method
   #config.deliver_later = false
 
-  # maximum login attempts before lock an account
+  # maximum login attempts before locking an account
   #config.maximum_attempts = 3
 
   # strategy to lock an account: :none or :failed_attempts

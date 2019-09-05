@@ -45,7 +45,7 @@ RailsJwtAuth.setup do |config|
   # url used to create email link with activation token parameter to accept invitation
   #config.invitations_url = 'http://frontend.com/accept_invitation'
 
-  # maximum login attempts before lock an account
+  # maximum login attempts before locking an account
   #config.maximum_attempts = 3
 
   # strategy to lock an account: :none or :failed_attempts
