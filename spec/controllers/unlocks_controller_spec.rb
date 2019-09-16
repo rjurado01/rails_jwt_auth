@@ -20,9 +20,7 @@ describe RailsJwtAuth::UnlocksController do
       describe 'PUT #update' do
         context 'when send a valid unlock_token' do
           before do
-            put :update, params: {
-              id: user.unlock_token
-            }
+            put :update, params: {id: user.unlock_token}
           end
 
           it 'returns 204 http status code' do

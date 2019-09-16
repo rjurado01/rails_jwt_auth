@@ -85,14 +85,10 @@ module RailsJwtAuth
     end
 
     def failed_attempt!
-      increment_failed_attempts
-      self.first_failed_attempt_at = Time.now.utc if failed_attempts == 1
-      save(validate: false)
-    end
-
-    def increment_failed_attempts
       self.failed_attempts ||= 0
       self.failed_attempts += 1
+      self.first_failed_attempt_at = Time.now.utc if failed_attempts == 1
+      save(validate: false)
     end
 
     def attempts_exceeded?
