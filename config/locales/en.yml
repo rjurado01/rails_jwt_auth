@@ -11,3 +11,5 @@ en:
         subject: "Someone has sent you an invitation!"
       email_changed:
         subject: "Email changed"
+      send_unlock_instructions:
+        subject: "Unlock instructions"

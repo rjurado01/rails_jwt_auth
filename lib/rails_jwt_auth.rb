@@ -59,6 +59,24 @@ module RailsJwtAuth
   mattr_accessor :deliver_later
   self.deliver_later = false
 
+  mattr_accessor :maximum_attempts
+  self.maximum_attempts = 3
+
+  mattr_accessor :lock_strategy
+  self.lock_strategy = :none
+
+  mattr_accessor :unlock_strategy
+  self.unlock_strategy = :time
+
+  mattr_accessor :unlock_in
+  self.unlock_in = 60.minutes
+
+  mattr_accessor :reset_attempts_in
+  self.unlock_in = 60.minutes
+
+  mattr_accessor :unlock_url
+  self.unlock_url = nil
+
   def self.model
     model_name.constantize
   end

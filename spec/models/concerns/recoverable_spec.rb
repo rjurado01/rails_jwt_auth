@@ -71,6 +71,26 @@ describe RailsJwtAuth::Recoverable do
           end
         end
 
+        context 'when user is locked' do
+          let(:user) { FactoryBot.create("#{orm.underscore}_user", locked_at: 2.minutes.ago) }
+
+          it 'returns false' do
+            expect(user.send_reset_password_instructions).to be_falsey
+          end
+
+          it 'does not fill reset password fields' do
+            user.send_reset_password_instructions
+            user.reload
+            expect(user.reset_password_token).to be_nil
+            expect(user.reset_password_sent_at).to be_nil
+          end
+
+          it 'doe not send reset password email' do
+            expect(RailsJwtAuth::Mailer).not_to receive(:reset_password_instructions)
+            user.send_reset_password_instructions
+          end
+        end
+
         context 'when email field config is invalid' do
           it 'throws InvalidEmailField exception' do
             allow(RailsJwtAuth).to receive(:email_field_name).and_return(:invalid)

@@ -24,6 +24,12 @@ class Create<%= RailsJwtAuth.model_name.pluralize %> < ActiveRecord::Migration<%
       # t.datetime :invitation_sent_at
       # t.datetime :invitation_accepted_at
       # t.datetime :invitation_created_at
+
+      ## Lockable
+      # t.integer :failed_attempts
+      # t.string :unlock_token
+      # t.datetime :first_failed_attempt_at
+      # t.datetime :locked_at
     end
   end
 end

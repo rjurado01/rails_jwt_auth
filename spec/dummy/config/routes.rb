@@ -5,4 +5,5 @@ Rails.application.routes.draw do
   resources :confirmations, controller: 'rails_jwt_auth/confirmations', only: [:create, :update]
   resources :passwords, controller: 'rails_jwt_auth/passwords', only: [:create, :update]
   resources :invitations, controller: 'rails_jwt_auth/invitations', only: [:create, :update]
+  resources :unlocks, controller: 'rails_jwt_auth/unlocks', only: %i[update]
 end

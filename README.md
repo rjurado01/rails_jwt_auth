@@ -78,11 +78,17 @@ You can edit configuration options into `config/initializers/auth_token_auth.rb`
 | confirmations_url               | nil               | Url used to create email link with confirmation token                  |
 | reset_passwords_url             | nil               | Url used to create email link with reset password token                |
 | set_passwords_url               | nil               | Url used to create email link with set password token                  |
-| invitationss_url                | nil               | Url used to create email link with invitation token                    |
+| invitations_url                 | nil               | Url used to create email link with invitation token                    |
+| maximum_attempts                | 3                 | Number of failed login attempts before locking an account              |
+| lock_strategy                   | :none             | Strategy to be used to lock an account: `:none` or `:failed_attempts`  |
+| unlock_strategy                 | :time             | Strategy to use when unlocking accounts: `:time`, `:email` or `:both`  |
+| unlock_in                       | 60.minutes        | Interval to unlock an account if `unlock_strategy` is `:time`          |
+| reset_attempts_in               | 60.minutes        | Interval after which to reset failed attempts counter of an account    |
+| unlock_url                      | nil               | Url used to create email link with unlock token                        |
 
 ## Modules
 
-It's composed of 5 modules:
+It's composed of 6 modules:
 
 | Module        | Description                                                                                                     |
 | ------------- | --------------------------------------------------------------------------------------------------------------- |
@@ -91,6 +97,7 @@ It's composed of 5 modules:
 | Recoverable   | Resets the user password and sends reset instructions                                                           |
 | Trackable     | Tracks sign in timestamps and IP address                                                                        |
 | Invitable     | Allows you to invite an user to your application sending an invitation mail                                     |
+| Lockable      | Locks the user after a specified number of failed sign in attempts                                              |
 
 ## ORMs support
 
@@ -108,6 +115,7 @@ class User < ApplicationRecord
   include RailsJwtAuth::Recoverable
   include RailsJwtAuth::Trackable
   include RailsJwtAuth::Invitable
+  include RailsJwtAuth::Lockable
 
   validates :email, presence: true,
                     uniqueness: true,
@@ -127,6 +135,7 @@ class User
   include RailsJwtAuth::Recoverable
   include RailsJwtAuth::Trackable
   include RailsJwtAuth::Invitable
+  include RailsJwtAuth::Lockable
 
   field :email, type: String
 
@@ -159,7 +168,7 @@ end
     end
     ```
 
-    This helper expect that token has been into **AUTHORIZATION** header.  
+    This helper expect that token has been into **AUTHORIZATION** header.
     Raises `RailsJwtAuth::NotAuthorized` exception when it fails.
 
 -   **authenticate**
@@ -341,6 +350,19 @@ Invitations api is provided by `RailsJwtAuth::InvitationsController`.
 ```
 
 Note: To add more fields, see "Custom strong parameters" below.
+
+### Unlocks
+
+Unlock api is provided by `RailsJwtAuth::UnlocksController`.
+
+1.  Unlock user:
+
+```js
+{
+  url: host/unlocks/:unlock_token,
+  method: PUT
+}
+```
 
 ## Customize
 
