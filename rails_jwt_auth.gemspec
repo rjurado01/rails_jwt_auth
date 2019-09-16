@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.email       = ['rjurado@openmailbox.org']
   s.homepage    = 'https://github.com/rjurado01/rails_jwt_auth'
   s.summary     = 'Rails jwt authentication.'
-  s.description = 'Rails authentication solution based on Warden and JWT and inspired by Devise.'
+  s.description = 'Rails-API authentication solution based on JWT and inspired by Devise.'
   s.license     = 'MIT'
 
   s.files = Dir['{app,config,db,lib}/**/*', 'MIT-LICENSE', 'Rakefile', 'README.md']
