@@ -241,16 +241,6 @@ Registration api is defined by `RailsJwtAuth::RegistrationsController`.
 }
 ```
 
-2.  Delete user:
-
-```js
-{
-  url: host/registration,
-  method: DELETE,
-  headers: { 'Authorization': 'Bearer auth_token'}
-}
-```
-
 ### Confirmation
 
 Confirmation api is defined by `RailsJwtAuth::ConfirmationsController`.
