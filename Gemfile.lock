@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    rails_jwt_auth (1.4.0)
+    rails_jwt_auth (1.4.1)
       bcrypt (~> 3.1)
       jwt (~> 2.1)
       rails (>= 5.0, < 6.1)
