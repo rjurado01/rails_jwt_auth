@@ -59,7 +59,7 @@ rails g rails_jwt_auth:migrate
 
 ## Configuration
 
-You can edit configuration options into `config/initializers/auth_token_auth.rb` file created by generator.
+You can edit configuration options into `config/initializers/rails_jwt_auth.rb` file created by generator.
 
 | Option                          | Default value     | Description                                                            |
 | ------------------------------- | ----------------- | ---------------------------------------------------------------------- |
@@ -244,6 +244,8 @@ Registration api is defined by `RailsJwtAuth::RegistrationsController`.
 ### Confirmation
 
 Confirmation api is defined by `RailsJwtAuth::ConfirmationsController`.
+
+It is necessary to set a value for `confirmations_url` option into `config/initializers/rails_jwt_auth.rb`.
 
 1.  Confirm user:
 
