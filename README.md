@@ -245,7 +245,7 @@ Registration api is defined by `RailsJwtAuth::RegistrationsController`.
 
 Confirmation api is defined by `RailsJwtAuth::ConfirmationsController`.
 
-It is necessary to set a value for confirmations_url in the configuration.options into `config/initializers/rails_jwt_auth.rb`.
+It is necessary to set a value for `confirmations_url` option into `config/initializers/rails_jwt_auth.rb`.
 
 1.  Confirm user:
 
