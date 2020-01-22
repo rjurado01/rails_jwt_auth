@@ -205,8 +205,8 @@ Session api is defined by `RailsJwtAuth::SessionsController`.
   method: POST,
   data: {
     session: {
-      email: "user@email.com",
-      password: "12345678"
+      email: 'user@email.com',
+      password: '12345678'
     }
   }
 }
@@ -234,8 +234,8 @@ Registration api is defined by `RailsJwtAuth::RegistrationsController`.
   method: POST,
   data: {
     user: {
-      email: "user@email.com",
-      password: "12345678"
+      email: 'user@email.com',
+      password: '12345678'
     }
   }
 }
@@ -254,7 +254,7 @@ It is necessary to set a value for `confirmations_url` option into `config/initi
   url: host/confirmation,
   method: PUT
   data: {
-    confirmation_token: "token"
+    confirmation_token: 'token'
   }
 }
 ```
@@ -267,7 +267,7 @@ It is necessary to set a value for `confirmations_url` option into `config/initi
   method: POST,
   data: {
     confirmation: {
-      email: "user@example.com"
+      email: 'user@example.com'
     }
   }
 }
@@ -285,7 +285,7 @@ Password api is defined by `RailsJwtAuth::PasswordsController`.
   method: POST,
   data: {
     password: {
-      email: "user@example.com"
+      email: 'user@example.com'
     }
   }
 }
@@ -298,7 +298,7 @@ Password api is defined by `RailsJwtAuth::PasswordsController`.
   url: host/password,
   method: PUT,
   data: {
-    reset_password_token: "token",
+    reset_password_token: 'token',
     password: {
       password: '1234',
       password_confirmation: '1234'
@@ -319,7 +319,7 @@ Invitations api is provided by `RailsJwtAuth::InvitationsController`.
   method: POST,
   data: {
     invitation: {
-      email: "user@example.com",
+      email: 'user@example.com',
       // More fields of your user
     }
   }
@@ -473,7 +473,7 @@ require 'rails_jwt_auth/spec_helpers'
 ...
 RSpec.configure do |config|
   ...
-  config.include RailsJwtAuth::SpecHelpers, :type => :controller
+  config.include RailsJwtAuth::SpecHelpers, type: :controller
 end
 ```
 
@@ -481,11 +481,11 @@ And then we can just call sign_in(user) to sign in as a user:
 
 ```ruby
 describe ExampleController
-  it "blocks unauthenticated access" do
-    expect { get :index }.to raise_error(RailsJwtAuth::Errors::NotAuthorized)
+  it 'blocks unauthenticated access' do
+    expect { get :index }.to raise_error(RailsJwtAuth::NotAuthorized)
   end
 
-  it "allows authenticated access" do
+  it 'allows authenticated access' do
     sign_in user
     get :index
     expect(response).to be_success
