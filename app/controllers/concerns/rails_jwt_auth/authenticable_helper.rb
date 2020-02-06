@@ -6,18 +6,22 @@ module RailsJwtAuth
       @current_user
     end
 
+    def jwt_payload
+      @jwt_payload
+    end
+
     def signed_in?
       !current_user.nil?
     end
 
     def authenticate!
       begin
-        payload = RailsJwtAuth::JwtManager.decode_from_request(request).first
+        @jwt_payload = RailsJwtAuth::JwtManager.decode_from_request(request).first
       rescue JWT::ExpiredSignature, JWT::VerificationError, JWT::DecodeError
         unauthorize!
       end
 
-      if !@current_user = RailsJwtAuth.model.from_token_payload(payload)
+      if !@current_user = RailsJwtAuth.model.from_token_payload(@jwt_payload)
         unauthorize!
       elsif @current_user.respond_to? :update_tracked_fields!
         @current_user.update_tracked_fields!(request)
@@ -26,8 +30,8 @@ module RailsJwtAuth
 
     def authenticate
       begin
-        payload = RailsJwtAuth::JwtManager.decode_from_request(request).first
-        @current_user = RailsJwtAuth.model.from_token_payload(payload)
+        @jwt_payload = RailsJwtAuth::JwtManager.decode_from_request(request).first
+        @current_user = RailsJwtAuth.model.from_token_payload(@jwt_payload)
       rescue JWT::ExpiredSignature, JWT::VerificationError, JWT::DecodeError
         @current_user = nil
       end
