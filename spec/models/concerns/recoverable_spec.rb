@@ -145,15 +145,18 @@ describe RailsJwtAuth::Recoverable do
 
       describe '#before_save' do
         context 'when updates password' do
-          it 'cleans reset password token' do
+          it 'cleans reset password token and sessions' do
             user.reset_password_token = 'abcd'
             user.reset_password_sent_at = Time.current
+            user.auth_tokens = ['test']
             user.save
             expect(user.reload.reset_password_token).not_to be_nil
 
             user.password = 'newpassword'
             user.save
-            expect(user.reload.reset_password_token).to be_nil
+            user.reload
+            expect(user.reset_password_token).to be_nil
+            expect(user.auth_tokens).to be_empty
           end
         end
       end

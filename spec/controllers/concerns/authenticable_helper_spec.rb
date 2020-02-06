@@ -9,6 +9,13 @@ describe RailsJwtAuth::AuthenticableHelper, type: :helper do
     end
   end
 
+  describe '#jwt_payload' do
+    it 'returns current jwt payload info' do
+      @jwt_payload = {name: 'name'}
+      expect(helper.jwt_payload).to eq(@jwt_payload)
+    end
+  end
+
   describe '#authenticate!' do
     before :all do
       RailsJwtAuth.model_name = ActiveRecordUser.to_s
@@ -21,10 +28,12 @@ describe RailsJwtAuth::AuthenticableHelper, type: :helper do
       it 'success!' do
         token = user.regenerate_auth_token
         jwt = RailsJwtAuth::JwtManager.encode(auth_token: token)
+        payload = RailsJwtAuth::JwtManager.decode(jwt)[0]
         helper.request.env['HTTP_AUTHORIZATION'] = "Bearer #{jwt}"
 
         helper.authenticate!
         expect(helper.current_user).to eq(user)
+        expect(helper.jwt_payload).to eq(payload)
       end
     end
 
@@ -101,10 +110,12 @@ describe RailsJwtAuth::AuthenticableHelper, type: :helper do
       it 'success!' do
         token = user.regenerate_auth_token
         jwt = RailsJwtAuth::JwtManager.encode(auth_token: token)
+        payload = RailsJwtAuth::JwtManager.decode(jwt)[0]
         helper.request.env['HTTP_AUTHORIZATION'] = "Bearer #{jwt}"
 
         helper.authenticate
         expect(helper.current_user).to eq(user)
+        expect(helper.jwt_payload).to eq(payload)
       end
     end
 
