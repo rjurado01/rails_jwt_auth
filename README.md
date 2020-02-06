@@ -187,6 +187,10 @@ end
 
     Return current signed-in user.
 
+-   **jwt_payload**
+
+    Return current jwt payload.
+
 -   **signed_in?**
 
     Verify if a user is signed in.
@@ -428,7 +432,10 @@ class CurrentUserController < ApplicationController
 
   def update
     if update_params[:password]
-      current_user.update_with_password(update_params)
+      # update password and remove other sessions tokens
+      current_user.update_with_password(
+        update_params.merge(auth_tokens: [jwt_payload['auth_token']])
+      )
     else
       current_user.update_attributes(update_params)
     end
