@@ -14,7 +14,10 @@ module RailsJwtAuth
         validate :validate_reset_password_token, if: :password_digest_changed?
 
         before_update do
-          self.reset_password_token = nil if password_digest_changed? && reset_password_token
+          if password_digest_changed? && reset_password_token
+            self.reset_password_token = nil
+            self.auth_tokens = []
+          end
         end
       end
     end
