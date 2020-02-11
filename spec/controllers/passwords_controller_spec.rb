@@ -65,6 +65,20 @@ describe RailsJwtAuth::PasswordsController do
             expect(json['errors']['email'].first['error']).to eq 'not_found'
           end
         end
+
+        context 'when send empty email' do
+          before do
+            post :create, params: {password: {email: ''}}
+          end
+
+          it 'returns 422 http status code' do
+            expect(response).to have_http_status(422)
+          end
+
+          it 'returns not found error' do
+            expect(json['errors']['email'].first['error']).to eq 'blank'
+          end
+        end
       end
 
       describe 'PUT #update' do
