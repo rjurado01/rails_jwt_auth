@@ -46,8 +46,10 @@ module RailsJwtAuth
                                  'invalid'
                                end
 
-      # abort reset password if exists to allow save
-      self.reset_password_token = self.reset_password_sent_at = nil if reset_password_token
+      # if recoberable module is enabled ensure clean recovery to allow save
+      if self.respond_to? :reset_password_token
+        self.reset_password_token = self.reset_password_sent_at = nil
+      end
 
       assign_attributes(params)
       valid? # validates first other fields
