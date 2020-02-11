@@ -6,7 +6,10 @@ module RailsJwtAuth
     def create
       return render_422(email: [{error: :blank}]) if password_create_params[:email].blank?
 
-      user = RailsJwtAuth.model.where(email: password_create_params[:email].to_s.downcase).first
+      user = RailsJwtAuth.model.where(
+        email: password_create_params[:email].to_s.strip.downcase
+      ).first
+
       return render_422(email: [{error: :not_found}]) unless user
 
       user.send_reset_password_instructions ? render_204 : render_422(user.errors.details)
