@@ -69,35 +69,6 @@ RSpec.describe RailsJwtAuth::Mailer, type: :mailer do
     end
   end
 
-  describe 'set_password_instructions' do
-    let(:user) do
-      FactoryBot.create(:active_record_user, reset_password_token: 'abcd',
-                                             reset_password_sent_at: Time.current)
-    end
-
-    let(:mail) { described_class.set_password_instructions(user).deliver_now }
-    let(:url) { "#{RailsJwtAuth.set_passwords_url}?reset_password_token=#{user.reset_password_token}" }
-
-    it 'sends email with correct info' do
-      expect { mail }.to change { ActionMailer::Base.deliveries.count }.by(1)
-      expect(mail.subject).to eq(I18n.t('rails_jwt_auth.mailer.set_password_instructions.subject'))
-      expect(mail.to).to include(user.email)
-      expect(mail.from).to include(RailsJwtAuth.mailer_sender)
-      expect(mail.body).to include(url)
-    end
-
-    context 'when set_passwords_url option is defined with hash url' do
-      before do
-        RailsJwtAuth.set_passwords_url = 'http://www.host.com/#/url?param=value'
-      end
-
-      it 'uses this to generate confirmation url' do
-        url = "#{RailsJwtAuth.set_passwords_url}&reset_password_token=#{user.reset_password_token}"
-        expect(mail.body).to include(url)
-      end
-    end
-  end
-
   describe 'send_invitation' do
     let(:user) do
       FactoryBot.create(:active_record_user, invitation_token: 'abcd',

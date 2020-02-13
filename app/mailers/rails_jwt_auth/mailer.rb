@@ -36,20 +36,6 @@ if defined?(ActionMailer)
       mail(to: @user[RailsJwtAuth.email_field_name], subject: subject)
     end
 
-    def set_password_instructions(user)
-      raise RailsJwtAuth::NotSetPasswordsUrl unless RailsJwtAuth.set_passwords_url.present?
-      @user = user
-
-      @reset_passwords_url = add_param_to_url(
-        RailsJwtAuth.set_passwords_url,
-        'reset_password_token',
-        @user.reset_password_token
-      )
-
-      subject = I18n.t('rails_jwt_auth.mailer.set_password_instructions.subject')
-      mail(to: @user[RailsJwtAuth.email_field_name], subject: subject)
-    end
-
     def send_invitation(user)
       raise RailsJwtAuth::NotInvitationsUrl unless RailsJwtAuth.invitations_url.present?
       @user = user

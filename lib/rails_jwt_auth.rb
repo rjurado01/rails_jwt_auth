@@ -50,9 +50,6 @@ module RailsJwtAuth
   mattr_accessor :reset_passwords_url
   self.reset_passwords_url = nil
 
-  mattr_accessor :set_passwords_url
-  self.set_passwords_url = nil
-
   mattr_accessor :invitations_url
   self.invitations_url = nil
 

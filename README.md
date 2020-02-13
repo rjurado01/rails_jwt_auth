@@ -77,7 +77,6 @@ You can edit configuration options into `config/initializers/rails_jwt_auth.rb` 
 | invitation_expiration_time      | 2.days            | Time an invitation is valid and can be accepted                        |
 | confirmations_url               | nil               | Url used to create email link with confirmation token                  |
 | reset_passwords_url             | nil               | Url used to create email link with reset password token                |
-| set_passwords_url               | nil               | Url used to create email link with set password token                  |
 | invitations_url                 | nil               | Url used to create email link with invitation token                    |
 | maximum_attempts                | 3                 | Number of failed login attempts before locking an account              |
 | lock_strategy                   | :none             | Strategy to be used to lock an account: `:none` or `:failed_attempts`  |
@@ -458,28 +457,6 @@ class CurrentUserController < ApplicationController
 
   def update_params
     params.require(:user).permit(:email, :current_password, :password)
-  end
-end
-```
-
-### Register users with random password
-
-This is a controller example that allows admins to register users with random password and send email to reset it.
-If registration is sucess it will send email to `set_password_url` with reset password token.
-
-```ruby
-class UsersController < ApplicationController
-  before_action 'authenticate!'
-
-  def create
-    user = User.new(create_params)
-    user.set_and_send_password_instructions ? render_204 : render_422(user.errors.details)
-  end
-
-  private
-
-  def create_params
-    params.require(:user).permit(:email)
   end
 end
 ```
