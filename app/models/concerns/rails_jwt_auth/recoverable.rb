@@ -10,15 +10,6 @@ module RailsJwtAuth
           field :reset_password_token,   type: String
           field :reset_password_sent_at, type: Time
         end
-
-        validate :validate_reset_password_token, if: :password_digest_changed?
-
-        before_update do
-          if password_digest_changed? && reset_password_token
-            self.reset_password_token = nil
-            self.auth_tokens = []
-          end
-        end
       end
     end
 
@@ -45,7 +36,7 @@ module RailsJwtAuth
     end
 
     def set_and_send_password_instructions
-      RailsJwtAuth.email_field_name! # ensure email field es valid
+      RailsJwtAuth.email_field_name! # ensure email field is valid
       return if password.present?
 
       self.password = SecureRandom.base58(48)
@@ -61,13 +52,21 @@ module RailsJwtAuth
       true
     end
 
-    protected
+    def set_reset_password(params)
+      self.assign_attributes(params)
+      self.reset_password_token = nil
+      self.auth_tokens = []
 
-    def validate_reset_password_token
-      if reset_password_sent_at &&
-         (reset_password_sent_at < (Time.current - RailsJwtAuth.reset_password_expiration_time))
-        errors.add(:reset_password_token, :expired)
-      end
+      valid?
+      errors.add(:password, :blank) if params[:password].blank?
+      errors.add(:reset_password_token, :expired) if expired_reset_password_token?
+
+      errors.empty? ? save : false
+    end
+
+    def expired_reset_password_token?
+      reset_password_sent_at &&
+        (reset_password_sent_at < (Time.current - RailsJwtAuth.reset_password_expiration_time))
     end
   end
 end

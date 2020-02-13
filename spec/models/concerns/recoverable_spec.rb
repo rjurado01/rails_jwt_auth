@@ -143,25 +143,34 @@ describe RailsJwtAuth::Recoverable do
         end
       end
 
-      describe '#before_save' do
-        context 'when updates password' do
-          it 'cleans reset password token and sessions' do
-            user.reset_password_token = 'abcd'
-            user.reset_password_sent_at = Time.current
-            user.auth_tokens = ['test']
-            user.save
-            expect(user.reload.reset_password_token).not_to be_nil
+      describe '#set_reset_password' do
+        it 'validates password presence' do
+          expect(user.set_reset_password({})).to be_falsey
+          expect(user.errors.details[:password].first[:error]).to eq(:blank)
+        end
 
-            user.password = 'newpassword'
-            user.save
-            user.reload
-            expect(user.reset_password_token).to be_nil
-            expect(user.auth_tokens).to be_empty
-          end
+        it 'validates reset_password_token' do
+          allow(user).to receive(:expired_reset_password_token?).and_return(true)
+
+          expect(user.set_reset_password({})).to be_falsey
+          expect(user.errors.details[:reset_password_token].first[:error]).to eq(:expired)
+        end
+
+        it 'cleans reset password token and sessions' do
+          user.reset_password_token = 'abcd'
+          user.reset_password_sent_at = Time.current
+          user.auth_tokens = ['test']
+          user.save
+
+          user.set_reset_password(password: 'newpassword')
+          user.reload
+
+          expect(user.reset_password_token).to be_nil
+          expect(user.auth_tokens).to be_empty
         end
       end
 
-      describe '#validations' do
+      describe '#expired_reset_password_token?' do
         context 'when reset password token has expired' do
           before do
             RailsJwtAuth.reset_password_expiration_time = 1.second
@@ -171,15 +180,13 @@ describe RailsJwtAuth::Recoverable do
             RailsJwtAuth.reset_password_expiration_time = 1.day
           end
 
-          it 'adds expiration error' do
+          it 'returns true' do
             user.reset_password_token = 'abcd'
             user.reset_password_sent_at = Time.current
             user.save
             sleep 1
 
-            user.password = 'newpassword'
-            expect(user.save).to be_falsey
-            expect(user.errors.details[:reset_password_token].first[:error]).to eq :expired
+            expect(user.expired_reset_password_token?).to be_truthy
           end
         end
       end
