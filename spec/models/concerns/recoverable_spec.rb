@@ -105,14 +105,14 @@ describe RailsJwtAuth::Recoverable do
       describe '#set_reset_password' do
         it 'validates password presence' do
           expect(user.set_reset_password({})).to be_falsey
-          expect(user.errors.details[:password].first[:error]).to eq(:blank)
+          expect(get_record_error(user, :password)).to eq(:blank)
         end
 
         it 'validates reset_password_token' do
           allow(user).to receive(:expired_reset_password_token?).and_return(true)
 
           expect(user.set_reset_password({})).to be_falsey
-          expect(user.errors.details[:reset_password_token].first[:error]).to eq(:expired)
+          expect(get_record_error(user, :reset_password_token)).to eq(:expired)
         end
 
         it 'cleans reset password token and sessions' do

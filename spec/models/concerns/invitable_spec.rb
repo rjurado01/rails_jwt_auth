@@ -6,19 +6,16 @@ describe RailsJwtAuth::Invitable do
       before(:all) { RailsJwtAuth.model_name = "#{orm}User" }
       before(:each) { ActionMailer::Base.deliveries.clear }
 
-      let(:invited_user) { "#{orm}User".constantize.invite! email: 'valid@example.com' }
+      let(:pass) { 'new_password' }
+      let(:email) { 'valid@email.com' }
+      let(:username) { 'TestName' }
+      let(:invited_user) { RailsJwtAuth.model.invite! email: email, username: username }
+      let(:user) { FactoryBot.create "#{orm.underscore}_user", email: email }
 
       describe '#attributes' do
-        subject { invited_user }
-        it { is_expected.to have_attributes(invitation_token: invited_user.invitation_token) }
-        it { is_expected.to have_attributes(invitation_accepted_at: nil) }
-        it do
-          is_expected.to have_attributes(invitation_created_at: invited_user.invitation_created_at)
-        end
-
-        it 'has a random password' do
-          expect(subject).to_not have_attributes(password_digest: nil)
-        end
+        it { expect(user).to respond_to(:invitation_token) }
+        it { expect(user).to respond_to(:invitation_sent_at) }
+        it { expect(user).to respond_to(:invitation_accepted_at) }
       end
 
       describe '.invite!' do # Class method
@@ -27,158 +24,75 @@ describe RailsJwtAuth::Invitable do
             allow(RailsJwtAuth).to receive(:auth_field_name).and_return(:invalid)
 
             expect {
-              RailsJwtAuth.model.invite! email: 'user@example.com'
+              RailsJwtAuth.model.invite! email: email
             }.to raise_error(RailsJwtAuth::InvalidAuthField)
           end
         end
 
-        context 'without existing user' do
-          subject { RailsJwtAuth.model.invite! email: 'another@example.com' }
+        context 'when auth field is blank' do
+          it 'returns record with auth field error' do
+            user = RailsJwtAuth.model.invite!
+            expect(get_record_error(user, :email)).to eq(:blank)
+          end
+        end
 
+        context 'when is new valid user' do
           it 'creates a record' do
-            expect { subject }.to change { "#{orm}User".constantize.count }.by 1
+            expect { invited_user }.to change { RailsJwtAuth.model.count }.by 1
           end
 
           it 'sends the invitation mail' do
-            subject
+            invited_user
             expect(ActionMailer::Base.deliveries.count).to eq(1)
           end
 
-          context 'with more fields than only email' do
-            subject do
-              RailsJwtAuth.model.invite!(email: 'valid@example.com', username: 'TestName')
-            end
+          it 'assign attributes' do
+            expect(invited_user.username).to eq('TestName')
+          end
 
-            it 'has extra attributes assigned' do
-              expect(subject.username).to eq('TestName')
-            end
+          it 'returns new record' do
+            expect(invited_user.class).to eq(RailsJwtAuth.model)
           end
         end
 
-        context 'without auth_field' do
-          it 'raises exception' do
-            expect { "#{orm}User".constantize.invite! }.to raise_error(ArgumentError)
-          end
-        end
-
-        context 'with existing user' do
+        context 'when user already exists' do
           context 'with pending invitation' do
-            let(:user) { "#{orm}User".constantize.invite! email: 'valid@example.com' }
+            after { Timecop.return }
 
-            before do
-              "#{orm}User".constantize.invite! email: 'valid@example.com'
-              ActionMailer::Base.deliveries.clear
-            end
-
-            it 'doesn\'t change the users password' do
-              expect(user.password_digest).to eq(user.reload.password_digest)
-            end
-
-            it 'resets invitation_sent_at' do
+            it 'resets invitation' do
               Timecop.freeze(Time.current)
-              user = "#{orm}User".constantize.invite! email: 'test@example.com'
+              first_invitation_date = Time.current.to_i
+              second_invitation_date = nil
+
+              invited_user
 
               Timecop.freeze(Time.current + 30.days) do
-                "#{orm}User".constantize.invite! email: user.email
-                expect(user.reload.invitation_sent_at.to_datetime.to_i)
-                  .to eq(Time.current.to_datetime.to_i)
+                RailsJwtAuth.model.invite! email: invited_user.email
+                second_invitation_date = Time.current.to_i
               end
 
-              expect(user.reload.invitation_sent_at.to_datetime.to_i)
-                .to_not eq(Time.current.to_datetime.to_i)
-              expect(user.reload.invitation_sent_at.to_datetime.to_i)
-                .to eq((Time.current.to_datetime + 30.days).to_datetime.to_i)
-              Timecop.return
+              expect(first_invitation_date).not_to eq(second_invitation_date)
+              expect(invited_user.reload.invitation_sent_at.to_i).to eq(second_invitation_date)
             end
 
-            it 'sends the invitation mail' do
-              "#{orm}User".constantize.invite! email: 'test@example.com'
+            it 'sends new invitation mail' do
+              invited_user
               expect(ActionMailer::Base.deliveries.count).to eq(1)
             end
           end
 
-          context 'when completely registered' do
-            let(:user) { FactoryBot.create "#{orm.underscore}_user", email: 'valid@example.com' }
+          context 'with register completed' do
+            before { user }
 
-            subject { "#{orm}User".constantize.invite! email: user.email }
-
-            it 'has taken error on auth_field_name' do
-              field = RailsJwtAuth.auth_field_name.to_sym
-              expect(subject.errors).to_not be_empty
-              error = subject.errors.details[field].first.values.first
-              expect(error).to eq(:taken)
+            it 'returns record with registered error' do
+              expect(RailsJwtAuth.model.find_by(email: user.email)).not_to be_nil
+              expect(get_record_error(invited_user, :email)).to eq(:registered)
             end
-          end
-
-          context 'when invitation already accepted' do
-            let(:email) { 'valid@example.com' }
-
-            before do
-              # invite and accept
-              user = "#{orm}User".constantize.invite! email: email
-              user.accept_invitation!
-              user.save
-            end
-
-            it 'has taken error on auth_field_name' do
-              field = RailsJwtAuth.auth_field_name.to_sym
-              user2 = "#{orm}User".constantize.invite! email: email
-              expect(user2.errors).to_not be_empty
-              error = user2.errors.details[field].first.values.first
-              expect(error).to eq(:taken)
-            end
-          end
-        end
-      end
-
-      describe '#accept_invitation!' do
-        context 'with invited user' do
-          before do
-            Timecop.freeze
-            invited_user.accept_invitation!
-          end
-
-          after do
-            Timecop.return
-          end
-
-          it 'clears invitation_token' do
-            expect(invited_user.invitation_token).to be_nil
-          end
-
-          it 'sets invitation_accepted_at' do
-            expect(invited_user.invitation_accepted_at).to eq(Time.current)
-          end
-        end
-
-        context 'with non-invited user' do
-          let(:user) { FactoryBot.create "#{orm.underscore}_user" }
-          before do
-            user.accept_invitation!
-          end
-
-          it 'doesn\'t set invitation_accepted_at' do
-            expect(user.reload.invitation_accepted_at).to be_nil
-          end
-        end
-
-        context 'with already confirmed user' do
-          before do
-            @invited_user = "#{orm}User".constantize.invite! email: 'valid@example.com'
-            @invited_user.confirm!
-            @invited_user.accept_invitation!
-            @invited_user.save
-          end
-
-          it 'doesn\'t include already_confirmed in errors' do
-            expect(@invited_user.errors).to be_empty
           end
         end
       end
 
       describe '#invite!' do
-        let(:user) { FactoryBot.build "#{orm.underscore}_user" }
-
         context 'when email field config is invalid' do
           it 'throws InvalidEmailField exception' do
             allow(RailsJwtAuth).to receive(:email_field_name).and_return(:invalid)
@@ -186,27 +100,102 @@ describe RailsJwtAuth::Invitable do
           end
         end
 
-        context 'without invitation token' do
-          it 'generates invitation_token' do
-            user.invite!
-            expect(user.invitation_token).to_not be_nil
-          end
-        end
-
-        context 'with token' do
+        context 'when user is new' do
           before do
-            user.invitation_token = 'abcde'
-            user.invite!
+            @user = FactoryBot.build("#{orm.underscore}_user")
+            @user.invite!
           end
 
-          it 'doesn\'t change actual token' do
-            expect(user.invitation_token).to eq('abcde')
+          it 'fill in invitation fields' do
+            expect(@user.invitation_token).to_not be_nil
+            expect(@user.invitation_sent_at).to_not be_nil
+            expect(@user.invitation_accepted_at).to be_nil
+          end
+
+          it 'set provisional password' do
+            expect(@user.password_digest).to_not be_nil
+          end
+
+          it 'sends new invitation mail' do
+            expect(ActionMailer::Base.deliveries.count).to eq(1)
           end
         end
 
-        it 'delivers invitation' do
-          expect(user).to receive(:send_invitation_mail)
-          user.invite!
+        context 'when user has pending invitation' do
+          after { Timecop.return }
+
+          it 'resets invitation' do
+            Timecop.freeze(Time.current)
+            first_invitation_date = Time.current.to_i
+            second_invitation_date = nil
+
+            invited_user
+
+            Timecop.freeze(Time.current + 30.days) do
+              invited_user.invite!
+              second_invitation_date = Time.current.to_i
+            end
+
+            expect(first_invitation_date).not_to eq(second_invitation_date)
+            expect(invited_user.reload.invitation_sent_at.to_i).to eq(second_invitation_date)
+          end
+
+          it 'sends new invitation mail' do
+            invited_user
+            expect(ActionMailer::Base.deliveries.count).to eq(1)
+
+            invited_user.invite!
+            expect(ActionMailer::Base.deliveries.count).to eq(2)
+          end
+        end
+
+        context 'when user register is completed' do
+          before { user }
+
+          it 'returns record with registered error' do
+            expect(RailsJwtAuth.model.find_by(email: user.email)).not_to be_nil
+            user.invite!
+            expect(get_record_error(user, :email)).to eq(:registered)
+          end
+        end
+      end
+
+      describe '#accept_invitation!' do
+        let(:accept_attrs) { {password: pass, password_confirmation: pass} }
+
+        context 'with invited user' do
+          it 'completes invitation' do
+            invited_user
+
+            expect(invited_user.invitation_token).not_to be_nil
+            expect(invited_user.invitation_sent_at).not_to be_nil
+            expect(invited_user.invitation_accepted_at).to be_nil
+
+            invited_user.accept_invitation!(accept_attrs)
+
+            expect(invited_user.invitation_token).to be_nil
+            expect(invited_user.invitation_sent_at).to be_nil
+            expect(invited_user.invitation_accepted_at).not_to be_nil
+            expect(invited_user.confirmed_at).not_to be_nil
+          end
+
+          it 'validates password' do
+            invited_user.accept_invitation!({})
+            expect(get_record_error(invited_user, :password)).to eq(:blank)
+          end
+
+          it 'validates token' do
+            invited_user.invitation_sent_at = Time.now - 1.year
+            invited_user.accept_invitation!(accept_attrs)
+            expect(get_record_error(invited_user, :invitation_token)).to eq(:expired)
+          end
+        end
+
+        context 'with non-invited user' do
+          it 'doesn\'t set invitation_accepted_at' do
+            expect(user.accept_invitation!({})).to be_falsey
+            expect(user.reload.invitation_accepted_at).to be_nil
+          end
         end
       end
     end

@@ -78,3 +78,9 @@ RSpec.configure do |config|
     RailsJwtAuth.unlock_url = 'http://example.com/unlock-account'
   end
 end
+
+def get_record_error(record, field)
+  return nil unless record && field
+
+  record.errors.details[field]&.first[:error]
+end

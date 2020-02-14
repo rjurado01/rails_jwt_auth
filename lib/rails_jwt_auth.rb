@@ -111,4 +111,12 @@ module RailsJwtAuth
 
     field_name
   end
+
+  # Thanks to https://github.com/heartcombo/devise/blob/master/lib/devise.rb#L496
+  def self.friendly_token(length = 24)
+    # To calculate real characters, we must perform this operation.
+    # See SecureRandom.urlsafe_base64
+    rlength = (length * 3 / 4) - 1
+    SecureRandom.urlsafe_base64(rlength, true).tr('lIO0', 'sxyz')
+  end
 end

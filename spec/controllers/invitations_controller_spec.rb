@@ -7,6 +7,8 @@ RSpec.describe RailsJwtAuth::InvitationsController do
         RailsJwtAuth.model_name = "#{orm}User"
       end
 
+      let(:json) { JSON.parse(response.body) }
+
       describe 'POST #create' do
         context 'when user is authenticated' do
           before do
@@ -59,6 +61,7 @@ RSpec.describe RailsJwtAuth::InvitationsController do
       describe 'PUT #update' do
         context 'when invited user' do
           let(:user) { RailsJwtAuth.model.invite! email: 'valid@example.com' }
+
           context 'with all params' do
             before do
               put :update, params: {
@@ -93,20 +96,17 @@ RSpec.describe RailsJwtAuth::InvitationsController do
             end
           end
 
-          context 'with invitation token' do
+          context 'without password' do
             before do
               put :update, params: {
                 id: user.invitation_token,
-                invitation: {invitation_token: user.invitation_token}
+                invitation: {password: ''}
               }
             end
 
-            it 'returns HTTP 204 No content' do
-              expect(response).to have_http_status(:no_content)
-            end
-
-            it 'deletes the token of the user' do
-              expect(user.reload.invitation_token).to be_nil
+            it 'returns HTTP 422 with password error' do
+              expect(response).to have_http_status(422)
+              expect(json['errors']['password'].first['error']).to eq 'blank'
             end
           end
 

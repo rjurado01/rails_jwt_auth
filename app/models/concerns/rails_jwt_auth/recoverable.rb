@@ -27,7 +27,7 @@ module RailsJwtAuth
         return false
       end
 
-      self.reset_password_token = SecureRandom.base58(24)
+      self.reset_password_token = RailsJwtAuth.friendly_token
       self.reset_password_sent_at = Time.current
       return false unless save
 
@@ -37,19 +37,24 @@ module RailsJwtAuth
 
     def set_reset_password(params)
       self.assign_attributes(params)
-      self.reset_password_token = nil
-      self.auth_tokens = []
 
       valid?
       errors.add(:password, :blank) if params[:password].blank?
       errors.add(:reset_password_token, :expired) if expired_reset_password_token?
 
-      errors.empty? ? save : false
+      return false unless errors.empty?
+
+      self.reset_password_token = nil
+      self.reset_password_sent_at = nil
+      self.auth_tokens = []
+      save
     end
 
     def expired_reset_password_token?
-      reset_password_sent_at &&
-        (reset_password_sent_at < (Time.current - RailsJwtAuth.reset_password_expiration_time))
+      expiration_time = RailsJwtAuth.reset_password_expiration_time
+      return false if expiration_time.to_i.zero?
+
+      reset_password_sent_at && reset_password_sent_at < expiration_time.ago
     end
   end
 end

@@ -3,6 +3,8 @@ module RailsJwtAuth
     include ParamsHelper
     include RenderHelper
 
+    before_action :load_user, only: [:update]
+
     def create
       authenticate!
       user = RailsJwtAuth.model.invite!(invitation_create_params)
@@ -10,15 +12,21 @@ module RailsJwtAuth
     end
 
     def update
-      return render_404 unless
-        params[:id] &&
-        (user = RailsJwtAuth.model.where(invitation_token: params[:id]).first)
+      return render_404 unless @user
 
-      user.assign_attributes invitation_update_params
-      user.accept_invitation!
-      return render_204 if user.errors.empty? && user.save
+      if @user.accept_invitation!(invitation_update_params)
+        render_204
+      else
+        render_422(@user.errors.details)
+      end
+    end
 
-      render_422(user.errors.details)
+    private
+
+    def load_user
+      return unless params[:id]
+
+      @user = RailsJwtAuth.model.where(invitation_token: params[:id]).first
     end
   end
 end

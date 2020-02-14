@@ -45,7 +45,7 @@ describe RailsJwtAuth::Confirmable do
 
             Timecop.freeze(Date.today + 30) do
               expect(user.confirm!).to be_falsey
-              expect(user.errors.details[:confirmation_token].first[:error]).to eq :expired
+              expect(get_record_error(user, :confirmation_token)).to eq :expired
             end
           end
         end
@@ -117,7 +117,7 @@ describe RailsJwtAuth::Confirmable do
 
           it 'addds error to user' do
             user.send_confirmation_instructions
-            expect(user.errors.details[:email].first[:error]).to eq :already_confirmed
+            expect(get_record_error(user, :email)).to eq :already_confirmed
           end
 
           it 'does not send confirmation email' do
@@ -203,9 +203,7 @@ describe RailsJwtAuth::Confirmable do
 
               Timecop.freeze(Date.today + 30) do
                 expect(unconfirmed_user.save).to be_falsey
-                expect(unconfirmed_user.errors.details[:confirmation_token].first[:error]).to eq(
-                  :expired
-                )
+                expect(get_record_error(unconfirmed_user, :confirmation_token)).to eq(:expired)
               end
             end
           end

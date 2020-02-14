@@ -71,8 +71,7 @@ RSpec.describe RailsJwtAuth::Mailer, type: :mailer do
 
   describe 'send_invitation' do
     let(:user) do
-      FactoryBot.create(:active_record_user, invitation_token: 'abcd',
-                                             invitation_created_at: Time.current)
+      FactoryBot.create(:active_record_user, invitation_token: 'abcd')
     end
 
     let(:mail) { described_class.send_invitation(user).deliver_now }
