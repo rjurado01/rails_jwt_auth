@@ -3,7 +3,7 @@ module RailsJwtAuth
     include ParamsHelper
     include RenderHelper
 
-    before_action :load_user, only: [:update]
+    before_action :set_user_from_token, only: [:update]
 
     def create
       authenticate!
@@ -23,8 +23,8 @@ module RailsJwtAuth
 
     private
 
-    def load_user
-      return unless params[:id]
+    def set_user_from_token
+      return if params[:id].blank?
 
       @user = RailsJwtAuth.model.where(invitation_token: params[:id]).first
     end
