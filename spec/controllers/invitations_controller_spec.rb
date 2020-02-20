@@ -8,38 +8,50 @@ RSpec.describe RailsJwtAuth::InvitationsController do
       end
 
       describe 'POST #create' do
-        context 'without passing email as param' do
-          it 'raises ActiveRecord::ParameterMissing' do
-            expect { post :create, params: {} }.to raise_error ActionController::ParameterMissing
+        context 'when user is authenticated' do
+          before do
+            allow(subject).to receive(:authenticate!).and_return(true)
+          end
+
+          context 'without passing email as param' do
+            it 'raises ActiveRecord::ParameterMissing' do
+              expect { post :create, params: {} }.to raise_error ActionController::ParameterMissing
+            end
+          end
+
+          context 'passing email as param' do
+            let(:email) { 'valid@example.com' }
+
+            context 'without existing user' do
+              it 'returns HTTP 201 Created' do
+                post :create, params: {invitation: {email: email}}
+                expect(response).to have_http_status(:no_content)
+              end
+            end
+
+            context 'with already invited user' do
+              let(:user) { RailsJwtAuth.model.invite! email: 'test@example.com' }
+
+              it 'returns HTTP 201 Created' do
+                post :create, params: {invitation: {email: user.email}}
+                expect(response).to have_http_status(:no_content)
+              end
+            end
+
+            context 'with already registered user' do
+              let(:user) { FactoryBot.create "#{orm.underscore}_user" }
+
+              it 'returns HTTP 422 Unprocessable Entity' do
+                post :create, params: {invitation: {email: user.email}}
+                expect(response).to have_http_status(:unprocessable_entity)
+              end
+            end
           end
         end
 
-        context 'passing email as param' do
-          let(:email) { 'valid@example.com' }
-
-          context 'without existing user' do
-            it 'returns HTTP 201 Created' do
-              post :create, params: {invitation: {email: email}}
-              expect(response).to have_http_status(:no_content)
-            end
-          end
-
-          context 'with already invited user' do
-            let(:user) { RailsJwtAuth.model.invite! email: 'test@example.com' }
-
-            it 'returns HTTP 201 Created' do
-              post :create, params: {invitation: {email: user.email}}
-              expect(response).to have_http_status(:no_content)
-            end
-          end
-
-          context 'with already registered user' do
-            let(:user) { FactoryBot.create "#{orm.underscore}_user" }
-
-            it 'returns HTTP 422 Unprocessable Entity' do
-              post :create, params: {invitation: {email: user.email}}
-              expect(response).to have_http_status(:unprocessable_entity)
-            end
+        context 'when user is not authenticated' do
+          it 'raises RailsJwtAuth::NotAuthorized' do
+            expect { post :create, params: {} }.to raise_error RailsJwtAuth::NotAuthorized
           end
         end
       end
