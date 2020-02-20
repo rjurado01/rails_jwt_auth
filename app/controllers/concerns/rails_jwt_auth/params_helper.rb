@@ -9,7 +9,7 @@ module RailsJwtAuth
     end
 
     def confirmation_create_params
-      params.require(:confirmation).permit(:email)
+      params.require(:confirmation).permit(RailsJwtAuth.email_field_name)
     end
 
     def session_create_params

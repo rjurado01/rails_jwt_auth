@@ -197,6 +197,21 @@ end
 
 ## Default Controllers API
 
+|       Prefix | Verb   | URI Pattern                  | Controller#Action                   |
+| ------------ | ------ | ---------------------------- | ----------------------------------- |
+|      session | DELETE | /session(.:format)           | rails_jwt_auth/sessions#destroy     |
+|              | POST   | /session(.:format)           | rails_jwt_auth/sessions#create      |
+| registration | POST   | /registration(.:format)      | rails_jwt_auth/registrations#create |
+|confirmations | POST   | /confirmations(.:format)     | rails_jwt_auth/confirmations#create |
+| confirmation | PATCH  | /confirmations/:id(.:format) | rails_jwt_auth/confirmations#update |
+|              | PUT    | /confirmations/:id(.:format) | rails_jwt_auth/confirmations#update |
+|    passwords | POST   | /passwords(.:format)         | rails_jwt_auth/passwords#create     |
+|     password | PATCH  | /passwords/:id(.:format)     | rails_jwt_auth/passwords#update     |
+|              | PUT    | /passwords/:id(.:format)     | rails_jwt_auth/passwords#update     |
+|  invitations | POST   | /invitations(.:format)       | rails_jwt_auth/invitations#create   |
+|   invitation | PATCH  | /invitations/:id(.:format)   | rails_jwt_auth/invitations#update   |
+|              | PUT    | /invitations/:id(.:format)   | rails_jwt_auth/invitations#update   |
+
 ### Session
 
 Session api is defined by `RailsJwtAuth::SessionsController`.
@@ -255,11 +270,9 @@ It is necessary to set a value for `confirmations_url` option into `config/initi
 
 ```js
 {
-  url: host/confirmation,
+  url: host/confirmations/:token,
   method: PUT
-  data: {
-    confirmation_token: 'token'
-  }
+  data: {}
 }
 ```
 
@@ -267,7 +280,7 @@ It is necessary to set a value for `confirmations_url` option into `config/initi
 
 ```js
 {
-  url: host/confirmation,
+  url: host/confirmations,
   method: POST,
   data: {
     confirmation: {
@@ -285,7 +298,7 @@ Password api is defined by `RailsJwtAuth::PasswordsController`.
 
 ```js
 {
-  url: host/password,
+  url: host/passwords,
   method: POST,
   data: {
     password: {
@@ -299,10 +312,9 @@ Password api is defined by `RailsJwtAuth::PasswordsController`.
 
 ```js
 {
-  url: host/password,
+  url: host/passwords/:token,
   method: PUT,
   data: {
-    reset_password_token: 'token',
     password: {
       password: '1234',
       password_confirmation: '1234'
@@ -356,7 +368,8 @@ Unlock api is provided by `RailsJwtAuth::UnlocksController`.
 ```js
 {
   url: host/unlocks/:unlock_token,
-  method: PUT
+  method: PUT,
+  data: {}
 }
 ```
 
