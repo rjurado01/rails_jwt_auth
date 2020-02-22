@@ -1,8 +1,8 @@
 sudo: false
 language: ruby
 rvm:
-  - 2.3.4
-before_install: gem install bundler -v 1.15.4
+  - 2.6.4
+before_install: gem install bundler -v 1.17.2
 
 services:
   - mongodb
