@@ -2,6 +2,7 @@ require 'bcrypt'
 
 require 'rails_jwt_auth/engine'
 require 'rails_jwt_auth/jwt_manager'
+require 'rails_jwt_auth/session'
 
 module RailsJwtAuth
   InvalidEmailField = Class.new(StandardError)

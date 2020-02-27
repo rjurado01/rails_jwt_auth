@@ -67,14 +67,6 @@ module RailsJwtAuth
       end
     end
 
-    def authentication?(pass)
-      authenticate(pass)
-    end
-
-    def unauthenticated_error
-      {error: :invalid_session}
-    end
-
     module ClassMethods
       def from_token_payload(payload)
         if RailsJwtAuth.simultaneous_sessions > 0

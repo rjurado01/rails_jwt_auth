@@ -59,6 +59,7 @@ RSpec.configure do |config|
   # config.filter_gems_from_backtrace('gem name')
 
   #config.include RailsJwtAuth::Spec::Helpers
+  config.include ActiveSupport::Testing::TimeHelpers
 
   config.before(:each) do
     MongoidUser.destroy_all
@@ -82,5 +83,6 @@ end
 def get_record_error(record, field)
   return nil unless record && field
 
-  record.errors.details[field]&.first[:error]
+  field_error = record.errors&.details[field]&.first
+  field_error ? field_error[:error] : nil
 end

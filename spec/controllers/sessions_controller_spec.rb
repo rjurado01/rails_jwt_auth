@@ -68,7 +68,7 @@ describe RailsJwtAuth::SessionsController do
           end
 
           it 'returns error message' do
-            expect(json['errors']['session'].first['error']).to eq 'invalid_session'
+            expect(json['errors']['email'].first['error']).to eq 'invalid'
           end
         end
 
@@ -82,7 +82,7 @@ describe RailsJwtAuth::SessionsController do
           end
 
           it 'returns error message' do
-            expect(json['errors']['session'].first['error']).to eq 'invalid_session'
+            expect(json['errors']['password'].first['error']).to eq 'invalid'
           end
         end
 
@@ -96,7 +96,7 @@ describe RailsJwtAuth::SessionsController do
           end
 
           it 'returns error message' do
-            expect(json['errors']['session'].first['error']).to eq 'unconfirmed'
+            expect(json['errors']['email'].first['error']).to eq 'unconfirmed'
           end
         end
 
@@ -110,7 +110,7 @@ describe RailsJwtAuth::SessionsController do
           end
 
           it 'returns error message' do
-            expect(json['errors']['session'].first['error']).to eq 'locked'
+            expect(json['errors']['email'].first['error']).to eq 'locked'
           end
         end
       end

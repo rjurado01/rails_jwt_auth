@@ -14,7 +14,8 @@ module RailsJwtAuth
     end
 
     def lock_access!
-      self.locked_at = Time.now.utc
+      self.locked_at = Time.current
+
       save(validate: false).tap do |result|
         send_unlock_instructions if result && unlock_strategy_enabled?(:email)
       end
@@ -22,43 +23,27 @@ module RailsJwtAuth
 
     def unlock_access!
       self.locked_at = nil
-      self.failed_attempts = 0
-      self.first_failed_attempt_at = nil
       self.unlock_token = nil
-      save(validate: false)
+      reset_attempts
+
+      save(validate: false) if changed?
     end
 
-    def reset_attempts!
-      self.failed_attempts = 0
-      self.first_failed_attempt_at = nil
-      save(validate: false)
+    def access_locked?
+      locked_at && !lock_expired?
     end
 
-    def authentication?(pass)
-      return super(pass) unless lock_strategy_enabled?(:failed_attempts)
+    def failed_attempt!
+      return if access_locked?
 
-      reset_attempts! if !access_locked? && attempts_expired?
-      unlock_access! if lock_expired?
+      reset_attempts if attempts_expired?
 
-      if access_locked?
-        false
-      elsif super(pass)
-        unlock_access!
-        self
-      else
-        failed_attempt!
-        lock_access! if attempts_exceeded?
-        false
-      end
-    end
+      self.failed_attempts ||= 0
+      self.failed_attempts += 1
+      self.first_failed_attempt_at = Time.current if failed_attempts == 1
 
-    def unauthenticated_error
-      return super unless lock_strategy_enabled?(:failed_attempts)
-
-      if access_locked?
-        {error: :locked}
-      else
-        {error: :invalid_session, remaining_attempts: remaining_attempts}
+      save(validate: false).tap do |result|
+        lock_access! if result && attempts_exceeded?
       end
     end
 
@@ -72,10 +57,6 @@ module RailsJwtAuth
       RailsJwtAuth.deliver_later ? mailer.deliver_later : mailer.deliver
     end
 
-    def access_locked?
-      locked_at && !lock_expired?
-    end
-
     def lock_expired?
       if unlock_strategy_enabled?(:time)
         locked_at && locked_at < RailsJwtAuth.unlock_in.ago
@@ -84,19 +65,17 @@ module RailsJwtAuth
       end
     end
 
-    def failed_attempt!
-      self.failed_attempts ||= 0
-      self.failed_attempts += 1
-      self.first_failed_attempt_at = Time.now.utc if failed_attempts == 1
-      save(validate: false)
-    end
-
-    def attempts_exceeded?
-      failed_attempts && failed_attempts >= RailsJwtAuth.maximum_attempts
+    def reset_attempts
+      self.failed_attempts = 0
+      self.first_failed_attempt_at = nil
     end
 
     def remaining_attempts
       RailsJwtAuth.maximum_attempts - failed_attempts.to_i
+    end
+
+    def attempts_exceeded?
+      !remaining_attempts.positive?
     end
 
     def attempts_expired?

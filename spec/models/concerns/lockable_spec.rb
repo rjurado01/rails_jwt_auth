@@ -4,7 +4,9 @@ describe RailsJwtAuth::Lockable do
   %w[ActiveRecord Mongoid].each do |orm|
     context "when use #{orm}" do
       before(:each) { RailsJwtAuth.model_name = "#{orm}User" }
+
       let(:user) { FactoryBot.create("#{orm.underscore}_user") }
+
       let(:locked_user) {
         FactoryBot.create(
           "#{orm.underscore}_user",
@@ -52,8 +54,19 @@ describe RailsJwtAuth::Lockable do
         end
       end
 
+      describe '#access_locked?' do
+        it 'returns if user is locked' do
+          expect(user.access_locked?).to be_falsey
+          user.lock_access!
+          expect(user.access_locked?).to be_truthy
+        end
+      end
+
       describe '#unlock_access!' do
-        it 'unlocks the user' do
+        it 'unlocks the user and reset attempts' do
+          expect(locked_user.failed_attempts).to be > 0
+          expect(locked_user.access_locked?).to be_truthy
+
           locked_user.unlock_access!
           expect(locked_user.locked_at).to be_nil
           expect(locked_user.failed_attempts).to eq 0
@@ -62,111 +75,64 @@ describe RailsJwtAuth::Lockable do
         end
       end
 
-      describe '#reset_attempts!' do
-        before do
-          user.update(failed_attempts: 1, first_failed_attempt_at: 3.minutes.ago)
-        end
-
-        it 'resets attempts' do
-          user.reset_attempts!
-          expect(user.failed_attempts).to eq 0
-          expect(user.first_failed_attempt_at).to be_nil
-        end
-      end
-
-      describe '#authentication?' do
-        context 'when user is not locked' do
-          context 'when password is correct' do
-            it 'returns true' do
-              expect(user.authentication?('12345678')).to be_truthy
-            end
-          end
-
-          context 'when password is invalid' do
-            it 'returns false' do
-              expect(user.authentication?('invalid')).to be_falsey
+      describe '#failed_attempt!' do
+        context 'when is first time' do
+          it 'increase failed attempts and set first_failed_attempt_at' do
+            travel_to Time.now do
+              user.failed_attempt!
               expect(user.failed_attempts).to eq 1
+              expect(user.first_failed_attempt_at).to eq(Time.current)
+              expect(user.access_locked?).to be_falsey
             end
           end
+        end
 
-          context 'when attempts are exceeded' do
-            it 'locks access' do
-              RailsJwtAuth.maximum_attempts.times do
-                expect(user.authentication?('invalid')).to be_falsey
-              end
+        context 'when is penultimate opportunity' do
+          it 'increase failed attempts' do
+            user.first_failed_attempt_at = Time.current
+            user.failed_attempts = RailsJwtAuth.maximum_attempts - 2
 
+            first_failed_attempt_at = user.first_failed_attempt_at
+
+            travel_to Time.current + 5.seconds do
+              user.failed_attempt!
+              expect(user.failed_attempts).to eq RailsJwtAuth.maximum_attempts - 1
+              expect(user.first_failed_attempt_at).to eq(first_failed_attempt_at)
+              expect(user.access_locked?).to be_falsey
+            end
+          end
+        end
+
+        context 'when is last oportunity' do
+          it 'increase failed attempts and lock account' do
+            user.first_failed_attempt_at = Time.current
+            user.failed_attempts = RailsJwtAuth.maximum_attempts - 1
+
+            travel_to Time.current + 5.seconds do
+              user.failed_attempt!
               expect(user.failed_attempts).to eq RailsJwtAuth.maximum_attempts
-              expect(user.authentication?('12345678')).to be_falsey
-            end
-          end
-
-          context 'when attempts are reseted' do
-            it 'does not lock access' do
-              (RailsJwtAuth.maximum_attempts - 1).times do
-                expect(user.authentication?('invalid')).to be_falsey
-              end
-
-              Timecop.travel(4.hours.from_now) do
-                expect(user.authentication?('invalid')).to be_falsey
-                expect(user.authentication?('12345678')).to be_truthy
-              end
+              expect(user.access_locked?).to be_truthy
             end
           end
         end
 
-        context 'when user is locked' do
-          %i[time both].each do |unlock_strategy|
-            context "when unlock_strategy is #{unlock_strategy}" do
-              before do
-                RailsJwtAuth.unlock_strategy = unlock_strategy
-              end
-
-              context 'when lock has expired' do
-                it 'returns true' do
-                  locked_user
-                  Timecop.travel(4.hours.from_now) do
-                    expect(locked_user.authentication?('12345678')).to be_truthy
-                  end
-                end
-              end
-            end
-          end
-
-          context 'when unlock strategy is by email' do
-            before do
-              RailsJwtAuth.unlock_strategy = :email
+        context 'when attempts are expired' do
+          it 'reset attempts' do
+            travel_to Time.current - RailsJwtAuth.unlock_in - 5.seconds do
+              user.failed_attempt!
             end
 
-            it 'lock does not expires' do
-              locked_user
-              Timecop.travel(4.hours.from_now) do
-                expect(locked_user.authentication?('12345678')).to be_falsey
-              end
-            end
-          end
-
-          context 'when lock has not expired' do
-            it 'returns false' do
-              expect(locked_user.authentication?('12345678')).to be_falsey
-            end
-          end
-        end
-      end
-
-      describe '#unauthenticated_error' do
-        context 'when access is locked' do
-          it 'returns locked error' do
-            expect(locked_user.unauthenticated_error).to eq(error: :locked)
+            expect(user.failed_attempts).to eq 1
+            user.failed_attempt!
+            expect(user.failed_attempts).to eq 1
           end
         end
 
-        context 'when access is not locked' do
-          it 'returns invalid_session error and remaining_attempts' do
-            user.authentication?('invalid')
-            expect(user.unauthenticated_error).to eq(
-              error: :invalid_session,
-              remaining_attempts: RailsJwtAuth.maximum_attempts - 1
-            )
+        context 'whe user is locked' do
+          it 'does nothing' do
+            user.lock_access!
+            user.failed_attempt!
+            expect(user.failed_attempts).to eq nil
           end
         end
       end
