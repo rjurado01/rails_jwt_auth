@@ -72,9 +72,15 @@ module RailsJwtAuth
       self.confirmation_token = nil
 
       if unconfirmed_email
-        self[RailsJwtAuth.email_field_name!] = unconfirmed_email
-        self.email_confirmation = unconfirmed_email if respond_to?(:email_confirmation)
+        email_field = RailsJwtAuth.email_field_name!
+
+        self[email_field] = unconfirmed_email
         self.unconfirmed_email = nil
+
+        # supports email confirmation attr_accessor validation
+        if respond_to?("#{email_field}_confirmation")
+          self.instance_variable_set("@#{email_field}_confirmation", self[email_field])
+        end
       end
 
       save

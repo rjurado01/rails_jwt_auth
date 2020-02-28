@@ -2,11 +2,11 @@ require 'rails_helper'
 
 describe RailsJwtAuth::Confirmable do
   %w[ActiveRecord Mongoid].each do |orm|
-    let(:user) { FactoryBot.create("#{orm.underscore}_user") }
-    let(:unconfirmed_user) { FactoryBot.create("#{orm.underscore}_unconfirmed_user") }
-
     context "when use #{orm}" do
       before(:all) { RailsJwtAuth.model_name = "#{orm}User" }
+
+      let(:user) { FactoryBot.create("#{orm.underscore}_user") }
+      let(:unconfirmed_user) { FactoryBot.create("#{orm.underscore}_unconfirmed_user") }
 
       describe '#attributes' do
         it { expect(user).to have_attributes(confirmation_token: user.confirmation_token) }
@@ -47,6 +47,16 @@ describe RailsJwtAuth::Confirmable do
               expect(user.confirm!).to be_falsey
               expect(user.errors.details[:confirmation_token].first[:error]).to eq :expired
             end
+          end
+        end
+
+        context 'when user has email confirmation field' do
+          it 'fill in with email' do
+            user.email = 'new@email.com'
+            user.save
+
+            user.confirm!
+            expect(user.email_confirmation).to eq(user.email)
           end
         end
       end

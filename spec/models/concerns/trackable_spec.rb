@@ -2,16 +2,16 @@ require 'rails_helper'
 
 describe RailsJwtAuth::Trackable do
   %w[ActiveRecord Mongoid].each do |orm|
-    let(:user) do
-      FactoryBot.create(
-        "#{orm.underscore}_user",
-        last_sign_in_at: Time.current,
-        last_sign_in_ip: '127.0.0.1'
-      )
-    end
-
     context "when use #{orm}" do
       before(:all) { RailsJwtAuth.model_name = "#{orm}User" }
+
+      let(:user) do
+        FactoryBot.create(
+          "#{orm.underscore}_user",
+          last_sign_in_at: Time.current,
+          last_sign_in_ip: '127.0.0.1'
+        )
+      end
 
       describe '#attributes' do
         it { expect(user).to have_attributes(last_sign_in_at: user.last_sign_in_at) }
