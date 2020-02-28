@@ -95,6 +95,7 @@ module RailsJwtAuth
 
     def validate_confirmation
       return true unless confirmed_at
+
       email_field = RailsJwtAuth.email_field_name!
 
       if confirmed_at_was && !public_send("#{email_field}_changed?")

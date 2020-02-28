@@ -90,11 +90,12 @@ describe RailsJwtAuth::Authenticatable do
                                         password: current_password,
                                         reset_password_token: '12345678',
                                         reset_password_sent_at: Time.current)
-              Timecop.travel(Time.current + RailsJwtAuth.reset_password_expiration_time)
+
+              travel(RailsJwtAuth.reset_password_expiration_time)
             end
 
             after do
-              Timecop.return
+              travel_back
             end
 
             it 'reset recoverable fields' do

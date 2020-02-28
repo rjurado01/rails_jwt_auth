@@ -64,7 +64,7 @@ module RailsJwtAuth
         end
 
         it 'unlock access when lock is expired' do
-          Timecop.freeze(Date.today - 30.days) { user.lock_access! }
+          travel_to(Date.today - 30.days) { user.lock_access! }
           session = Session.new('email' => user.email, password: pass)
           expect(session.valid?).to be_truthy
           expect(user.reload.locked_at).to be_nil

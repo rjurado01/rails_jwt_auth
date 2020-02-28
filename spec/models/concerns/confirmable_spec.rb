@@ -43,7 +43,7 @@ describe RailsJwtAuth::Confirmable do
             user.email = 'new@email.com'
             user.save
 
-            Timecop.freeze(Date.today + 30) do
+            travel_to(Time.current + RailsJwtAuth.confirmation_expiration_time + 1.second) do
               expect(user.confirm!).to be_falsey
               expect(get_record_error(user, :confirmation_token)).to eq :expired
             end
@@ -201,7 +201,7 @@ describe RailsJwtAuth::Confirmable do
             it 'adds expiration error' do
               unconfirmed_user.confirmed_at = Time.current
 
-              Timecop.freeze(Date.today + 30) do
+              travel_to(Time.current + RailsJwtAuth.confirmation_expiration_time + 1.second) do
                 expect(unconfirmed_user.save).to be_falsey
                 expect(get_record_error(unconfirmed_user, :confirmation_token)).to eq(:expired)
               end

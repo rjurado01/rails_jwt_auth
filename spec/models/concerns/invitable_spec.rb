@@ -57,16 +57,15 @@ describe RailsJwtAuth::Invitable do
 
         context 'when user already exists' do
           context 'with pending invitation' do
-            after { Timecop.return }
-
             it 'resets invitation' do
-              Timecop.freeze(Time.current)
-              first_invitation_date = Time.current.to_i
+              first_invitation_date = Time.current
               second_invitation_date = nil
 
-              invited_user
+              travel_to(first_invitation_date) do
+                invited_user
+              end
 
-              Timecop.freeze(Time.current + 30.days) do
+              travel_to(Time.current + 30.days) do
                 RailsJwtAuth.model.invite! email: invited_user.email
                 second_invitation_date = Time.current.to_i
               end
@@ -122,16 +121,15 @@ describe RailsJwtAuth::Invitable do
         end
 
         context 'when user has pending invitation' do
-          after { Timecop.return }
-
           it 'resets invitation' do
-            Timecop.freeze(Time.current)
-            first_invitation_date = Time.current.to_i
+            first_invitation_date = Time.current
             second_invitation_date = nil
 
-            invited_user
+            travel_to(first_invitation_date) do
+              invited_user
+            end
 
-            Timecop.freeze(Time.current + 30.days) do
+            travel_to(Time.current + 30.days) do
               invited_user.invite!
               second_invitation_date = Time.current.to_i
             end

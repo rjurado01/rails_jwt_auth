@@ -114,7 +114,7 @@ RSpec.describe RailsJwtAuth::InvitationsController do
             let!(:invited_user) { RailsJwtAuth.model.invite! email: 'test@example.com' }
 
             it 'returns HTTP 422 Unprocessable Entity' do
-              Timecop.travel(3.days.from_now) do
+              travel_to(3.days.from_now) do
                 put :update, params: {
                   id: invited_user.invitation_token,
                   invitation: {password: 'abcdef', password_confirmation: 'abcdef'}
