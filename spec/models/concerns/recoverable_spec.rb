@@ -1,21 +1,21 @@
 require 'rails_helper'
 
 describe RailsJwtAuth::Recoverable do
-  %w(ActiveRecord Mongoid).each do |orm|
-    let(:user) { FactoryBot.create("#{orm.underscore}_user") }
+  before :all do
+    class Mock
+      def deliver
+      end
 
-    before :all do
-      class Mock
-        def deliver
-        end
-
-        def deliver_later
-        end
+      def deliver_later
       end
     end
+  end
 
+  %w(ActiveRecord Mongoid).each do |orm|
     context "when use #{orm}" do
       before(:all) { RailsJwtAuth.model_name = "#{orm}User" }
+
+      let(:user) { FactoryBot.create("#{orm.underscore}_user") }
 
       describe '#attributes' do
         it { expect(user).to respond_to(:reset_password_token) }

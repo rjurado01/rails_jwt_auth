@@ -2,11 +2,11 @@ require 'rails_helper'
 
 describe RailsJwtAuth::Authenticatable do
   %w[ActiveRecord Mongoid].each do |orm|
-    before(:all) { RailsJwtAuth.model_name = "#{orm}User" }
-
-    let(:user) { FactoryBot.create("#{orm.underscore}_user", auth_tokens: %w[abcd]) }
-
     context "when use #{orm}" do
+      before(:all) { RailsJwtAuth.model_name = "#{orm}User" }
+
+      let(:user) { FactoryBot.create("#{orm.underscore}_user", auth_tokens: %w[abcd]) }
+
       describe '#attributes' do
         it { expect(user).to have_attributes(password: user.password) }
         it { expect(user).to have_attributes(auth_tokens: user.auth_tokens) }
