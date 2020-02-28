@@ -7,6 +7,8 @@ class MongoidUser
   include RailsJwtAuth::Invitable
   include RailsJwtAuth::Lockable
 
+  attr_accessor :email_confirmation
+
   field :username,      type: String
   field :email,         type: String
 
