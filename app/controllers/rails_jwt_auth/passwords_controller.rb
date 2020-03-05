@@ -10,14 +10,14 @@ module RailsJwtAuth
     def show
       return render_404 unless @user
 
-      if user.reset_password_sent_at < RailsJwtAuth.reset_password_expiration_time.ago
+      if @user.reset_password_sent_at < RailsJwtAuth.reset_password_expiration_time.ago
         return render_410
       end
 
       render_204
     end
 
-    # used to request restore password email
+    # used to request restore password
     def create
       return render_422(RailsJwtAuth.email_field_name => [{error: :not_found}]) unless @user
 

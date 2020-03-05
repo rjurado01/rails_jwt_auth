@@ -7,7 +7,35 @@ RSpec.describe RailsJwtAuth::InvitationsController do
         RailsJwtAuth.model_name = "#{orm}User"
       end
 
+      let(:invited_user) { RailsJwtAuth.model.invite! email: 'valid@example.com' }
       let(:json) { JSON.parse(response.body) }
+
+      describe 'GET #show' do
+        context 'when token is valid' do
+          it 'returns 204 http status code' do
+            get :show, params: {id: invited_user.invitation_token}
+            expect(response).to have_http_status(204)
+          end
+        end
+
+        context 'when token is invalid' do
+          it 'returns 404 http status code' do
+            get :show, params: {id: 'invalid'}
+            expect(response).to have_http_status(404)
+          end
+        end
+
+        context 'when token is expired' do
+          it 'returns 410 http status code' do
+            travel_to(RailsJwtAuth.invitation_expiration_time.ago - 1.second) do
+              invited_user
+            end
+
+            get :show, params: {id: invited_user.invitation_token}
+            expect(response).to have_http_status(410)
+          end
+        end
+      end
 
       describe 'POST #create' do
         context 'when user is authenticated' do
@@ -20,31 +48,28 @@ RSpec.describe RailsJwtAuth::InvitationsController do
               expect { post :create, params: {} }.to raise_error ActionController::ParameterMissing
             end
           end
-
-          context 'passing email as param' do
             let(:email) { 'valid@example.com' }
 
+          context 'passing email as param' do
             context 'without existing user' do
               it 'returns HTTP 201 Created' do
-                post :create, params: {invitation: {email: email}}
+                post :create, params: {invitation: {email: 'test@example.com'}}
                 expect(response).to have_http_status(:no_content)
               end
             end
 
             context 'with already invited user' do
-              let(:user) { RailsJwtAuth.model.invite! email: 'test@example.com' }
-
               it 'returns HTTP 201 Created' do
-                post :create, params: {invitation: {email: user.email}}
+                post :create, params: {invitation: {email: invited_user.email}}
                 expect(response).to have_http_status(:no_content)
               end
             end
 
             context 'with already registered user' do
-              let(:user) { FactoryBot.create "#{orm.underscore}_user" }
+              let(:registered_user) { FactoryBot.create "#{orm.underscore}_user" }
 
               it 'returns HTTP 422 Unprocessable Entity' do
-                post :create, params: {invitation: {email: user.email}}
+                post :create, params: {invitation: {email: registered_user.email}}
                 expect(response).to have_http_status(:unprocessable_entity)
               end
             end
@@ -60,12 +85,10 @@ RSpec.describe RailsJwtAuth::InvitationsController do
 
       describe 'PUT #update' do
         context 'when invited user' do
-          let(:user) { RailsJwtAuth.model.invite! email: 'valid@example.com' }
-
           context 'with all params' do
             before do
               put :update, params: {
-                id: user.invitation_token,
+                id: invited_user.invitation_token,
                 invitation: {password: 'abcdef', password_confirmation: 'abcdef'}
               }
             end
@@ -75,11 +98,11 @@ RSpec.describe RailsJwtAuth::InvitationsController do
             end
 
             it 'updates users password' do
-              expect(user.password_digest).to_not eq(user.reload.password_digest)
+              expect(invited_user.password_digest).to_not eq(invited_user.reload.password_digest)
             end
 
             it 'deletes the token of the user' do
-              expect(user.reload.invitation_token).to be_nil
+              expect(invited_user.reload.invitation_token).to be_nil
             end
           end
 
@@ -99,7 +122,7 @@ RSpec.describe RailsJwtAuth::InvitationsController do
           context 'without password' do
             before do
               put :update, params: {
-                id: user.invitation_token,
+                id: invited_user.invitation_token,
                 invitation: {password: ''}
               }
             end
@@ -111,12 +134,12 @@ RSpec.describe RailsJwtAuth::InvitationsController do
           end
 
           context 'with expired invitation' do
-            let!(:invited_user) { RailsJwtAuth.model.invite! email: 'test@example.com' }
-
             it 'returns HTTP 422 Unprocessable Entity' do
+              id = invited_user.invitation_token
+
               travel_to(3.days.from_now) do
                 put :update, params: {
-                  id: invited_user.invitation_token,
+                  id: id,
                   invitation: {password: 'abcdef', password_confirmation: 'abcdef'}
                 }
               end
@@ -128,7 +151,7 @@ RSpec.describe RailsJwtAuth::InvitationsController do
           context 'with mismatching passwords' do
             before do
               put :update, params: {
-                id: user.invitation_token,
+                id: invited_user.invitation_token,
                 invitation: {password: 'abcdef', password_confirmation: ''}
               }
             end
@@ -138,7 +161,7 @@ RSpec.describe RailsJwtAuth::InvitationsController do
             end
 
             it 'the token keeps in the user' do
-              expect(user.invitation_token).to eq(user.reload.invitation_token)
+              expect(invited_user.invitation_token).to eq(invited_user.reload.invitation_token)
             end
           end
         end

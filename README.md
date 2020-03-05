@@ -202,13 +202,12 @@ end
 |              | POST   | /session(.:format)           | rails_jwt_auth/sessions#create      |
 | registration | POST   | /registration(.:format)      | rails_jwt_auth/registrations#create |
 |confirmations | POST   | /confirmations(.:format)     | rails_jwt_auth/confirmations#create |
-| confirmation | PATCH  | /confirmations/:id(.:format) | rails_jwt_auth/confirmations#update |
-|              | PUT    | /confirmations/:id(.:format) | rails_jwt_auth/confirmations#update |
+| confirmation | PUT    | /confirmations/:id(.:format) | rails_jwt_auth/confirmations#update |
 |    passwords | POST   | /passwords(.:format)         | rails_jwt_auth/passwords#create     |
-|     password | PATCH  | /passwords/:id(.:format)     | rails_jwt_auth/passwords#update     |
+|     password | GET    | /passwords/:id(.:format)     | rails_jwt_auth/passwords#show       |
 |              | PUT    | /passwords/:id(.:format)     | rails_jwt_auth/passwords#update     |
 |  invitations | POST   | /invitations(.:format)       | rails_jwt_auth/invitations#create   |
-|   invitation | PATCH  | /invitations/:id(.:format)   | rails_jwt_auth/invitations#update   |
+|   invitation | GET    | /invitations/:id(.:format)   | rails_jwt_auth/invitations#show     |
 |              | PUT    | /invitations/:id(.:format)   | rails_jwt_auth/invitations#update   |
 
 ### Session
@@ -293,7 +292,7 @@ It is necessary to set a value for `confirmations_url` option into `config/initi
 
 Password api is defined by `RailsJwtAuth::PasswordsController`.
 
-1.  Send reset password email:
+1.  Send reset password email (init reset password process):
 
 ```js
 {
@@ -307,7 +306,18 @@ Password api is defined by `RailsJwtAuth::PasswordsController`.
 }
 ```
 
-2.  Update password:
+2.  Check token validation:
+
+Used to verify token and show an alert in your web before new password is setted.
+
+```js
+{
+  url: host/passwords/:token,
+  method: GET
+}
+```
+
+3.  Update password:
 
 ```js
 {
@@ -341,7 +351,18 @@ Invitations api is provided by `RailsJwtAuth::InvitationsController`.
 }
 ```
 
-2.  Accept an invitation:
+2.  Check token validation:
+
+Used to verify token and show an alert in your web before invitation data is completed.
+
+```js
+{
+  url: host/invitations/:token,
+  method: GET
+}
+```
+
+3.  Accept an invitation:
 
 ```js
 {

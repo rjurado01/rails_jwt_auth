@@ -11,6 +11,34 @@ describe RailsJwtAuth::PasswordsController do
       let(:user) { FactoryBot.create("#{orm.underscore}_user", password: '12345678') }
       let(:unconfirmed_user) { FactoryBot.create("#{orm.underscore}_unconfirmed_user") }
 
+      describe 'GET #show' do
+        context 'when token is valid' do
+          it 'returns 204 http status code' do
+            user.send_reset_password_instructions
+            get :show, params: {id: user.reset_password_token}
+            expect(response).to have_http_status(204)
+          end
+        end
+
+        context 'when token is invalid' do
+          it 'returns 404 http status code' do
+            get :show, params: {id: 'invalid'}
+            expect(response).to have_http_status(404)
+          end
+        end
+
+        context 'when token is expired' do
+          it 'returns 410 http status code' do
+            travel_to(RailsJwtAuth.reset_password_expiration_time.ago - 1.second) do
+              user.send_reset_password_instructions
+            end
+
+            get :show, params: {id: user.reset_password_token}
+            expect(response).to have_http_status(410)
+          end
+        end
+      end
+
       describe 'POST #create' do
         context 'when sends valid email' do
           it 'returns 204 http status code' do
