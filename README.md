@@ -480,38 +480,47 @@ end
 
 ### Custom responses
 
-You can overwrite `RailsJwtAuth::RenderHelper` to customize controllers responses.
+You can overwrite `RailsJwtAuth::RenderHelper` to customize controllers responses 
+without need to overwrite each controller.
+
+Example:
+
+```ruby
+# app/controllers/concerns/rails_jwt_auth/render_helper.rb
+
+module RailsJwtAuth
+  module RenderHelper
+    private
+
+    def render_session(jwt, user)
+      # add custom field to session response
+      render json: {session: {jwt: jwt, my_custom_field: user.custom_field}}, status: 201
+    end
+
+  ...
+end
+```
 
 ### Custom strong parameters
 
-You can overwrite `RailsJwtAuth::ParamsHelper` to customize controllers strong parameters.
+You can overwrite `RailsJwtAuth::ParamsHelper` to customize controllers strong parameters 
+without need to overwrite each controller.
 
-## Examples
-
-### Edit user information
-
-This is a controller example that allows users to edit their `email` and `password`.
+Example:
 
 ```ruby
-class CurrentUserController < ApplicationController
-  before_action 'authenticate!'
+# app/controllers/concerns/rails_jwt_auth/params_helper.rb
 
-  def update
-    if update_params[:password]
-      # update password and remove other sessions tokens
-      current_user.update_with_password(
-        update_params.merge(auth_tokens: [jwt_payload['auth_token']])
-      )
-    else
-      current_user.update_attributes(update_params)
+module RailsJwtAuth
+  module ParamsHelper
+    private
+
+    def registration_create_params
+      # change root to :data
+      params.require(:data).permit(:email, :password, :password_confirmation)
     end
-  end
 
-  private
-
-  def update_params
-    params.require(:user).permit(:email, :current_password, :password)
-  end
+  ...
 end
 ```
 
