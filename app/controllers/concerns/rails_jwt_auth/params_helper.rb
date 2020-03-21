@@ -31,5 +31,11 @@ module RailsJwtAuth
     def invitation_update_params
       params.require(:invitation).permit(:password, :password_confirmation)
     end
+
+    def profile_update_params
+      params.require(:profile).permit(
+        RailsJwtAuth.auth_field_name, :current_password, :password, :password_confirmation
+      )
+    end
   end
 end

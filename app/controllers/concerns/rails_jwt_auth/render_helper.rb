@@ -9,6 +9,10 @@ module RailsJwtAuth
       render json: resource, root: true, status: 201
     end
 
+    def render_profile(resource)
+      render json: resource, root: true, status: 200
+    end
+
     def render_204
       head 204
     end

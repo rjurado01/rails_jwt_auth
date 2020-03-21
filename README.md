@@ -202,6 +202,8 @@ end
 |      session | DELETE | /session(.:format)           | rails_jwt_auth/sessions#destroy     |
 |              | POST   | /session(.:format)           | rails_jwt_auth/sessions#create      |
 | registration | POST   | /registration(.:format)      | rails_jwt_auth/registrations#create |
+|      profile | GET    | /profile(.:format)           | rails_jwt_auth/profiles#show        |
+|              | PUT    | /profile(.:format)           | rails_jwt_auth/profiles#update      |
 |confirmations | POST   | /confirmations(.:format)     | rails_jwt_auth/confirmations#create |
 | confirmation | PUT    | /confirmations/:id(.:format) | rails_jwt_auth/confirmations#update |
 |    passwords | POST   | /passwords(.:format)         | rails_jwt_auth/passwords#create     |
@@ -256,6 +258,36 @@ Registration api is defined by `RailsJwtAuth::RegistrationsController`.
       password: '12345678'
     }
   }
+}
+```
+
+### Profile
+
+Profile api let you get/update your user info and is defined by `RailsJwtAuth::ProfilesController`.
+
+1. Get user info:
+
+```js
+{
+  url: host/profile,
+  method: GET,
+  headers: { 'Authorization': 'Bearer auth_token'}
+}
+```
+
+2. Update user info:
+
+```js
+{
+  url: host/profile,
+  method: PUT,
+  data: {
+    profile: {
+      current_password: 'old_password',
+      password: 'new_password'
+    }
+  },
+  headers: { 'Authorization': 'Bearer auth_token'}
 }
 ```
 
