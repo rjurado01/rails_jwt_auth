@@ -36,6 +36,9 @@ module RailsJwtAuth
   mattr_accessor :send_email_changed_notification
   self.send_email_changed_notification = true
 
+  mattr_accessor :send_password_changed_notification
+  self.send_password_changed_notification = true
+
   mattr_accessor :confirmation_expiration_time
   self.confirmation_expiration_time = 1.day
 
@@ -119,5 +122,13 @@ module RailsJwtAuth
     # See SecureRandom.urlsafe_base64
     rlength = (length * 3 / 4) - 1
     SecureRandom.urlsafe_base64(rlength, true).tr('lIO0', 'sxyz')
+  end
+
+  def self.send_email(mailer)
+    RailsJwtAuth.deliver_later ? mailer.deliver_later : mailer.deliver
+  end
+
+  def self.get_after_changed_method(field)
+    defined?(Mongoid) ? "#{field}_changed?" : "saved_change_to_#{field}?"
   end
 end

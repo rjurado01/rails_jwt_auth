@@ -64,6 +64,7 @@ RSpec.configure do |config|
   config.before(:each) do
     MongoidUser.destroy_all
     ActiveRecordUser.destroy_all
+    ActionMailer::Base.deliveries.clear
 
     RailsJwtAuth.simultaneous_sessions = 1
     RailsJwtAuth.confirmations_url = 'http://example.com/confirmations'
