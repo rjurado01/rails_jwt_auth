@@ -50,8 +50,7 @@ module RailsJwtAuth
       self.invitation_sent_at = Time.current
       return false unless save(validate: false)
 
-      mailer = Mailer.send_invitation(self)
-      RailsJwtAuth.deliver_later ? mailer.deliver_later : mailer.deliver
+      RailsJwtAuth.send_email(Mailer.send_invitation(self))
     end
 
     # Finishes invitation process setting user password

@@ -53,8 +53,7 @@ module RailsJwtAuth
       self.unlock_token = SecureRandom.base58(24)
       save(validate: false)
 
-      mailer = Mailer.send_unlock_instructions(self)
-      RailsJwtAuth.deliver_later ? mailer.deliver_later : mailer.deliver
+      RailsJwtAuth.send_email(Mailer.send_unlock_instructions(self))
     end
 
     def lock_expired?
