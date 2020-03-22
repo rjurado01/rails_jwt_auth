@@ -39,8 +39,7 @@ describe RailsJwtAuth::AuthenticableHelper, type: :helper do
 
     context 'when jwt is invalid' do
       it 'fail!' do
-        allow(RailsJwtAuth::JwtManager)
-          .to receive(:decode_from_request).and_raise(JWT::DecodeError)
+        allow(RailsJwtAuth::JwtManager).to receive(:decode).and_raise(JWT::DecodeError)
 
         expect { helper.authenticate! }.to raise_error(RailsJwtAuth::NotAuthorized)
       end
@@ -48,8 +47,7 @@ describe RailsJwtAuth::AuthenticableHelper, type: :helper do
 
     context 'when jwt is expired' do
       it 'fail!' do
-        allow(RailsJwtAuth::JwtManager)
-          .to receive(:decode_from_request).and_raise(JWT::ExpiredSignature)
+        allow(RailsJwtAuth::JwtManager).to receive(:decode).and_raise(JWT::ExpiredSignature)
 
         expect { helper.authenticate! }.to raise_error(RailsJwtAuth::NotAuthorized)
       end
@@ -57,8 +55,7 @@ describe RailsJwtAuth::AuthenticableHelper, type: :helper do
 
     context 'when jwt verification fail' do
       it 'fail!' do
-        allow(RailsJwtAuth::JwtManager)
-          .to receive(:decode_from_request).and_raise(JWT::VerificationError)
+        allow(RailsJwtAuth::JwtManager).to receive(:decode).and_raise(JWT::VerificationError)
 
         expect { helper.authenticate! }.to raise_error(RailsJwtAuth::NotAuthorized)
       end
@@ -66,8 +63,7 @@ describe RailsJwtAuth::AuthenticableHelper, type: :helper do
 
     context 'when session_token is invalid' do
       it 'fail!' do
-        allow(RailsJwtAuth::JwtManager)
-          .to receive(:decode_from_request).and_return([{auth_token: 'invalid'}])
+        allow(RailsJwtAuth::JwtManager).to receive(:decode).and_return([{auth_token: 'invalid'}])
 
         expect { helper.authenticate! }.to raise_error(RailsJwtAuth::NotAuthorized)
       end
@@ -89,7 +85,7 @@ describe RailsJwtAuth::AuthenticableHelper, type: :helper do
         user = Object.new
         user.extend RailsJwtAuth::Trackable
 
-        allow(RailsJwtAuth::JwtManager).to receive(:decode_from_request).and_return([{}])
+        allow(RailsJwtAuth::JwtManager).to receive(:decode).and_return([{}])
         allow(RailsJwtAuth.model).to receive(:get_by_token).and_return(user)
 
         expect(user).to receive(:update_tracked_fields!).and_return(true)
@@ -121,8 +117,7 @@ describe RailsJwtAuth::AuthenticableHelper, type: :helper do
 
     context 'when jwt is invalid' do
       it 'fail!' do
-        allow(RailsJwtAuth::JwtManager)
-          .to receive(:decode_from_request).and_raise(JWT::DecodeError)
+        allow(RailsJwtAuth::JwtManager).to receive(:decode).and_raise(JWT::DecodeError)
 
         expect { helper.authenticate }.not_to raise_error
         expect(helper.current_user).to eq(nil)
@@ -131,8 +126,7 @@ describe RailsJwtAuth::AuthenticableHelper, type: :helper do
 
     context 'when jwt is expired' do
       it 'fail!' do
-        allow(RailsJwtAuth::JwtManager)
-          .to receive(:decode_from_request).and_raise(JWT::ExpiredSignature)
+        allow(RailsJwtAuth::JwtManager).to receive(:decode).and_raise(JWT::ExpiredSignature)
 
         expect { helper.authenticate }.not_to raise_error
         expect(helper.current_user).to eq(nil)
@@ -141,8 +135,7 @@ describe RailsJwtAuth::AuthenticableHelper, type: :helper do
 
     context 'when jwt verification fail' do
       it 'fail!' do
-        allow(RailsJwtAuth::JwtManager)
-          .to receive(:decode_from_request).and_raise(JWT::VerificationError)
+        allow(RailsJwtAuth::JwtManager).to receive(:decode).and_raise(JWT::VerificationError)
 
         expect { helper.authenticate }.not_to raise_error
         expect(helper.current_user).to eq(nil)
@@ -151,8 +144,7 @@ describe RailsJwtAuth::AuthenticableHelper, type: :helper do
 
     context 'when session_token is invalid' do
       it 'fail!' do
-        allow(RailsJwtAuth::JwtManager)
-          .to receive(:decode_from_request).and_return([{auth_token: 'invalid'}])
+        allow(RailsJwtAuth::JwtManager).to receive(:decode).and_return([{auth_token: 'invalid'}])
 
         expect { helper.authenticate }.not_to raise_error
         expect(helper.current_user).to eq(nil)
@@ -176,7 +168,7 @@ describe RailsJwtAuth::AuthenticableHelper, type: :helper do
         user = Object.new
         user.extend RailsJwtAuth::Trackable
 
-        allow(RailsJwtAuth::JwtManager).to receive(:decode_from_request).and_return([{}])
+        allow(RailsJwtAuth::JwtManager).to receive(:decode).and_return([{}])
         allow(RailsJwtAuth.model).to receive(:get_by_token).and_return(user)
 
         expect(user).to receive(:update_tracked_fields!).and_return(true)

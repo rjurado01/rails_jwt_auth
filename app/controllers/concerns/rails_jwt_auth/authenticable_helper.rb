@@ -14,9 +14,13 @@ module RailsJwtAuth
       !current_user.nil?
     end
 
+    def get_jwt_from_request
+      request.env['HTTP_AUTHORIZATION']&.split&.last
+    end
+
     def authenticate!
       begin
-        @jwt_payload = RailsJwtAuth::JwtManager.decode_from_request(request).first
+        @jwt_payload = RailsJwtAuth::JwtManager.decode(get_jwt_from_request).first
       rescue JWT::ExpiredSignature, JWT::VerificationError, JWT::DecodeError
         unauthorize!
       end
@@ -30,7 +34,7 @@ module RailsJwtAuth
 
     def authenticate
       begin
-        @jwt_payload = RailsJwtAuth::JwtManager.decode_from_request(request).first
+        @jwt_payload = RailsJwtAuth::JwtManager.decode(get_jwt_from_request).first
         @current_user = RailsJwtAuth.model.from_token_payload(@jwt_payload)
       rescue JWT::ExpiredSignature, JWT::VerificationError, JWT::DecodeError
         @current_user = nil

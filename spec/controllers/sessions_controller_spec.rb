@@ -119,11 +119,8 @@ describe RailsJwtAuth::SessionsController do
         context 'when user is logged' do
           before do
             user.regenerate_auth_token
-            jwt_info = [{auth_token: user.auth_tokens.first}]
-
-            allow(controller).to receive(:current_user).and_return(user)
-            allow(controller).to receive(:authenticate!).and_return(true)
-            allow(RailsJwtAuth::JwtManager).to receive(:decode_from_request).and_return(jwt_info)
+            jwt_info = [{'auth_token' => user.auth_tokens.first}]
+            allow(RailsJwtAuth::JwtManager).to receive(:decode).and_return(jwt_info)
 
             delete :destroy
           end

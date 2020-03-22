@@ -22,8 +22,7 @@ module RailsJwtAuth
     protected
 
     def changing_password?
-      profile_update_params.values_at(:current_password, :password, :password_confirmation)
-                           .any?(&:present?)
+      profile_update_params.values_at(:current_password, :password, :password_confirmation).any?
     end
   end
 end

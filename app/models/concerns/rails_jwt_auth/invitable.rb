@@ -40,6 +40,8 @@ module RailsJwtAuth
         return false
       end
 
+      @inviting = true
+
       unless password || password_digest
         self.password = self.password_confirmation = RailsJwtAuth.friendly_token(16)
       end
@@ -51,6 +53,8 @@ module RailsJwtAuth
       return false unless save(validate: false)
 
       RailsJwtAuth.send_email(Mailer.send_invitation(self))
+    ensure
+      @inviting = false
     end
 
     # Finishes invitation process setting user password
@@ -70,6 +74,10 @@ module RailsJwtAuth
       self.invitation_sent_at = nil
       self.confirmed_at = Time.current if respond_to?(:confirmed_at) && confirmed_at.nil?
       save
+    end
+
+    def inviting?
+      @inviting || false
     end
 
     def expired_invitation_token?

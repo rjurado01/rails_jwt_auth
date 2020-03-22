@@ -57,16 +57,18 @@ module RailsJwtAuth
           expect(session.valid?).to be_falsey
           expect(get_record_error(session, :email)).to eq(:locked)
         end
+      end
 
+      describe '#generate!' do
         it 'increase failed attemps' do
-          Session.new('email' => user.email, password: 'invalid').valid?
+          Session.new('email' => user.email, password: 'invalid').generate!(nil)
           expect(user.reload.failed_attempts).to eq(1)
         end
 
         it 'unlock access when lock is expired' do
           travel_to(Date.today - 30.days) { user.lock_access! }
           session = Session.new('email' => user.email, password: pass)
-          expect(session.valid?).to be_truthy
+          expect(session.generate!(nil)).to be_truthy
           expect(user.reload.locked_at).to be_nil
         end
       end

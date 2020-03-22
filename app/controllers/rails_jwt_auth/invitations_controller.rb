@@ -9,11 +9,7 @@ module RailsJwtAuth
     def show
       return render_404 unless @user
 
-      if @user.invitation_sent_at < RailsJwtAuth.invitation_expiration_time.ago
-        return render_410
-      end
-
-      render_204
+      @user.expired_invitation_token? ? render_410 : render_204
     end
 
     # used to invite a user, if user is invited send new invitation

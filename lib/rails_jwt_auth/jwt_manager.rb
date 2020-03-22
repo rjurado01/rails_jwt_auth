@@ -25,9 +25,5 @@ module RailsJwtAuth
         iss: RailsJwtAuth.jwt_issuer
       }
     end
-
-    def self.decode_from_request(request)
-      decode(request.env['HTTP_AUTHORIZATION']&.split&.last)
-    end
   end
 end
