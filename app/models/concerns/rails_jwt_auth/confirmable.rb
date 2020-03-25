@@ -35,11 +35,11 @@ module RailsJwtAuth
             self.confirmation_sent_at = Time.current
 
             # send confirmation to new email
-            RailsJwtAuth.send_email(Mailer.confirmation_instructions(self))
+            RailsJwtAuth.send_email(RailsJwtAuth.mailer.confirmation_instructions(self))
 
             # send notify to old email
             if RailsJwtAuth.send_email_changed_notification
-              RailsJwtAuth.send_email(Mailer.email_changed(self))
+              RailsJwtAuth.send_email(RailsJwtAuth.mailer.email_changed(self))
             end
           end
         end
@@ -58,7 +58,7 @@ module RailsJwtAuth
       self.confirmation_sent_at = Time.current
       return false unless save
 
-      RailsJwtAuth.send_email(Mailer.confirmation_instructions(self))
+      RailsJwtAuth.send_email(RailsJwtAuth.mailer.confirmation_instructions(self))
       true
     end
 

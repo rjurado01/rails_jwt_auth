@@ -30,6 +30,9 @@ module RailsJwtAuth
   mattr_accessor :simultaneous_sessions
   self.simultaneous_sessions = 2
 
+  mattr_accessor :mailer_name
+  self.mailer_name = 'RailsJwtAuth::Mailer'
+
   mattr_accessor :mailer_sender
   self.mailer_sender = 'initialize-mailer_sender@example.com'
 
@@ -80,6 +83,10 @@ module RailsJwtAuth
 
   def self.model
     model_name.constantize
+  end
+
+  def self.mailer
+    mailer_name.constantize
   end
 
   def self.table_name

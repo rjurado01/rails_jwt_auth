@@ -61,30 +61,31 @@ rails g rails_jwt_auth:migrate
 
 You can edit configuration options into `config/initializers/rails_jwt_auth.rb` file created by generator.
 
-| Option                             | Default value    | Description                                                            |
-| ---------------------------------- | ---------------- | ---------------------------------------------------------------------- |
-| model_name                         | `'User'`         | Authentication model name                                              |
-| auth_field_name                    | `'email'`        | Field used to authenticate user with password                          |
-| email_auth_field                   | `'email'`        | Field used to send emails                                              |
-| jwt_expiration_time                | `7.days`         | Tokens expiration time                                                 |
-| jwt_issuer                         | `'RailsJwtAuth'` | The "iss" (issuer) claim identifies the principal that issued the JWT  |
-| simultaneous_sessions              | `2`              | Number of simultaneous sessions for an user. Set 0 to disable sessions |
-| mailer_sender                      |                  | E-mail address which will be shown in RailsJwtAuth::Mailer             |
-| send_email_changed_notification    | `true`           | Notify original email when it changes                                  |
-| send_password_changed_notification | `true`           | Notify email when password changes                                  |
-| confirmation_expiration_time       | `1.day`          | Confirmation token expiration time                                     |
-| reset_password_expiration_time     | `1.day`          | Confirmation token expiration time                                     |
-| deliver_later                      | `false`          | Uses `deliver_later` method to send emails                             |
-| invitation_expiration_time         | `2.days`         | Time an invitation is valid and can be accepted                        |
-| confirmations_url                  | `nil`            | Url used to create email link with confirmation token                  |
-| reset_passwords_url                | `nil`            | Url used to create email link with reset password token                |
-| invitations_url                    | `nil`            | Url used to create email link with invitation token                    |
-| maximum_attempts                   | `3`              | Number of failed login attempts before locking an account              |
-| lock_strategy                      | `:none`          | Strategy to be used to lock an account: `:none` or `:failed_attempts`  |
-| unlock_strategy                    | `:time`          | Strategy to use when unlocking accounts: `:time`, `:email` or `:both`  |
-| unlock_in                          | `60.minutes`     | Interval to unlock an account if `unlock_strategy` is `:time`          |
-| reset_attempts_in                  | `60.minutes`     | Interval after which to reset failed attempts counter of an account    |
-| unlock_url                         | `nil`            | Url used to create email link with unlock token                        |
+| Option                             | Default value            | Description                                                            |
+| ---------------------------------- | ----------------         | ---------------------------------------------------------------------- |
+| model_name                         | `'User'`                 | Authentication model name                                              |
+| auth_field_name                    | `'email'`                | Field used to authenticate user with password                          |
+| email_auth_field                   | `'email'`                | Field used to send emails                                              |
+| jwt_expiration_time                | `7.days`                 | Tokens expiration time                                                 |
+| jwt_issuer                         | `'RailsJwtAuth'`         | The "iss" (issuer) claim identifies the principal that issued the JWT  |
+| simultaneous_sessions              | `2`                      | Number of simultaneous sessions for an user. Set 0 to disable sessions |
+| mailer_name                        | `'RailsJwtAuth::Mailer'` | Authentication model name                                              |
+| mailer_sender                      | `...@example.com`        | E-mail address which will be shown in RailsJwtAuth::Mailer             |
+| send_email_changed_notification    | `true`                   | Notify original email when it changes                                  |
+| send_password_changed_notification | `true`                   | Notify email when password changes                                  |
+| confirmation_expiration_time       | `1.day`                  | Confirmation token expiration time                                     |
+| reset_password_expiration_time     | `1.day`                  | Confirmation token expiration time                                     |
+| deliver_later                      | `false`                  | Uses `deliver_later` method to send emails                             |
+| invitation_expiration_time         | `2.days`                 | Time an invitation is valid and can be accepted                        |
+| confirmations_url                  | `nil`                    | Url used to create email link with confirmation token                  |
+| reset_passwords_url                | `nil`                    | Url used to create email link with reset password token                |
+| invitations_url                    | `nil`                    | Url used to create email link with invitation token                    |
+| maximum_attempts                   | `3`                      | Number of failed login attempts before locking an account              |
+| lock_strategy                      | `:none`                  | Strategy to be used to lock an account: `:none` or `:failed_attempts`  |
+| unlock_strategy                    | `:time`                  | Strategy to use when unlocking accounts: `:time`, `:email` or `:both`  |
+| unlock_in                          | `60.minutes`             | Interval to unlock an account if `unlock_strategy` is `:time`          |
+| reset_attempts_in                  | `60.minutes`             | Interval after which to reset failed attempts counter of an account    |
+| unlock_url                         | `nil`                    | Url used to create email link with unlock token                        |
 
 ## Modules
 
@@ -523,6 +524,25 @@ module RailsJwtAuth
   ...
 end
 ```
+
+#### Custom mailer
+
+To use a custom mailer, create a class that extends RailsJwtAuth::Mailer, like this:
+
+```ruby
+class CustomMailer < RailsJwtAuth::Mailer
+  def confirmation_instructions(user)
+    # set your custom code here
+
+    super
+  end
+end
+```
+
+Then, in your config/initializers/rails_jwt_auth.rb, set config.mailer to "CustomMailer".
+
+> If you only need to customize templates, overwrite files in 'app/views/rails_jwt_auth/mailer'
+
 
 ## Testing (rspec)
 

@@ -52,7 +52,7 @@ module RailsJwtAuth
       self.invitation_sent_at = Time.current
       return false unless save(validate: false)
 
-      RailsJwtAuth.send_email(Mailer.send_invitation(self))
+      RailsJwtAuth.send_email(RailsJwtAuth.mailer.send_invitation(self))
     ensure
       @inviting = false
     end

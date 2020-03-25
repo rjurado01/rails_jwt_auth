@@ -17,7 +17,7 @@ module RailsJwtAuth
 
         before_update do
           if RailsJwtAuth.send_password_changed_notification && password_digest_changed?
-            RailsJwtAuth.send_email(Mailer.password_changed(self))
+            RailsJwtAuth.send_email(RailsJwtAuth.mailer.password_changed(self))
           end
         end
       end
