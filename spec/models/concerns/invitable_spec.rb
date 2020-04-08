@@ -84,7 +84,7 @@ describe RailsJwtAuth::Invitable do
       describe '#invite!' do
         context 'when user is new' do
           before do
-            @user = FactoryBot.build("#{orm.underscore}_user")
+            @user = FactoryBot.build("#{orm.underscore}_user_without_password")
             @user.invite!
           end
 
@@ -92,10 +92,6 @@ describe RailsJwtAuth::Invitable do
             expect(@user.invitation_token).to_not be_nil
             expect(@user.invitation_sent_at).to_not be_nil
             expect(@user.invitation_accepted_at).to be_nil
-          end
-
-          it 'set provisional password' do
-            expect(@user.password_digest).to_not be_nil
           end
 
           it 'sends new invitation mail' do
@@ -169,6 +165,14 @@ describe RailsJwtAuth::Invitable do
             invited_user.invitation_sent_at = Time.now - 1.year
             invited_user.accept_invitation!(accept_attrs)
             expect(get_record_error(invited_user, :invitation_token)).to eq(:expired)
+          end
+
+          it 'does not send password changed email' do
+            invited_user
+            ActionMailer::Base.deliveries.clear
+
+            invited_user.accept_invitation!(accept_attrs)
+            expect(ActionMailer::Base.deliveries.count).to eq(0)
           end
         end
 

@@ -16,7 +16,8 @@ module RailsJwtAuth
         has_secure_password
 
         before_update do
-          if RailsJwtAuth.send_password_changed_notification && password_digest_changed?
+          if RailsJwtAuth.send_password_changed_notification &&
+             password_digest_changed? && password_digest_was
             RailsJwtAuth.send_email(RailsJwtAuth.mailer.password_changed(self))
           end
         end
@@ -71,6 +72,14 @@ module RailsJwtAuth
       else
         {id: id.to_s}
       end
+    end
+
+    def save_without_password
+      valid?
+      errors.delete(:password) # allow register without pass
+      return false unless errors.empty?
+
+      save(validate: false)
     end
 
     module ClassMethods

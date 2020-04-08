@@ -41,16 +41,10 @@ module RailsJwtAuth
       end
 
       @inviting = true
-
-      unless password || password_digest
-        self.password = self.password_confirmation = RailsJwtAuth.friendly_token(16)
-      end
-
-      return false unless valid?
-
       self.invitation_token = RailsJwtAuth.friendly_token
       self.invitation_sent_at = Time.current
-      return false unless save(validate: false)
+
+      return false unless save_without_password
 
       RailsJwtAuth.send_email(RailsJwtAuth.mailer.send_invitation(self))
     ensure

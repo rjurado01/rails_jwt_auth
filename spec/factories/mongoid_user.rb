@@ -10,4 +10,9 @@ FactoryBot.define do
       user.skip_confirmation!
     end
   end
+
+  factory :mongoid_user_without_password, class: MongoidUser do
+    email
+    sequence(:username) { |n| "user_#{n}" }
+  end
 end

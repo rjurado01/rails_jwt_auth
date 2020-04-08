@@ -10,4 +10,9 @@ FactoryBot.define do
       user.skip_confirmation!
     end
   end
+
+  factory :active_record_user_without_password, class: ActiveRecordUser do
+    email
+    sequence(:username) { |n| "user_#{n}" }
+  end
 end

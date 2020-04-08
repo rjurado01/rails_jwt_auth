@@ -223,6 +223,14 @@ describe RailsJwtAuth::Authenticatable do
         end
       end
 
+      describe '#save_without_password' do
+        it 'avoid password validation' do
+          u = FactoryBot.build("#{orm.underscore}_user_without_password")
+          expect(u.save).to be_falsey
+          expect(u.save_without_password).to be_truthy
+        end
+      end
+
       describe '#after_update' do
         context 'when send_password_changed_notification option is false' do
           it 'does not send notify email' do
