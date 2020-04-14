@@ -136,16 +136,6 @@ describe RailsJwtAuth::Confirmable do
             end
           end
         end
-
-        context 'when email field config is invalid' do
-          it 'throws InvalidEmailField exception' do
-            allow(RailsJwtAuth).to receive(:email_field_name).and_return(:invalid)
-
-            expect {
-              user.send_confirmation_instructions
-            }.to raise_error(RailsJwtAuth::InvalidEmailField)
-          end
-        end
       end
 
       describe '#after_create' do

@@ -22,7 +22,7 @@ module RailsJwtAuth
         end
 
         before_update do
-          email_field = RailsJwtAuth.email_field_name!
+          email_field = RailsJwtAuth.email_field_name
 
           if public_send("#{email_field}_changed?") &&
              public_send("#{email_field}_was") &&
@@ -47,7 +47,7 @@ module RailsJwtAuth
     end
 
     def send_confirmation_instructions
-      email_field = RailsJwtAuth.email_field_name!
+      email_field = RailsJwtAuth.email_field_name
 
       if confirmed? && !unconfirmed_email
         errors.add(email_field, :already_confirmed)
@@ -71,7 +71,7 @@ module RailsJwtAuth
       self.confirmation_token = nil
 
       if unconfirmed_email
-        email_field = RailsJwtAuth.email_field_name!
+        email_field = RailsJwtAuth.email_field_name
 
         self[email_field] = unconfirmed_email
         self.unconfirmed_email = nil
@@ -95,7 +95,7 @@ module RailsJwtAuth
     def validate_confirmation
       return true unless confirmed_at
 
-      email_field = RailsJwtAuth.email_field_name!
+      email_field = RailsJwtAuth.email_field_name
 
       if confirmed_at_was && !public_send("#{email_field}_changed?")
         errors.add(email_field, :already_confirmed)

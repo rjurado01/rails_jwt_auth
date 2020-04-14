@@ -19,13 +19,13 @@ if defined?(ActionMailer)
     def email_changed(user)
       @user = user
       subject = I18n.t('rails_jwt_auth.mailer.email_changed.subject')
-      mail(to: @user[RailsJwtAuth.email_field_name!], subject: subject)
+      mail(to: @user[RailsJwtAuth.email_field_name], subject: subject)
     end
 
     def password_changed(user)
       @user = user
       subject = I18n.t('rails_jwt_auth.mailer.password_changed.subject')
-      mail(to: @user[RailsJwtAuth.email_field_name!], subject: subject)
+      mail(to: @user[RailsJwtAuth.email_field_name], subject: subject)
     end
 
     def reset_password_instructions(user)

@@ -76,7 +76,7 @@ module RailsJwtAuth
   self.unlock_in = 60.minutes
 
   mattr_accessor :reset_attempts_in
-  self.unlock_in = 60.minutes
+  self.reset_attempts_in = 60.minutes
 
   mattr_accessor :unlock_url
   self.unlock_url = nil
@@ -97,32 +97,6 @@ module RailsJwtAuth
     yield self
   end
 
-  def self.auth_field_name!
-    field_name = RailsJwtAuth.auth_field_name
-    klass = RailsJwtAuth.model
-
-    unless field_name.present? &&
-           (klass.respond_to?(:column_names) && klass.column_names.include?(field_name) ||
-            klass.respond_to?(:fields) && klass.fields[field_name])
-      raise RailsJwtAuth::InvalidAuthField
-    end
-
-    field_name
-  end
-
-  def self.email_field_name!
-    field_name = RailsJwtAuth.email_field_name
-    klass = RailsJwtAuth.model
-
-    unless field_name.present? &&
-           (klass.respond_to?(:column_names) && klass.column_names.include?(field_name) ||
-            klass.respond_to?(:fields) && klass.fields[field_name])
-      raise RailsJwtAuth::InvalidEmailField
-    end
-
-    field_name
-  end
-
   # Thanks to https://github.com/heartcombo/devise/blob/master/lib/devise.rb#L496
   def self.friendly_token(length = 24)
     # To calculate real characters, we must perform this operation.
@@ -133,9 +107,5 @@ module RailsJwtAuth
 
   def self.send_email(mailer)
     RailsJwtAuth.deliver_later ? mailer.deliver_later : mailer.deliver
-  end
-
-  def self.get_after_changed_method(field)
-    defined?(Mongoid) ? "#{field}_changed?" : "saved_change_to_#{field}?"
   end
 end

@@ -14,7 +14,7 @@ module RailsJwtAuth
     end
 
     def send_reset_password_instructions
-      email_field = RailsJwtAuth.email_field_name! # ensure email field es valid
+      email_field = RailsJwtAuth.email_field_name # ensure email field es valid
 
       if self.class.ancestors.include?(RailsJwtAuth::Confirmable) && !confirmed?
         errors.add(email_field, :unconfirmed)

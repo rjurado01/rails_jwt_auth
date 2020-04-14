@@ -19,16 +19,6 @@ describe RailsJwtAuth::Invitable do
       end
 
       describe '.invite!' do # Class method
-        context 'when auth field config is invalid' do
-          it 'throws InvalidAuthField an exception' do
-            allow(RailsJwtAuth).to receive(:auth_field_name).and_return(:invalid)
-
-            expect {
-              RailsJwtAuth.model.invite! email: email
-            }.to raise_error(RailsJwtAuth::InvalidAuthField)
-          end
-        end
-
         context 'when auth field is blank' do
           it 'returns record with auth field error' do
             user = RailsJwtAuth.model.invite!
@@ -92,13 +82,6 @@ describe RailsJwtAuth::Invitable do
       end
 
       describe '#invite!' do
-        context 'when email field config is invalid' do
-          it 'throws InvalidEmailField exception' do
-            allow(RailsJwtAuth).to receive(:email_field_name).and_return(:invalid)
-            expect { user.invite! }.to raise_error(RailsJwtAuth::InvalidEmailField)
-          end
-        end
-
         context 'when user is new' do
           before do
             @user = FactoryBot.build("#{orm.underscore}_user")

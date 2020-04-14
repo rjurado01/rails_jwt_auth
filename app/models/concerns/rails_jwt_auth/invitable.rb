@@ -19,7 +19,7 @@ module RailsJwtAuth
       # Creates an user and sends an invitation to him.
       def invite!(attributes={})
         attrs = ActiveSupport::HashWithIndifferentAccess.new(attributes.to_h)
-        auth_field = RailsJwtAuth.auth_field_name!
+        auth_field = RailsJwtAuth.auth_field_name
         auth_attribute = attrs.delete(auth_field)
 
         record = RailsJwtAuth.model.find_or_initialize_by(auth_field => auth_attribute)
@@ -33,10 +33,10 @@ module RailsJwtAuth
     # Sends an invitation to user
     # If the user has pending invitation, new one is sent
     def invite!
-      RailsJwtAuth.email_field_name! # ensure email field is valid
+      RailsJwtAuth.email_field_name # ensure email field is valid
 
       if persisted? && !invitation_token
-        errors.add(RailsJwtAuth.auth_field_name!, :registered)
+        errors.add(RailsJwtAuth.auth_field_name, :registered)
         return false
       end
 

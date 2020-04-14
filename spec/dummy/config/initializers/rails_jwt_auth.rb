@@ -1,6 +1,6 @@
 RailsJwtAuth.setup do |config|
   # authentication model class name
-  #config.model_name = 'User'
+  config.model_name = 'ActiveRecordUser'
 
   # field name used to authentication with password
   #config.auth_field_name = 'email'

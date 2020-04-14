@@ -17,8 +17,17 @@ RailsJwtAuth.setup do |config|
   # number of simultaneously sessions for an user
   #config.simultaneous_sessions = 2
 
+  # mailer class name
+  #config.mailer_name = 'RailsJwtAuth::Mailer'
+
   # mailer sender
   #config.mailer_sender = 'initialize-mailer_sender@example.com'
+
+  # activate email notification when email is changed
+  #config.send_email_changed_notification = true
+
+  # activate email notification when password is changed
+  #config.send_password_changed_notification = true
 
   # expiration time for confirmation tokens
   #config.confirmation_expiration_time = 1.day

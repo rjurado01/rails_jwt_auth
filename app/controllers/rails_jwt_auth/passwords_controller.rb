@@ -48,7 +48,7 @@ module RailsJwtAuth
         return render_422(RailsJwtAuth.email_field_name => [{error: :blank}])
       end
 
-      email_field = RailsJwtAuth.email_field_name!
+      email_field = RailsJwtAuth.email_field_name
 
       @user = RailsJwtAuth.model.where(
         email_field => password_create_params[email_field].to_s.strip.downcase

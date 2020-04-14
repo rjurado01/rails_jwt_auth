@@ -5,7 +5,7 @@ module RailsJwtAuth
     Errors = Struct.new :details # simulate ActiveModel::Errors
 
     def initialize(params={})
-      @auth_field_value = params[RailsJwtAuth.auth_field_name!]
+      @auth_field_value = params[RailsJwtAuth.auth_field_name]
       @password = params[:password]
 
       find_user if @auth_field_value.present?
