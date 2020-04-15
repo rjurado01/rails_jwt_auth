@@ -3,7 +3,7 @@ require 'rails_helper'
 describe RailsJwtAuth::Trackable do
   %w[ActiveRecord Mongoid].each do |orm|
     context "when use #{orm}" do
-      before(:all) { RailsJwtAuth.model_name = "#{orm}User" }
+      before(:all) { initialize_orm(orm) }
 
       let(:user) do
         FactoryBot.create(

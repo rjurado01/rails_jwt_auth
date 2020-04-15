@@ -4,9 +4,7 @@ require 'rails_jwt_auth/jwt_manager'
 describe RailsJwtAuth::SessionsController do
   %w[ActiveRecord Mongoid].each do |orm|
     context "when use #{orm}" do
-      before :all do
-        RailsJwtAuth.model_name = "#{orm}User"
-      end
+      before(:all) { initialize_orm(orm) }
 
       let(:json) { JSON.parse(response.body) }
       let(:user) { FactoryBot.create("#{orm.underscore}_user") }

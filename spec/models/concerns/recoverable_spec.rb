@@ -13,7 +13,7 @@ describe RailsJwtAuth::Recoverable do
 
   %w(ActiveRecord Mongoid).each do |orm|
     context "when use #{orm}" do
-      before(:all) { RailsJwtAuth.model_name = "#{orm}User" }
+      before(:all) { initialize_orm(orm) }
 
       let(:user) { FactoryBot.create("#{orm.underscore}_user") }
 

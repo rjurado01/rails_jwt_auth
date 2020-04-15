@@ -3,9 +3,7 @@ require 'rails_helper'
 describe RailsJwtAuth::RegistrationsController do
   %w[ActiveRecord Mongoid].each do |orm|
     context "when use #{orm}" do
-      before :all do
-        RailsJwtAuth.model_name = "#{orm}User"
-      end
+      before(:all) { initialize_orm(orm) }
 
       before do
         allow_any_instance_of(RailsJwtAuth.model)

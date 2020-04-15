@@ -5,8 +5,6 @@ require 'rails_jwt_auth/jwt_manager'
 require 'rails_jwt_auth/session'
 
 module RailsJwtAuth
-  InvalidEmailField = Class.new(StandardError)
-  InvalidAuthField = Class.new(StandardError)
   NotConfirmationsUrl = Class.new(StandardError)
   NotInvitationsUrl = Class.new(StandardError)
   NotResetPasswordsUrl = Class.new(StandardError)
@@ -81,6 +79,10 @@ module RailsJwtAuth
   mattr_accessor :unlock_url
   self.unlock_url = nil
 
+  def self.setup
+    yield self
+  end
+
   def self.model
     model_name.constantize
   end
@@ -91,10 +93,6 @@ module RailsJwtAuth
 
   def self.table_name
     model_name.underscore.pluralize
-  end
-
-  def self.setup
-    yield self
   end
 
   # Thanks to https://github.com/heartcombo/devise/blob/master/lib/devise.rb#L496

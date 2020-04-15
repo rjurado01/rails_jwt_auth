@@ -5,9 +5,7 @@ include RailsJwtAuth::SpecHelpers
 RSpec.describe RailsJwtAuth::ProfilesController do
   %w[ActiveRecord Mongoid].each do |orm|
     context "Using #{orm}" do
-      before :all do
-        RailsJwtAuth.model_name = "#{orm}User"
-      end
+      before(:all) { initialize_orm(orm) }
 
       let(:json) { JSON.parse(response.body).first[1] }
       let(:errors) { JSON.parse(response.body)['errors'] }

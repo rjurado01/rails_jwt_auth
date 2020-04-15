@@ -5,9 +5,7 @@ require 'rails_jwt_auth/session'
 module RailsJwtAuth
   %w[ActiveRecord].each do |orm|
     describe Session do
-      before(:all) do
-        RailsJwtAuth.model_name = "#{orm}User"
-      end
+      before(:all) { initialize_orm(orm) }
 
       let(:pass) { '12345678' }
       let(:user) { FactoryBot.create("#{orm.underscore}_user", password: pass) }

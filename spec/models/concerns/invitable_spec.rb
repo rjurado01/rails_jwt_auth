@@ -3,7 +3,7 @@ require 'rails_helper'
 describe RailsJwtAuth::Invitable do
   %w[ActiveRecord Mongoid].each do |orm|
     context "Using #{orm}" do
-      before(:all) { RailsJwtAuth.model_name = "#{orm}User" }
+      before(:all) { initialize_orm(orm) }
       before(:each) { ActionMailer::Base.deliveries.clear }
 
       let(:pass) { 'new_password' }

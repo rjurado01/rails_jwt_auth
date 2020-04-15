@@ -3,7 +3,7 @@ require 'rails_helper'
 describe RailsJwtAuth::Lockable do
   %w[ActiveRecord Mongoid].each do |orm|
     context "when use #{orm}" do
-      before(:each) { RailsJwtAuth.model_name = "#{orm}User" }
+      before(:each) { initialize_orm(orm) }
 
       let(:user) { FactoryBot.create("#{orm.underscore}_user") }
 

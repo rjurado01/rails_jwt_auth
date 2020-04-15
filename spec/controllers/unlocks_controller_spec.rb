@@ -3,9 +3,7 @@ require 'rails_helper'
 describe RailsJwtAuth::UnlocksController do
   %w[ActiveRecord Mongoid].each do |orm|
     context "when use #{orm}" do
-      before :all do
-        RailsJwtAuth.model_name = "#{orm}User"
-      end
+      before(:all) { initialize_orm(orm) }
 
       let(:user) {
         FactoryBot.create(

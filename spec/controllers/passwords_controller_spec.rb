@@ -3,9 +3,7 @@ require 'rails_helper'
 describe RailsJwtAuth::PasswordsController do
   %w[ActiveRecord Mongoid].each do |orm|
     context "when use #{orm}" do
-      before :all do
-        RailsJwtAuth.model_name = "#{orm}User"
-      end
+      before(:all) { initialize_orm(orm) }
 
       let(:json) { JSON.parse(response.body) }
       let(:user) { FactoryBot.create("#{orm.underscore}_user", password: '12345678') }

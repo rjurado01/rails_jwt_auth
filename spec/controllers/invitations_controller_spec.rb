@@ -3,9 +3,7 @@ require 'rails_helper'
 RSpec.describe RailsJwtAuth::InvitationsController do
   %w[ActiveRecord Mongoid].each do |orm|
     context "Using #{orm}" do
-      before :all do
-        RailsJwtAuth.model_name = "#{orm}User"
-      end
+      before(:all) { initialize_orm(orm) }
 
       let(:invited_user) { RailsJwtAuth.model.invite! email: 'valid@example.com' }
       let(:json) { JSON.parse(response.body) }
