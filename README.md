@@ -539,7 +539,7 @@ class CustomMailer < RailsJwtAuth::Mailer
 end
 ```
 
-Then, in your config/initializers/rails_jwt_auth.rb, set config.mailer to "CustomMailer".
+Then, in your `config/initializers/rails_jwt_auth.rb`, set `config.mailer` to `"CustomMailer"`.
 
 > If you only need to customize templates, overwrite files in 'app/views/rails_jwt_auth/mailer'
 
