@@ -11,8 +11,29 @@ module RailsJwtAuth
       find_user if @auth_field_value.present?
     end
 
-    # Can't use ActiveModel::Validations since we have dynamic fields
     def valid?
+      validate!
+
+      @errors.details.empty?
+    end
+
+    def generate!(request)
+      if valid?
+        user.unlock_access! if lockable?
+        generate_jwt(request)
+
+        true
+      else
+        user.failed_attempt! if lockable?
+
+        false
+      end
+    end
+
+    private
+
+    # Can't use ActiveModel::Validations since we have dynamic fields
+    def validate!
       @errors = Errors.new({})
 
       validate_auth_field_presence
@@ -22,25 +43,7 @@ module RailsJwtAuth
       validate_user_is_confirmed if confirmable?
       validate_user_is_not_locked if lockable?
       validate_custom
-
-      no_errors
     end
-
-    def generate!(request)
-      valid?
-
-      if no_errors
-        user.unlock_access! if lockable?
-        generate_jwt(request)
-
-        true
-      else
-        user.failed_attempt! if lockable?
-        false
-      end
-    end
-
-    private
 
     def find_user
       @user = RailsJwtAuth.model.where(RailsJwtAuth.auth_field_name => @auth_field_value).first
@@ -58,8 +61,8 @@ module RailsJwtAuth
       @user.present?
     end
 
-    def no_errors
-      @errors.details.empty?
+    def field_error(field)
+      RailsJwtAuth.email_error ? field : :session
     end
 
     def validate_auth_field_presence
@@ -71,11 +74,11 @@ module RailsJwtAuth
     end
 
     def validate_user_exist
-      add_error(RailsJwtAuth.auth_field_name, :invalid) unless @user
+      add_error(field_error(RailsJwtAuth.auth_field_name), :invalid) unless @user
     end
 
     def validate_user_password
-      add_error(:password, :invalid) unless @user.authenticate(@password)
+      add_error(field_error(:password), :invalid) unless @user.authenticate(@password)
     end
 
     def validate_custom
