@@ -67,4 +67,7 @@ RailsJwtAuth.setup do |config|
 
   # url used to create email link with unlock token
   #config.unlock_url = 'http://frontend.com/unlock-account'
+
+  # set false to avoid giving clue about the existing emails with errors
+  #config.avoid_email_errors = true
 end

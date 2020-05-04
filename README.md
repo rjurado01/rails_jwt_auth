@@ -86,6 +86,7 @@ You can edit configuration options into `config/initializers/rails_jwt_auth.rb` 
 | unlock_in                          | `60.minutes`             | Interval to unlock an account if `unlock_strategy` is `:time`          |
 | reset_attempts_in                  | `60.minutes`             | Interval after which to reset failed attempts counter of an account    |
 | unlock_url                         | `nil`                    | Url used to create email link with unlock token                        |
+| avoid_email_errors                 | `true`                   | Avoid returns email errors to avoid giving clue to an attacker         |
 
 ## Modules
 

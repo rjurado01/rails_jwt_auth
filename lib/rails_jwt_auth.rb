@@ -79,6 +79,9 @@ module RailsJwtAuth
   mattr_accessor :unlock_url
   self.unlock_url = nil
 
+  mattr_accessor :avoid_email_errors
+  self.avoid_email_errors = true
+
   def self.setup
     yield self
   end

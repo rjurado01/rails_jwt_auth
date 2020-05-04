@@ -34,10 +34,20 @@ module RailsJwtAuth
         it 'validates auth field' do
           session = Session.new('email' => 'invalid')
           expect(session.valid?).to be_falsey
+          expect(get_record_error(session, :session)).to eq(:invalid)
+
+          RailsJwtAuth.avoid_email_errors = false
+          session = Session.new('email' => 'invalid')
+          expect(session.valid?).to be_falsey
           expect(get_record_error(session, :email)).to eq(:invalid)
         end
 
         it 'validates password' do
+          session = Session.new('email' => user.email, password: 'invalid')
+          expect(session.valid?).to be_falsey
+          expect(get_record_error(session, :session)).to eq(:invalid)
+
+          RailsJwtAuth.avoid_email_errors = false
           session = Session.new('email' => user.email, password: 'invalid')
           expect(session.valid?).to be_falsey
           expect(get_record_error(session, :password)).to eq(:invalid)

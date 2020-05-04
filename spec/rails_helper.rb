@@ -72,6 +72,7 @@ RSpec.configure do |config|
     RailsJwtAuth.confirmations_url = 'http://example.com/confirmations'
     RailsJwtAuth.invitations_url = 'http://example.com/invitations'
     RailsJwtAuth.reset_passwords_url = 'http://example.com/reset_passwords'
+    RailsJwtAuth.avoid_email_errors = true
 
     # Configuration for Lockable module
     RailsJwtAuth.maximum_attempts = 3

@@ -19,7 +19,13 @@ module RailsJwtAuth
 
     # used to request restore password
     def create
-      return render_422(RailsJwtAuth.email_field_name => [{error: :not_found}]) unless @user
+      unless @user
+        if RailsJwtAuth.avoid_email_errors
+          return render_204
+        else
+          return render_422(RailsJwtAuth.email_field_name => [{error: :not_found}])
+        end
+      end
 
       @user.send_reset_password_instructions ? render_204 : render_422(@user.errors.details)
     end

@@ -62,7 +62,7 @@ module RailsJwtAuth
     end
 
     def field_error(field)
-      RailsJwtAuth.email_error ? field : :session
+      RailsJwtAuth.avoid_email_errors ? :session : field
     end
 
     def validate_auth_field_presence

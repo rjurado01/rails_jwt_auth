@@ -81,8 +81,9 @@ describe RailsJwtAuth::PasswordsController do
           end
         end
 
-        context 'when send invalid email' do
+        context 'when send invalid email and avoid_email_errors is false' do
           before do
+            RailsJwtAuth.avoid_email_errors = false
             post :create, params: {password: {email: 'invalid'}}
           end
 
@@ -92,6 +93,16 @@ describe RailsJwtAuth::PasswordsController do
 
           it 'returns not found error' do
             expect(json['errors']['email'].first['error']).to eq 'not_found'
+          end
+        end
+
+        context 'when send invalid email and avoid_email_errors is true' do
+          before do
+            post :create, params: {password: {email: 'invalid'}}
+          end
+
+          it 'returns 204 http status code' do
+            expect(response).to have_http_status(204)
           end
         end
 
