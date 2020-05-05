@@ -65,6 +65,12 @@ module RailsJwtAuth
           expect(session.valid?).to be_falsey
           expect(get_record_error(session, :email)).to eq(:locked)
         end
+
+        it 'avoid validates password when exist other errors' do
+          session = Session.new('email' => unconfirmed_user.email, password: 'invalid')
+          expect(session.valid?).to be_falsey
+          expect(get_record_error(session, :password)).to be_nil
+        end
       end
 
       describe '#generate!' do

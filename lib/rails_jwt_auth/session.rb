@@ -14,7 +14,7 @@ module RailsJwtAuth
     def valid?
       validate!
 
-      @errors.details.empty?
+      !errors?
     end
 
     def generate!(request)
@@ -32,16 +32,16 @@ module RailsJwtAuth
 
     private
 
-    # Can't use ActiveModel::Validations since we have dynamic fields
     def validate!
+      # Can't use ActiveModel::Validations since we have dynamic fields
       @errors = Errors.new({})
 
       validate_auth_field_presence
       validate_password_presence
       validate_user_exist
-      validate_user_password if user?
       validate_user_is_confirmed if confirmable?
       validate_user_is_not_locked if lockable?
+      validate_user_password unless errors?
       validate_custom
     end
 
@@ -100,6 +100,10 @@ module RailsJwtAuth
     def add_error(field, detail)
       @errors.details[field.to_sym] ||= []
       @errors.details[field.to_sym].push({error: detail})
+    end
+
+    def errors?
+      @errors.details.any?
     end
 
     def generate_jwt(request)
