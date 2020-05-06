@@ -71,6 +71,16 @@ RSpec.describe RailsJwtAuth::ProfilesController do
             expect(response).to have_http_status(422)
             expect(errors['password_confirmation'].first['error']).to eq 'confirmation'
           end
+
+          it 'ignore empty password fields' do
+            put :update, params: {profile: {
+              current_password: '',
+              password: '',
+              password_confirmation: nil
+            }}
+
+            expect(response).to have_http_status(204)
+          end
         end
 
         context 'when user is not logged' do
