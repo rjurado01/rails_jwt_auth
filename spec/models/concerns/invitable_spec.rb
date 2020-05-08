@@ -183,6 +183,13 @@ describe RailsJwtAuth::Invitable do
           end
         end
       end
+
+      describe '#valid_for_invite?' do
+        it 'returns when record is valid for invite' do
+          u = FactoryBot.build("#{orm.underscore}_user_without_password")
+          expect(u.valid_for_invite?).to be_truthy
+        end
+      end
     end
   end
 end

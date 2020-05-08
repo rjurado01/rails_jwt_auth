@@ -33,8 +33,6 @@ module RailsJwtAuth
     # Sends an invitation to user
     # If the user has pending invitation, new one is sent
     def invite!
-      RailsJwtAuth.email_field_name # ensure email field is valid
-
       if persisted? && !invitation_token
         errors.add(RailsJwtAuth.auth_field_name, :registered)
         return false
@@ -72,6 +70,13 @@ module RailsJwtAuth
 
     def inviting?
       @inviting || false
+    end
+
+    def valid_for_invite?
+      @inviting = true
+      valid_without_password?
+    ensure
+      @inviting = false
     end
 
     def expired_invitation_token?

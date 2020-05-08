@@ -75,11 +75,18 @@ module RailsJwtAuth
     end
 
     def save_without_password
-      valid?
-      errors.delete(:password) # allow register without pass
-      return false unless errors.empty?
+      self.password = nil
+      self.password_confirmation = nil
+
+      return false unless valid_without_password?
 
       save(validate: false)
+    end
+
+    def valid_without_password?
+      valid?
+      errors.delete(:password) # allow register without pass
+      errors.empty?
     end
 
     module ClassMethods
