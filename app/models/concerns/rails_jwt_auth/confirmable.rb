@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module RailsJwtAuth
   module Confirmable
     def self.included(base)
@@ -33,24 +35,20 @@ module RailsJwtAuth
 
             self.confirmation_token = SecureRandom.base58(24)
             self.confirmation_sent_at = Time.current
-
-            # send confirmation to new email
-            RailsJwtAuth.send_email(RailsJwtAuth.mailer.confirmation_instructions(self))
-
-            # send notify to old email
-            if RailsJwtAuth.send_email_changed_notification
-              RailsJwtAuth.send_email(RailsJwtAuth.mailer.email_changed(self))
-            end
           end
+        end
+
+        if defined?(ActiveRecord) && ancestors.include?(ActiveRecord::Base)
+          after_commit :deliver_email_changed_emails, if: :saved_change_to_unconfirmed_email?
+        elsif defined?(Mongoid) && ancestors.include?(Mongoid::Document)
+          after_update :deliver_email_changed_emails, if: :unconfirmed_email_changed?
         end
       end
     end
 
     def send_confirmation_instructions
-      email_field = RailsJwtAuth.email_field_name
-
       if confirmed? && !unconfirmed_email
-        errors.add(email_field, :already_confirmed)
+        errors.add(RailsJwtAuth.email_field_name, :already_confirmed)
         return false
       end
 
@@ -78,7 +76,7 @@ module RailsJwtAuth
 
         # supports email confirmation attr_accessor validation
         if respond_to?("#{email_field}_confirmation")
-          self.instance_variable_set("@#{email_field}_confirmation", self[email_field])
+          instance_variable_set("@#{email_field}_confirmation", self[email_field])
         end
       end
 
@@ -102,6 +100,16 @@ module RailsJwtAuth
       elsif confirmation_sent_at &&
             (confirmation_sent_at < (Time.current - RailsJwtAuth.confirmation_expiration_time))
         errors.add(:confirmation_token, :expired)
+      end
+    end
+
+    def deliver_email_changed_emails
+      # send confirmation to new email
+      RailsJwtAuth.send_email(RailsJwtAuth.mailer.confirmation_instructions(self))
+
+      # send notify to old email
+      if RailsJwtAuth.send_email_changed_notification
+        RailsJwtAuth.send_email(RailsJwtAuth.mailer.email_changed(self))
       end
     end
   end
