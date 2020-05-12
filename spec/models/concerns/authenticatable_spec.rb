@@ -14,14 +14,14 @@ describe RailsJwtAuth::Authenticatable do
 
       describe '#authenticate' do
         it 'authenticates user valid password' do
-          user = FactoryBot.create(:active_record_user, password: '12345678')
+          user = FactoryBot.create("#{orm.underscore}_user", password: '12345678')
           expect(user.authenticate('12345678')).not_to eq(false)
           expect(user.authenticate('invalid')).to eq(false)
         end
       end
 
       describe '#update_with_password' do
-        let(:user) { FactoryBot.create(:active_record_user, password: '12345678') }
+        let(:user) { FactoryBot.create("#{orm.underscore}_user", password: '12345678') }
 
         context 'when curren_password is blank' do
           it 'returns false' do
@@ -86,7 +86,7 @@ describe RailsJwtAuth::Authenticatable do
 
           context 'when reset_password_sent_at is expired' do
             before do
-              @user = FactoryBot.create(:active_record_user,
+              @user = FactoryBot.create("#{orm.underscore}_user",
                                         password: current_password,
                                         reset_password_token: '12345678',
                                         reset_password_sent_at: Time.current)
@@ -118,7 +118,7 @@ describe RailsJwtAuth::Authenticatable do
 
           context 'when reset_password_sent_at is valid' do
             before do
-              @user = FactoryBot.create(:active_record_user,
+              @user = FactoryBot.create("#{orm.underscore}_user",
                                         password: current_password,
                                         reset_password_token: '12345678',
                                         reset_password_sent_at: Time.current)
@@ -285,7 +285,7 @@ describe RailsJwtAuth::Authenticatable do
 
       describe '.get_by_token' do
         it 'returns user with specified token' do
-          user = FactoryBot.create(:active_record_user, auth_tokens: %w[abcd efgh])
+          user = FactoryBot.create("#{orm.underscore}_user", auth_tokens: %w[abcd efgh])
           expect(user.class.get_by_token('aaaa')).to eq(nil)
           expect(user.class.get_by_token('abcd')).to eq(user)
         end

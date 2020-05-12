@@ -15,10 +15,17 @@ module RailsJwtAuth
 
         has_secure_password
 
-        before_update do
-          if RailsJwtAuth.send_password_changed_notification &&
-             password_digest_changed? && password_digest_was
-            RailsJwtAuth.send_email(RailsJwtAuth.mailer.password_changed(self))
+        if defined?(ActiveRecord) && ancestors.include?(ActiveRecord::Base)
+          after_commit do
+            if saved_change_to_password_digest? && password_digest_before_last_save
+              deliver_password_changed_notification
+            end
+          end
+        elsif defined?(Mongoid) && ancestors.include?(Mongoid::Document)
+          after_update do
+            if password_digest_changed? && password_digest_was
+              deliver_password_changed_notification
+            end
           end
         end
       end
@@ -87,6 +94,14 @@ module RailsJwtAuth
       valid?
       errors.delete(:password) # allow register without pass
       errors.empty?
+    end
+
+    protected
+
+    def deliver_password_changed_notification
+      return unless RailsJwtAuth.send_password_changed_notification
+
+      RailsJwtAuth.send_email(RailsJwtAuth.mailer.password_changed(self))
     end
 
     module ClassMethods
