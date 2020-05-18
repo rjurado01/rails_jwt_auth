@@ -31,17 +31,23 @@ module RailsJwtAuth
       end
     end
 
-    def regenerate_auth_token(token = nil)
+    def load_auth_token
       new_token = SecureRandom.base58(24)
 
       if RailsJwtAuth.simultaneous_sessions > 1
-        tokens = ((auth_tokens || []) - [token]).last(RailsJwtAuth.simultaneous_sessions - 1)
-        update_attribute(:auth_tokens, (tokens + [new_token]).uniq)
+        tokens = (auth_tokens || []).last(RailsJwtAuth.simultaneous_sessions - 1)
+        self.auth_tokens = (tokens + [new_token]).uniq
       else
-        update_attribute(:auth_tokens, [new_token])
+        self.auth_tokens = [new_token]
       end
 
       new_token
+    end
+
+    def regenerate_auth_token(token=nil)
+      self.auth_tokens -= [token] if token
+      token = load_auth_token
+      save ? token : false
     end
 
     def destroy_auth_token(token)
@@ -75,7 +81,7 @@ module RailsJwtAuth
 
     def to_token_payload(_request=nil)
       if RailsJwtAuth.simultaneous_sessions > 0
-        {auth_token: regenerate_auth_token}
+        {auth_token: auth_tokens.last}
       else
         {id: id.to_s}
       end

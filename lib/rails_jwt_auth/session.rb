@@ -19,7 +19,12 @@ module RailsJwtAuth
 
     def generate!(request)
       if valid?
-        user.unlock_access! if lockable?
+        user.clean_reset_password if recoverable?
+        user.clean_lock if lockable?
+        user.load_auth_token
+
+        return false unless user.save
+
         generate_jwt(request)
 
         true
@@ -55,6 +60,10 @@ module RailsJwtAuth
 
     def lockable?
       @user&.kind_of?(RailsJwtAuth::Lockable)
+    end
+
+    def recoverable?
+      @user&.kind_of?(RailsJwtAuth::Recoverable)
     end
 
     def user?

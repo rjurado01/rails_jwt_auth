@@ -85,6 +85,14 @@ module RailsJwtAuth
           expect(session.generate!(nil)).to be_truthy
           expect(user.reload.locked_at).to be_nil
         end
+
+        it 'resets recovery password' do
+          travel_to(Date.today - 30.days) { user.send_reset_password_instructions }
+          session = Session.new('email' => user.email, password: pass)
+          expect(session.generate!(nil)).to be_truthy
+          expect(user.reload.reset_password_token).to be_nil
+          expect(user.reload.reset_password_sent_at).to be_nil
+        end
       end
     end
   end

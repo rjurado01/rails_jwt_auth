@@ -43,9 +43,8 @@ module RailsJwtAuth
 
       return false unless errors.empty?
 
-      self.reset_password_token = nil
-      self.reset_password_sent_at = nil
-      self.auth_tokens = []
+      clean_reset_password
+      self.auth_tokens = [] # reset all sessions
       save
     end
 
@@ -54,6 +53,11 @@ module RailsJwtAuth
       return false if expiration_time.to_i.zero?
 
       reset_password_sent_at && reset_password_sent_at < expiration_time.ago
+    end
+
+    def clean_reset_password
+      self.reset_password_sent_at = nil
+      self.reset_password_token = nil
     end
   end
 end

@@ -21,10 +21,14 @@ module RailsJwtAuth
       end
     end
 
-    def unlock_access!
+    def clean_lock
       self.locked_at = nil
       self.unlock_token = nil
       reset_attempts
+    end
+
+    def unlock_access!
+      clean_lock
 
       save(validate: false) if changed?
     end
