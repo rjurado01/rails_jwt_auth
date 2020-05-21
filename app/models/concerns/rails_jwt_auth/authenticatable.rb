@@ -14,20 +14,6 @@ module RailsJwtAuth
         end
 
         has_secure_password
-
-        if defined?(ActiveRecord) && ancestors.include?(ActiveRecord::Base)
-          after_commit do
-            if saved_change_to_password_digest? && password_digest_before_last_save
-              deliver_password_changed_notification
-            end
-          end
-        elsif defined?(Mongoid) && ancestors.include?(Mongoid::Document)
-          after_update do
-            if password_digest_changed? && password_digest_was
-              deliver_password_changed_notification
-            end
-          end
-        end
       end
     end
 
@@ -59,26 +45,6 @@ module RailsJwtAuth
       end
     end
 
-    def update_with_password(params)
-      current_password_error = if (current_password = params.delete(:current_password)).blank?
-                                 'blank'
-                               elsif !authenticate(current_password)
-                                 'invalid'
-                               end
-
-      # if recoberable module is enabled ensure clean recovery to allow save
-      if self.respond_to? :reset_password_token
-        self.reset_password_token = self.reset_password_sent_at = nil
-      end
-
-      assign_attributes(params)
-      valid? # validates first other fields
-      errors.add(:current_password, current_password_error) if current_password_error
-      errors.add(:password, 'blank') if params[:password].blank?
-
-      errors.empty? ? save : false
-    end
-
     def to_token_payload(_request=nil)
       if RailsJwtAuth.simultaneous_sessions > 0
         {auth_token: auth_tokens.last}
@@ -100,6 +66,31 @@ module RailsJwtAuth
       valid?
       errors.delete(:password) # allow register without pass
       errors.empty?
+    end
+
+    def update_password(params)
+      current_password_error = if (current_password = params.delete(:current_password)).blank?
+                                 'blank'
+                               elsif !authenticate(current_password)
+                                 'invalid'
+                               end
+
+      # if recoberable module is enabled ensure clean recovery to allow save
+      if self.respond_to? :reset_password_token
+        self.reset_password_token = self.reset_password_sent_at = nil
+      end
+
+      assign_attributes(params)
+      valid? # validates first other fields
+      errors.add(:current_password, current_password_error) if current_password_error
+      errors.add(:password, 'blank') if params[:password].blank?
+
+      return false unless errors.empty?
+      return false unless save
+
+      deliver_password_changed_notification
+
+      true
     end
 
     protected

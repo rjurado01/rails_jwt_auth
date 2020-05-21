@@ -12,13 +12,29 @@ module RailsJwtAuth
     end
 
     def update
-      result = if changing_password?
-                 current_user.update_with_password(profile_update_params)
-               else
-                 current_user.update(profile_update_params.except(*PASSWORD_PARAMS))
-               end
+      if current_user.update(profile_update_params)
+        render_204
+      else
+        render_422(current_user.errors.details)
+      end
+    end
 
-      result ? render_204 : render_422(current_user.errors.details)
+    def password
+      if current_user.update_password(profile_update_password_params)
+        render_204
+      else
+        render_422(current_user.errors.details)
+      end
+    end
+
+    def email
+      return update unless current_user.kind_of?(RailsJwtAuth::Confirmable)
+
+      if current_user.update_email(profile_update_email_params)
+        render_204
+      else
+        render_422(current_user.errors.details)
+      end
     end
 
     protected

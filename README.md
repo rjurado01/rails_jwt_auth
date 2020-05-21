@@ -199,21 +199,23 @@ end
 
 ## Default Controllers API
 
-|       Prefix | Verb   | URI Pattern                  | Controller#Action                   |
-| ------------ | ------ | ---------------------------- | ----------------------------------- |
-|      session | DELETE | /session(.:format)           | rails_jwt_auth/sessions#destroy     |
-|              | POST   | /session(.:format)           | rails_jwt_auth/sessions#create      |
-| registration | POST   | /registration(.:format)      | rails_jwt_auth/registrations#create |
-|      profile | GET    | /profile(.:format)           | rails_jwt_auth/profiles#show        |
-|              | PUT    | /profile(.:format)           | rails_jwt_auth/profiles#update      |
-|confirmations | POST   | /confirmations(.:format)     | rails_jwt_auth/confirmations#create |
-| confirmation | PUT    | /confirmations/:id(.:format) | rails_jwt_auth/confirmations#update |
-|    passwords | POST   | /passwords(.:format)         | rails_jwt_auth/passwords#create     |
-|     password | GET    | /passwords/:id(.:format)     | rails_jwt_auth/passwords#show       |
-|              | PUT    | /passwords/:id(.:format)     | rails_jwt_auth/passwords#update     |
-|  invitations | POST   | /invitations(.:format)       | rails_jwt_auth/invitations#create   |
-|   invitation | GET    | /invitations/:id(.:format)   | rails_jwt_auth/invitations#show     |
-|              | PUT    | /invitations/:id(.:format)   | rails_jwt_auth/invitations#update   |
+|       Prefix     | Verb   | URI Pattern                  | Controller#Action                   |
+| ---------------- | ------ | ---------------------------- | ----------------------------------- |
+|          session | DELETE | /session(.:format)           | rails_jwt_auth/sessions#destroy     |
+|                  | POST   | /session(.:format)           | rails_jwt_auth/sessions#create      |
+|     registration | POST   | /registration(.:format)      | rails_jwt_auth/registrations#create |
+|          profile | GET    | /profile(.:format)           | rails_jwt_auth/profiles#show        |
+|     mail_profile | PUT    | /profile/email(.:format)     | rails_jwt_auth/profiles#email       |
+| password_profile | PUT    | /profile/password(.:format)  | rails_jwt_auth/profiles#password    |
+|                  | PUT    | /profile(.:format)           | rails_jwt_auth/profiles#update      |
+|    confirmations | POST   | /confirmations(.:format)     | rails_jwt_auth/confirmations#create |
+|     confirmation | PUT    | /confirmations/:id(.:format) | rails_jwt_auth/confirmations#update |
+|        passwords | POST   | /passwords(.:format)         | rails_jwt_auth/passwords#create     |
+|         password | GET    | /passwords/:id(.:format)     | rails_jwt_auth/passwords#show       |
+|                  | PUT    | /passwords/:id(.:format)     | rails_jwt_auth/passwords#update     |
+|      invitations | POST   | /invitations(.:format)       | rails_jwt_auth/invitations#create   |
+|       invitation | GET    | /invitations/:id(.:format)   | rails_jwt_auth/invitations#show     |
+|                  | PUT    | /invitations/:id(.:format)   | rails_jwt_auth/invitations#update   |
 
 ### Session
 
@@ -257,7 +259,7 @@ Registration api is defined by `RailsJwtAuth::RegistrationsController`.
   data: {
     user: {
       email: 'user@email.com',
-      password: '12345678'
+      password: 'xxxx'
     }
   }
 }
@@ -285,8 +287,39 @@ Profile api let you get/update your user info and is defined by `RailsJwtAuth::P
   method: PUT,
   data: {
     profile: {
-      current_password: 'old_password',
-      password: 'new_password'
+      name: 'new_name',
+    }
+  },
+  headers: { 'Authorization': 'Bearer auth_token'}
+}
+```
+
+3. Update user password:
+
+```js
+{
+  url: host/profile/password,
+  method: PUT,
+  data: {
+    profile: {
+      current_password: 'xxxx',
+      password: 'yyyy',
+    }
+  },
+  headers: { 'Authorization': 'Bearer auth_token'}
+}
+```
+
+4. Update user email (needs confirmation module):
+
+```js
+{
+  url: host/profile/email,
+  method: PUT,
+  data: {
+    profile: {
+      email: 'new@email.com',
+      password: 'xxxx', # email change is protected by password
     }
   },
   headers: { 'Authorization': 'Bearer auth_token'}

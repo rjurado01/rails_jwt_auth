@@ -22,27 +22,6 @@ module RailsJwtAuth
             send_confirmation_instructions
           end
         end
-
-        before_update do
-          email_field = RailsJwtAuth.email_field_name
-
-          if public_send("#{email_field}_changed?") &&
-             public_send("#{email_field}_was") &&
-             !confirmed_at_changed? &&
-             !self['invitation_token']
-            self.unconfirmed_email = self[email_field]
-            self[email_field] = public_send("#{email_field}_was")
-
-            self.confirmation_token = SecureRandom.base58(24)
-            self.confirmation_sent_at = Time.current
-          end
-        end
-
-        if defined?(ActiveRecord) && ancestors.include?(ActiveRecord::Base)
-          after_commit :deliver_email_changed_emails, if: :saved_change_to_unconfirmed_email?
-        elsif defined?(Mongoid) && ancestors.include?(Mongoid::Document)
-          after_update :deliver_email_changed_emails, if: :unconfirmed_email_changed?
-        end
       end
     end
 
@@ -86,6 +65,32 @@ module RailsJwtAuth
     def skip_confirmation!
       self.confirmed_at = Time.current
       self.confirmation_token = nil
+    end
+
+    def update_email(params)
+      email_field = RailsJwtAuth.email_field_name.to_sym
+      params = HashWithIndifferentAccess.new(params)
+
+      # email change must be protected by password
+      password_error = if (password = params[:password]).blank?
+                         'blank'
+                       elsif !authenticate(password)
+                         'invalid'
+                       end
+
+      self.unconfirmed_email = params[email_field]
+      self.confirmation_token = SecureRandom.base58(24)
+      self.confirmation_sent_at = Time.current
+
+      valid? # validates first other fields
+      errors.add(:password, password_error) if password_error
+
+      return false unless errors.empty?
+      return false unless save
+
+      deliver_email_changed_emails
+
+      true
     end
 
     protected

@@ -20,42 +20,45 @@ describe RailsJwtAuth::Authenticatable do
         end
       end
 
-      describe '#update_with_password' do
-        let(:user) { FactoryBot.create("#{orm.underscore}_user", password: '12345678') }
+      describe '#update_password' do
+        let(:current_password) { '12345678' }
+        let(:user) { FactoryBot.create("#{orm.underscore}_user", password: current_password) }
+        let(:new_password) { 'new_password' }
+        let(:new_password_params) { {current_password: current_password, password: new_password} }
 
         context 'when curren_password is blank' do
           it 'returns false' do
-            expect(user.update_with_password(password: 'new_password')).to be_falsey
+            expect(user.update_password(password: 'new_password')).to be_falsey
           end
 
           it 'addd blank error message' do
-            user.update_with_password(password: 'new_password')
+            user.update_password(password: 'new_password')
             expect(user.errors.messages[:current_password].first).to eq 'blank'
           end
 
           it 'validates other fields' do
-            user.update_with_password(password: 'new_password', email: '')
+            user.update_password(password: 'new_password', email: '')
             expect(user.errors.messages[:email].first).not_to be 'nil'
           end
 
           it "don't updates password" do
-            user.update_with_password(password: 'new_password')
+            user.update_password(password: 'new_password')
             expect(user.reload.authenticate('new_password')).to be_falsey
           end
         end
 
         context 'when curren_password is invalid' do
           it 'returns false' do
-            expect(user.update_with_password(current_password: 'invalid')).to be_falsey
+            expect(user.update_password(current_password: 'invalid')).to be_falsey
           end
 
           it 'addd blank error message' do
-            user.update_with_password(current_password: 'invalid')
+            user.update_password(current_password: 'invalid')
             expect(user.errors.messages[:current_password].first).to eq 'invalid'
           end
 
           it "don't updates password" do
-            user.update_with_password(current_password: 'invalid')
+            user.update_password(current_password: 'invalid')
             expect(user.authenticate('new_password')).to be_falsey
           end
         end
@@ -63,32 +66,46 @@ describe RailsJwtAuth::Authenticatable do
         context 'when curren_password is valid' do
           it 'returns true' do
             expect(
-              user.update_with_password(current_password: '12345678', password: 'new_password')
+              user.update_password(current_password: '12345678', password: 'new_password')
             ).to be_truthy
           end
 
           it 'updates password' do
-            user.update_with_password(current_password: '12345678', password: 'new_password')
+            user.update_password(current_password: '12345678', password: 'new_password')
             expect(user.authenticate('new_password')).to be_truthy
           end
         end
 
         context 'when password is blank' do
           it 'addd blank error message' do
-            user.update_with_password(password: '')
+            user.update_password(password: '')
             expect(user.errors.messages[:password].first).to eq 'blank'
           end
         end
 
-        context 'when RailsJwtAuth::Authenticable is used with RailsJwtAuth::Recoverable' do
-          let(:current_password) { '12345678' }
-          let(:new_password) { 'new_password' }
+        context 'when send_password_changed_notification option is false' do
+          it 'does not send notify email' do
+            allow(RailsJwtAuth).to receive(:send_password_changed_notification).and_return(false)
+            expect(user.update_password(new_password_params)).to be_truthy
+            expect(ActionMailer::Base.deliveries.count).to eq(0)
+          end
+        end
 
+        context 'when send_password_changed_notification option is true' do
+          it 'sends confirmation and nofication email' do
+            allow(RailsJwtAuth).to receive(:send_password_changed_notification).and_return(true)
+            expect(user.update_password(new_password_params)).to be_truthy
+            expect(ActionMailer::Base.deliveries.count).to eq(1)
+            expect(ActionMailer::Base.deliveries.last.subject).to eq('Password changed')
+          end
+        end
+
+        context 'when RailsJwtAuth::Authenticable is used with RailsJwtAuth::Recoverable' do
           context 'when reset_password_sent_at is expired' do
             before do
               @user = FactoryBot.create("#{orm.underscore}_user",
                                         password: current_password,
-                                        reset_password_token: '12345678',
+                                        reset_password_token: 'xxx',
                                         reset_password_sent_at: Time.current)
 
               travel(RailsJwtAuth.reset_password_expiration_time)
@@ -99,19 +116,14 @@ describe RailsJwtAuth::Authenticatable do
             end
 
             it 'reset recoverable fields' do
-              @user.update_with_password(current_password: current_password, password: new_password)
+              @user.update_password(new_password_params)
               @user.reload
               expect(@user.reset_password_sent_at).to be_nil
               expect(@user.reset_password_token).to be_nil
             end
 
             it 'updates password' do
-              expect(
-                @user.update_with_password(
-                  current_password: current_password,
-                  password: new_password
-                )
-              ).to be_truthy
+              expect(@user.update_password(new_password_params)).to be_truthy
               expect(@user.reload.authenticate(new_password)).to be_truthy
             end
           end
@@ -120,24 +132,19 @@ describe RailsJwtAuth::Authenticatable do
             before do
               @user = FactoryBot.create("#{orm.underscore}_user",
                                         password: current_password,
-                                        reset_password_token: '12345678',
+                                        reset_password_token: 'xxxx',
                                         reset_password_sent_at: Time.current)
             end
 
             it 'reset recoverable fields' do
-              @user.update_with_password(current_password: current_password, password: new_password)
+              @user.update_password(new_password_params)
               @user.reload
               expect(@user.reset_password_sent_at).to be_nil
               expect(@user.reset_password_token).to be_nil
             end
 
             it 'updates password' do
-              expect(
-                @user.update_with_password(
-                  current_password: current_password,
-                  password: new_password
-                )
-              ).to be_truthy
+              expect(@user.update_password(new_password_params)).to be_truthy
               expect(@user.reload.authenticate(new_password)).to be_truthy
             end
           end
@@ -242,25 +249,6 @@ describe RailsJwtAuth::Authenticatable do
           u = FactoryBot.build("#{orm.underscore}_user_without_password")
           expect(u.valid?).to be_falsey
           expect(u.valid_without_password?).to be_truthy
-        end
-      end
-
-      describe '#after_update' do
-        context 'when send_password_changed_notification option is false' do
-          it 'does not send notify email' do
-            allow(RailsJwtAuth).to receive(:send_password_changed_notification).and_return(false)
-            expect(user.update(password: 'new_password')).to be_truthy
-            expect(ActionMailer::Base.deliveries.count).to eq(0)
-          end
-        end
-
-        context 'when send_password_changed_notification option is true' do
-          it 'sends confirmation and nofication email' do
-            allow(RailsJwtAuth).to receive(:send_password_changed_notification).and_return(true)
-            expect(user.update(password: 'new_password')).to be_truthy
-            expect(ActionMailer::Base.deliveries.count).to eq(1)
-            expect(ActionMailer::Base.deliveries.last.subject).to eq('Password changed')
-          end
         end
       end
 
