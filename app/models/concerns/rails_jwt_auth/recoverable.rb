@@ -31,7 +31,7 @@ module RailsJwtAuth
       self.reset_password_sent_at = Time.current
       return false unless save
 
-      RailsJwtAuth.send_email(RailsJwtAuth.mailer.reset_password_instructions(self))
+      RailsJwtAuth.send_email(:reset_password_instructions, self)
     end
 
     def set_reset_password(params)

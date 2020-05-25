@@ -77,14 +77,14 @@ You can edit configuration options into `config/initializers/rails_jwt_auth.rb` 
 | reset_password_expiration_time     | `1.day`                  | Confirmation token expiration time                                     |
 | deliver_later                      | `false`                  | Uses `deliver_later` method to send emails                             |
 | invitation_expiration_time         | `2.days`                 | Time an invitation is valid and can be accepted                        |
-| confirmations_url                  | `nil`                    | Url used to create email link with confirmation token                  |
-| reset_passwords_url                | `nil`                    | Url used to create email link with reset password token                |
-| invitations_url                    | `nil`                    | Url used to create email link with invitation token                    |
-| maximum_attempts                   | `3`                      | Number of failed login attempts before locking an account              |
 | lock_strategy                      | `:none`                  | Strategy to be used to lock an account: `:none` or `:failed_attempts`  |
 | unlock_strategy                    | `:time`                  | Strategy to use when unlocking accounts: `:time`, `:email` or `:both`  |
 | unlock_in                          | `60.minutes`             | Interval to unlock an account if `unlock_strategy` is `:time`          |
 | reset_attempts_in                  | `60.minutes`             | Interval after which to reset failed attempts counter of an account    |
+| maximum_attempts                   | `3`                      | Number of failed login attempts before locking an account              |
+| confirmations_url                  | `nil`                    | Url used to create email link with confirmation token                  |
+| reset_passwords_url                | `nil`                    | Url used to create email link with reset password token                |
+| invitations_url                    | `nil`                    | Url used to create email link with invitation token                    |
 | unlock_url                         | `nil`                    | Url used to create email link with unlock token                        |
 | avoid_email_errors                 | `true`                   | Avoid returns email errors to avoid giving clue to an attacker         |
 

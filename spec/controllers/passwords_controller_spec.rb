@@ -55,13 +55,8 @@ describe RailsJwtAuth::PasswordsController do
           end
 
           it 'sends new reset_password email with new token' do
-            class Mock
-              def deliver
-              end
-            end
-
-            expect(RailsJwtAuth::Mailer).to receive(:reset_password_instructions)
-              .with(user).and_return(Mock.new)
+            expect(RailsJwtAuth).to receive(:send_email)
+              .with(:reset_password_instructions, anything)
 
             old_token = user.reset_password_token
             post :create, params: {password: {email: user.email}}

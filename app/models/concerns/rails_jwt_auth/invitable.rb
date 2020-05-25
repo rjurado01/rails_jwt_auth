@@ -44,7 +44,8 @@ module RailsJwtAuth
 
       return false unless save_without_password
 
-      RailsJwtAuth.send_email(RailsJwtAuth.mailer.send_invitation(self))
+      RailsJwtAuth.send_email(:invitation_instructions, self)
+      true
     ensure
       @inviting = false
     end

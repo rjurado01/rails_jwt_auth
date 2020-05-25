@@ -86,17 +86,16 @@ describe RailsJwtAuth::Authenticatable do
         context 'when send_password_changed_notification option is false' do
           it 'does not send notify email' do
             allow(RailsJwtAuth).to receive(:send_password_changed_notification).and_return(false)
-            expect(user.update_password(new_password_params)).to be_truthy
-            expect(ActionMailer::Base.deliveries.count).to eq(0)
+            expect(RailsJwtAuth).not_to receive(:send_email)
+              .with(:password_changed_notification, user)
+            user.update_password(new_password_params)
           end
         end
 
         context 'when send_password_changed_notification option is true' do
           it 'sends confirmation and nofication email' do
-            allow(RailsJwtAuth).to receive(:send_password_changed_notification).and_return(true)
-            expect(user.update_password(new_password_params)).to be_truthy
-            expect(ActionMailer::Base.deliveries.count).to eq(1)
-            expect(ActionMailer::Base.deliveries.last.subject).to eq('Password changed')
+            expect(RailsJwtAuth).to receive(:send_email).with(:password_changed_notification, user)
+            user.update_password(new_password_params)
           end
         end
 

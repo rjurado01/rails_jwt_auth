@@ -48,7 +48,8 @@ describe RailsJwtAuth::Lockable do
             end
 
             it 'sends unlock instructions' do
-              expect { user.lock_access! }.to change { ActionMailer::Base.deliveries.count }.by(1)
+              expect(RailsJwtAuth).to receive(:send_email).with(:unlock_instructions, user)
+              user.lock_access!
             end
           end
         end

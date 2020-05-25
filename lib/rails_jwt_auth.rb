@@ -8,7 +8,7 @@ module RailsJwtAuth
   NotConfirmationsUrl = Class.new(StandardError)
   NotInvitationsUrl = Class.new(StandardError)
   NotResetPasswordsUrl = Class.new(StandardError)
-  NotSetPasswordsUrl = Class.new(StandardError)
+  NotUnlockUrl = Class.new(StandardError)
 
   mattr_accessor :model_name
   self.model_name = 'User'
@@ -106,7 +106,8 @@ module RailsJwtAuth
     SecureRandom.urlsafe_base64(rlength, true).tr('lIO0', 'sxyz')
   end
 
-  def self.send_email(mailer)
+  def self.send_email(method, user)
+    mailer = RailsJwtAuth.mailer.with(user_id: user.id.to_s).public_send(method)
     RailsJwtAuth.deliver_later ? mailer.deliver_later : mailer.deliver
   end
 end

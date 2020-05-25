@@ -5,13 +5,11 @@ en:
         subject: "Confirmation instructions"
       reset_password_instructions:
         subject: "Reset password instructions"
-      set_password_instructions:
-        subject: "Set password instructions"
-      send_invitation:
+      invitation_instructions:
         subject: "Someone has sent you an invitation!"
-      email_changed:
-        subject: "Email changed"
-      password_changed:
+      email_change_notification:
+        subject: "Email change"
+      password_changed_notification:
         subject: "Password changed"
-      send_unlock_instructions:
+      unlock_instructions:
         subject: "Unlock instructions"

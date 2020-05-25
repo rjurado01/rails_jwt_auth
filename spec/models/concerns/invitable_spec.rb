@@ -32,8 +32,8 @@ describe RailsJwtAuth::Invitable do
           end
 
           it 'sends the invitation mail' do
+            expect(RailsJwtAuth).to receive(:send_email).with(:invitation_instructions, anything)
             invited_user
-            expect(ActionMailer::Base.deliveries.count).to eq(1)
           end
 
           it 'assign attributes' do

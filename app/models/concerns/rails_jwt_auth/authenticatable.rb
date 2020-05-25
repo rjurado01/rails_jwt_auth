@@ -98,7 +98,7 @@ module RailsJwtAuth
     def deliver_password_changed_notification
       return unless RailsJwtAuth.send_password_changed_notification
 
-      RailsJwtAuth.send_email(RailsJwtAuth.mailer.password_changed(self))
+      RailsJwtAuth.send_email(:password_changed_notification, self)
     end
 
     module ClassMethods

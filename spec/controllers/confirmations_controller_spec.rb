@@ -6,7 +6,7 @@ describe RailsJwtAuth::ConfirmationsController do
       before(:all) { initialize_orm(orm) }
 
       let(:json) { JSON.parse(response.body) }
-      let(:user) { FactoryBot.create("#{orm.underscore}_unconfirmed_user") }
+      let!(:user) { FactoryBot.create("#{orm.underscore}_unconfirmed_user") }
 
       describe 'POST #create' do
         context 'when sends valid email' do
@@ -16,13 +16,7 @@ describe RailsJwtAuth::ConfirmationsController do
           end
 
           it 'sends new confirmation email with new token' do
-            class Mock
-              def deliver
-              end
-            end
-
-            expect(RailsJwtAuth::Mailer).to receive(:confirmation_instructions)
-              .with(user).and_return(Mock.new)
+            expect(RailsJwtAuth).to receive(:send_email).with(:confirmation_instructions, anything)
 
             old_token = user.confirmation_token
             post :create, params: {confirmation: {email: user.email}}

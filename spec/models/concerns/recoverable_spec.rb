@@ -1,16 +1,6 @@
 require 'rails_helper'
 
 describe RailsJwtAuth::Recoverable do
-  before :all do
-    class Mock
-      def deliver
-      end
-
-      def deliver_later
-      end
-    end
-  end
-
   %w(ActiveRecord Mongoid).each do |orm|
     context "when use #{orm}" do
       before(:all) { initialize_orm(orm) }
@@ -24,8 +14,6 @@ describe RailsJwtAuth::Recoverable do
 
       describe '#send_reset_password_instructions' do
         it 'fills reset password fields' do
-          mock = Mock.new
-          allow(RailsJwtAuth::Mailer).to receive(:reset_password_instructions).and_return(mock)
           user.send_reset_password_instructions
           user.reload
           expect(user.reset_password_token).not_to be_nil
@@ -33,22 +21,8 @@ describe RailsJwtAuth::Recoverable do
         end
 
         it 'sends reset password email' do
-          mock = Mock.new
-          allow(RailsJwtAuth::Mailer).to receive(:reset_password_instructions).and_return(mock)
-          expect(mock).to receive(:deliver)
+          expect(RailsJwtAuth).to receive(:send_email).with(:reset_password_instructions, user)
           user.send_reset_password_instructions
-        end
-
-        context 'when use deliver_later option' do
-          before { RailsJwtAuth.deliver_later = true }
-          after  { RailsJwtAuth.deliver_later = false }
-
-          it 'uses deliver_later method to send email' do
-            mock = Mock.new
-            allow(RailsJwtAuth::Mailer).to receive(:reset_password_instructions).and_return(mock)
-            expect(mock).to receive(:deliver_later)
-            user.send_reset_password_instructions
-          end
         end
 
         context 'when user is unconfirmed' do
@@ -66,7 +40,8 @@ describe RailsJwtAuth::Recoverable do
           end
 
           it 'doe not send reset password email' do
-            expect(RailsJwtAuth::Mailer).not_to receive(:reset_password_instructions)
+            expect(RailsJwtAuth).not_to receive(:send_email)
+              .with(:reset_password_instructions, user)
             user.send_reset_password_instructions
           end
         end
@@ -86,7 +61,8 @@ describe RailsJwtAuth::Recoverable do
           end
 
           it 'doe not send reset password email' do
-            expect(RailsJwtAuth::Mailer).not_to receive(:reset_password_instructions)
+            expect(RailsJwtAuth).not_to receive(:send_email)
+              .with(:reset_password_instructions, user)
             user.send_reset_password_instructions
           end
         end
@@ -100,7 +76,6 @@ describe RailsJwtAuth::Recoverable do
 
         it 'validates reset_password_token' do
           allow(user).to receive(:expired_reset_password_token?).and_return(true)
-
           expect(user.set_reset_password({})).to be_falsey
           expect(get_record_error(user, :reset_password_token)).to eq(:expired)
         end
@@ -121,21 +96,14 @@ describe RailsJwtAuth::Recoverable do
 
       describe '#expired_reset_password_token?' do
         context 'when reset password token has expired' do
-          before do
-            RailsJwtAuth.reset_password_expiration_time = 1.second
-          end
-
-          after do
-            RailsJwtAuth.reset_password_expiration_time = 1.day
-          end
-
           it 'returns true' do
             user.reset_password_token = 'abcd'
             user.reset_password_sent_at = Time.current
             user.save
-            sleep 1
 
-            expect(user.expired_reset_password_token?).to be_truthy
+            travel_to(Time.current + RailsJwtAuth.reset_password_expiration_time + 1.second) do
+              expect(user.expired_reset_password_token?).to be_truthy
+            end
           end
         end
       end
