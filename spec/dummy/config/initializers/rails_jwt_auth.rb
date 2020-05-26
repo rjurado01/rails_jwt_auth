@@ -21,13 +21,13 @@ RailsJwtAuth.setup do |config|
   #config.mailer_sender = 'initialize-mailer_sender@example.com'
 
   # url used to create email link with confirmation token
-  #config.confirmations_url = 'http://frontend.com/confirmation'
+  #config.confirm_email_url = 'http://frontend.com/confirmation'
 
   # expiration time for confirmation tokens
   #config.confirmation_expiration_time = 1.day
 
   # url used to create email link with reset password token
-  #config.reset_passwords_url = 'http://frontend.com/reset_password'
+  #config.reset_password_url = 'http://frontend.com/reset_password'
 
   # expiration time for reset password tokens
   #config.reset_password_expiration_time = 1.day
@@ -39,7 +39,7 @@ RailsJwtAuth.setup do |config|
   # config.invitation_expiration_time = 2.days
 
   # url used to create email link with activation token parameter to accept invitation
-  #config.invitations_url = 'http://frontend.com/accept_invitation'
+  #config.accept_invitation_url = 'http://frontend.com/accept_invitation'
 
   # maximum login attempts before locking an account
   #config.maximum_attempts = 3
@@ -57,5 +57,5 @@ RailsJwtAuth.setup do |config|
   #config.reset_attempts_in = 60.minutes
 
   # url used to create email link with unlock token
-  #config.unlock_url = 'http://frontend.com/unlock-account'
+  #config.unlock_account_url = 'http://frontend.com/unlock-account'
 end

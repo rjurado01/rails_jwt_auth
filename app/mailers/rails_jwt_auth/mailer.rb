@@ -9,10 +9,10 @@ if defined?(ActionMailer)
     end
 
     def confirmation_instructions
-      raise RailsJwtAuth::NotConfirmationsUrl unless RailsJwtAuth.confirmations_url.present?
+      raise RailsJwtAuth::NotConfirmationsUrl unless RailsJwtAuth.confirm_email_url.present?
 
-      @confirmations_url = add_param_to_url(
-        RailsJwtAuth.confirmations_url,
+      @confirm_email_url = add_param_to_url(
+        RailsJwtAuth.confirm_email_url,
         'confirmation_token',
         @user.confirmation_token
       )
@@ -25,10 +25,10 @@ if defined?(ActionMailer)
     end
 
     def reset_password_instructions
-      raise RailsJwtAuth::NotResetPasswordsUrl unless RailsJwtAuth.reset_passwords_url.present?
+      raise RailsJwtAuth::NotResetPasswordsUrl unless RailsJwtAuth.reset_password_url.present?
 
-      @reset_passwords_url = add_param_to_url(
-        RailsJwtAuth.reset_passwords_url,
+      @reset_password_url = add_param_to_url(
+        RailsJwtAuth.reset_password_url,
         'reset_password_token',
         @user.reset_password_token
       )
@@ -41,10 +41,10 @@ if defined?(ActionMailer)
     end
 
     def invitation_instructions
-      raise RailsJwtAuth::NotInvitationsUrl unless RailsJwtAuth.invitations_url.present?
+      raise RailsJwtAuth::NotInvitationsUrl unless RailsJwtAuth.accept_invitation_url.present?
 
-      @invitations_url = add_param_to_url(
-        RailsJwtAuth.invitations_url,
+      @accept_invitation_url = add_param_to_url(
+        RailsJwtAuth.accept_invitation_url,
         'invitation_token',
         @user.invitation_token
       )
@@ -53,9 +53,9 @@ if defined?(ActionMailer)
     end
 
     def unlock_instructions
-      raise RailsJwtAuth::NotUnlockUrl unless RailsJwtAuth.unlock_url.present?
+      raise RailsJwtAuth::NotUnlockUrl unless RailsJwtAuth.unlock_account_url.present?
 
-      @unlock_url = add_param_to_url(RailsJwtAuth.unlock_url, 'unlock_token', @user.unlock_token)
+      @unlock_account_url = add_param_to_url(RailsJwtAuth.unlock_account_url, 'unlock_token', @user.unlock_token)
 
       mail(to: @to, subject: @subject)
     end

@@ -10,7 +10,7 @@ RSpec.describe RailsJwtAuth::Mailer, type: :mailer do
     end
 
     let(:mail) { described_class.with(mail_params).confirmation_instructions.deliver_now }
-    let(:url) { "#{RailsJwtAuth.confirmations_url}?confirmation_token=#{user.confirmation_token}" }
+    let(:url) { "#{RailsJwtAuth.confirm_email_url}?confirmation_token=#{user.confirmation_token}" }
 
     it 'sends email with correct info' do
       expect { mail }.to change { ActionMailer::Base.deliveries.count }.by(1)
@@ -20,20 +20,20 @@ RSpec.describe RailsJwtAuth::Mailer, type: :mailer do
       expect(mail.body).to include(url)
     end
 
-    context 'when confirmations_url option is defined with hash url' do
+    context 'when confirm_email_url option is defined with hash url' do
       before do
-        RailsJwtAuth.confirmations_url = 'http://www.host.com/#/url?param=value'
+        RailsJwtAuth.confirm_email_url = 'http://www.host.com/#/url?param=value'
       end
 
       it 'uses this to generate confirmation url' do
-        url = "#{RailsJwtAuth.confirmations_url}&confirmation_token=#{user.confirmation_token}"
+        url = "#{RailsJwtAuth.confirm_email_url}&confirmation_token=#{user.confirmation_token}"
         expect(mail.body).to include(url)
       end
     end
 
     context 'when confirmation_url option is not defined' do
       it 'raises NotConfirmationsUrl exception' do
-        allow(RailsJwtAuth).to receive(:confirmations_url).and_return(nil)
+        allow(RailsJwtAuth).to receive(:confirm_email_url).and_return(nil)
         expect { mail }.to raise_error(RailsJwtAuth::NotConfirmationsUrl)
       end
     end
@@ -68,7 +68,7 @@ RSpec.describe RailsJwtAuth::Mailer, type: :mailer do
     end
 
     let(:mail) { described_class.with(mail_params).reset_password_instructions.deliver_now }
-    let(:url) { "#{RailsJwtAuth.reset_passwords_url}?reset_password_token=#{user.reset_password_token}" }
+    let(:url) { "#{RailsJwtAuth.reset_password_url}?reset_password_token=#{user.reset_password_token}" }
 
     it 'sends email with correct info' do
       expect { mail }.to change { ActionMailer::Base.deliveries.count }.by(1)
@@ -78,20 +78,20 @@ RSpec.describe RailsJwtAuth::Mailer, type: :mailer do
       expect(mail.body).to include(url)
     end
 
-    context 'when reset_passwords_url option is defined with hash url' do
+    context 'when reset_password_url option is defined with hash url' do
       before do
-        RailsJwtAuth.reset_passwords_url = 'http://www.host.com/#/url?param=value'
+        RailsJwtAuth.reset_password_url = 'http://www.host.com/#/url?param=value'
       end
 
       it 'uses this to generate confirmation url' do
-        url = "#{RailsJwtAuth.reset_passwords_url}&reset_password_token=#{user.reset_password_token}"
+        url = "#{RailsJwtAuth.reset_password_url}&reset_password_token=#{user.reset_password_token}"
         expect(mail.body).to include(url)
       end
     end
 
-    context 'when reset_passwords_url option is not defined' do
+    context 'when reset_password_url option is not defined' do
       it 'raises NotResetPasswordsUrl exception' do
-        allow(RailsJwtAuth).to receive(:reset_passwords_url).and_return(nil)
+        allow(RailsJwtAuth).to receive(:reset_password_url).and_return(nil)
         expect { mail }.to raise_error(RailsJwtAuth::NotResetPasswordsUrl)
       end
     end
@@ -115,7 +115,7 @@ RSpec.describe RailsJwtAuth::Mailer, type: :mailer do
     end
 
     let(:mail) { described_class.with(mail_params).invitation_instructions.deliver_now }
-    let(:url) { "#{RailsJwtAuth.invitations_url}?invitation_token=#{user.invitation_token}" }
+    let(:url) { "#{RailsJwtAuth.accept_invitation_url}?invitation_token=#{user.invitation_token}" }
 
     it 'sends email with correct info' do
       expect { mail }.to change { ActionMailer::Base.deliveries.count }.by(1)
@@ -125,20 +125,20 @@ RSpec.describe RailsJwtAuth::Mailer, type: :mailer do
       expect(mail.body).to include(url)
     end
 
-    context 'when invitations_url option is defined with hash url' do
+    context 'when accept_invitation_url option is defined with hash url' do
       before do
-        RailsJwtAuth.invitations_url = 'http://www.host.com/#/url?param=value'
+        RailsJwtAuth.accept_invitation_url = 'http://www.host.com/#/url?param=value'
       end
 
       it 'uses this to generate invitation url' do
-        url = "#{RailsJwtAuth.invitations_url}&invitation_token=#{user.invitation_token}"
+        url = "#{RailsJwtAuth.accept_invitation_url}&invitation_token=#{user.invitation_token}"
         expect(mail.body).to include(url)
       end
     end
 
-    context 'when invitations_url option is not defined' do
+    context 'when accept_invitation_url option is not defined' do
       it 'raises NotInvitationsUrl exception' do
-        allow(RailsJwtAuth).to receive(:invitations_url).and_return(nil)
+        allow(RailsJwtAuth).to receive(:accept_invitation_url).and_return(nil)
         expect { mail }.to raise_error(RailsJwtAuth::NotInvitationsUrl)
       end
     end
@@ -154,7 +154,7 @@ RSpec.describe RailsJwtAuth::Mailer, type: :mailer do
     end
 
     let(:mail) { described_class.with(mail_params).unlock_instructions.deliver_now }
-    let(:url) { "#{RailsJwtAuth.unlock_url}?unlock_token=#{user.unlock_token}" }
+    let(:url) { "#{RailsJwtAuth.unlock_account_url}?unlock_token=#{user.unlock_token}" }
 
     it 'sends email with correct info' do
       expect { mail }.to change { ActionMailer::Base.deliveries.count }.by(1)
@@ -164,20 +164,20 @@ RSpec.describe RailsJwtAuth::Mailer, type: :mailer do
       expect(mail.body).to include(url)
     end
 
-    context 'when unlock_url option is defined with hash url' do
+    context 'when unlock_account_url option is defined with hash url' do
       before do
-        RailsJwtAuth.unlock_url = 'http://www.host.com/#/url?param=value'
+        RailsJwtAuth.unlock_account_url = 'http://www.host.com/#/url?param=value'
       end
 
       it 'uses this to generate unlock url' do
-        url = "#{RailsJwtAuth.unlock_url}&unlock_token=#{user.unlock_token}"
+        url = "#{RailsJwtAuth.unlock_account_url}&unlock_token=#{user.unlock_token}"
         expect(mail.body).to include(url)
       end
     end
 
-    context 'when unlock_url option is not defined' do
+    context 'when unlock_account_url option is not defined' do
       it 'raises NotUnlockUrl exception' do
-        allow(RailsJwtAuth).to receive(:unlock_url).and_return(nil)
+        allow(RailsJwtAuth).to receive(:unlock_account_url).and_return(nil)
         expect { mail }.to raise_error(RailsJwtAuth::NotUnlockUrl)
       end
     end

@@ -49,15 +49,6 @@ module RailsJwtAuth
   mattr_accessor :invitation_expiration_time
   self.invitation_expiration_time = 2.days
 
-  mattr_accessor :confirmations_url
-  self.confirmations_url = nil
-
-  mattr_accessor :reset_passwords_url
-  self.reset_passwords_url = nil
-
-  mattr_accessor :invitations_url
-  self.invitations_url = nil
-
   mattr_accessor :deliver_later
   self.deliver_later = false
 
@@ -76,8 +67,17 @@ module RailsJwtAuth
   mattr_accessor :reset_attempts_in
   self.reset_attempts_in = 60.minutes
 
-  mattr_accessor :unlock_url
-  self.unlock_url = nil
+  mattr_accessor :confirm_email_url
+  self.confirm_email_url = nil
+
+  mattr_accessor :reset_password_url
+  self.reset_password_url = nil
+
+  mattr_accessor :accept_invitation_url
+  self.accept_invitation_url = nil
+
+  mattr_accessor :unlock_account_url
+  self.unlock_account_url = nil
 
   mattr_accessor :avoid_email_errors
   self.avoid_email_errors = true

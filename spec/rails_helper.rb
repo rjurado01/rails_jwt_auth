@@ -69,9 +69,9 @@ RSpec.configure do |config|
     ActionMailer::Base.deliveries.clear
 
     RailsJwtAuth.simultaneous_sessions = 1
-    RailsJwtAuth.confirmations_url = 'http://example.com/confirmations'
-    RailsJwtAuth.invitations_url = 'http://example.com/invitations'
-    RailsJwtAuth.reset_passwords_url = 'http://example.com/reset_passwords'
+    RailsJwtAuth.confirm_email_url = 'http://example.com/confirmations'
+    RailsJwtAuth.accept_invitation_url = 'http://example.com/invitations'
+    RailsJwtAuth.reset_password_url = 'http://example.com/reset_passwords'
     RailsJwtAuth.avoid_email_errors = true
 
     # Configuration for Lockable module
@@ -80,7 +80,7 @@ RSpec.configure do |config|
     RailsJwtAuth.unlock_strategy = :both
     RailsJwtAuth.unlock_in = 60.minutes
     RailsJwtAuth.reset_attempts_in = 60.minutes
-    RailsJwtAuth.unlock_url = 'http://example.com/unlock-account'
+    RailsJwtAuth.unlock_account_url = 'http://example.com/unlock-account'
   end
 end
 

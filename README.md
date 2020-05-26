@@ -82,10 +82,10 @@ You can edit configuration options into `config/initializers/rails_jwt_auth.rb` 
 | unlock_in                          | `60.minutes`             | Interval to unlock an account if `unlock_strategy` is `:time`          |
 | reset_attempts_in                  | `60.minutes`             | Interval after which to reset failed attempts counter of an account    |
 | maximum_attempts                   | `3`                      | Number of failed login attempts before locking an account              |
-| confirmations_url                  | `nil`                    | Url used to create email link with confirmation token                  |
-| reset_passwords_url                | `nil`                    | Url used to create email link with reset password token                |
-| invitations_url                    | `nil`                    | Url used to create email link with invitation token                    |
-| unlock_url                         | `nil`                    | Url used to create email link with unlock token                        |
+| confirm_email_url                  | `nil`                    | Your web url where emai link redirects with confirmation token         |
+| reset_password_url                 | `nil`                    | Your web url where emai link redirects with reset password token       |
+| accept_invitation_url              | `nil`                    | Your web url where emai link redirects with invitation token           |
+| unlock_account_url                 | `nil`                    | Your web url where emai link redirects with unlock token               |
 | avoid_email_errors                 | `true`                   | Avoid returns email errors to avoid giving clue to an attacker         |
 
 ## Modules
