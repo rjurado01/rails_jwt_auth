@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe RailsJwtAuth::UnlocksController do
+describe RailsJwtAuth::UnlockAccountsController do
   %w[ActiveRecord Mongoid].each do |orm|
     context "when use #{orm}" do
       before(:all) { initialize_orm(orm) }

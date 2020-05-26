@@ -9,7 +9,7 @@ Rails.application.routes.draw do
   end
 
   resources :confirmations, controller: 'rails_jwt_auth/confirmations', only: [:create, :update]
-  resources :passwords, controller: 'rails_jwt_auth/passwords', only: [:show, :create, :update]
+  resources :reset_passwords, controller: 'rails_jwt_auth/reset_passwords', only: [:show, :create, :update]
   resources :invitations, controller: 'rails_jwt_auth/invitations', only: [:show, :create, :update]
-  resources :unlocks, controller: 'rails_jwt_auth/unlocks', only: %i[update]
+  resources :unlock_accounts, controller: 'rails_jwt_auth/unlock_accounts', only: %i[update]
 end

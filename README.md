@@ -199,23 +199,24 @@ end
 
 ## Default Controllers API
 
-|       Prefix     | Verb   | URI Pattern                  | Controller#Action                   |
-| ---------------- | ------ | ---------------------------- | ----------------------------------- |
-|          session | DELETE | /session(.:format)           | rails_jwt_auth/sessions#destroy     |
-|                  | POST   | /session(.:format)           | rails_jwt_auth/sessions#create      |
-|     registration | POST   | /registration(.:format)      | rails_jwt_auth/registrations#create |
-|          profile | GET    | /profile(.:format)           | rails_jwt_auth/profiles#show        |
-|     mail_profile | PUT    | /profile/email(.:format)     | rails_jwt_auth/profiles#email       |
-| password_profile | PUT    | /profile/password(.:format)  | rails_jwt_auth/profiles#password    |
-|                  | PUT    | /profile(.:format)           | rails_jwt_auth/profiles#update      |
-|    confirmations | POST   | /confirmations(.:format)     | rails_jwt_auth/confirmations#create |
-|     confirmation | PUT    | /confirmations/:id(.:format) | rails_jwt_auth/confirmations#update |
-|        passwords | POST   | /passwords(.:format)         | rails_jwt_auth/passwords#create     |
-|         password | GET    | /passwords/:id(.:format)     | rails_jwt_auth/passwords#show       |
-|                  | PUT    | /passwords/:id(.:format)     | rails_jwt_auth/passwords#update     |
-|      invitations | POST   | /invitations(.:format)       | rails_jwt_auth/invitations#create   |
-|       invitation | GET    | /invitations/:id(.:format)   | rails_jwt_auth/invitations#show     |
-|                  | PUT    | /invitations/:id(.:format)   | rails_jwt_auth/invitations#update   |
+|       Prefix     | Verb   | URI Pattern                    | Controller#Action                     |
+| ---------------- | ------ | ------------------------------ | -----------------------------------   |
+|          session | DELETE | /session(.:format)             | rails_jwt_auth/sessions#destroy       |
+|                  | POST   | /session(.:format)             | rails_jwt_auth/sessions#create        |
+|     registration | POST   | /registration(.:format)        | rails_jwt_auth/registrations#create   |
+|          profile | GET    | /profile(.:format)             | rails_jwt_auth/profiles#show          |
+|     mail_profile | PUT    | /profile/email(.:format)       | rails_jwt_auth/profiles#email         |
+| password_profile | PUT    | /profile/password(.:format)    | rails_jwt_auth/profiles#password      |
+|                  | PUT    | /profile(.:format)             | rails_jwt_auth/profiles#update        |
+|    confirmations | POST   | /confirmations(.:format)       | rails_jwt_auth/confirmations#create   |
+|     confirmation | PUT    | /confirmations/:id(.:format)   | rails_jwt_auth/confirmations#update   |
+|  reset_passwords | POST   | /reset_passwords(.:format)     | rails_jwt_auth/reset_passwords#create |
+|   reset_password | GET    | /reset_passwords/:id(.:format) | rails_jwt_auth/reset_passwords#show   |
+|                  | PUT    | /reset_passwords/:id(.:format) | rails_jwt_auth/reset_passwords#update |
+|      invitations | POST   | /invitations(.:format)         | rails_jwt_auth/invitations#create     |
+|       invitation | GET    | /invitations/:id(.:format)     | rails_jwt_auth/invitations#show       |
+|                  | PUT    | /invitations/:id(.:format)     | rails_jwt_auth/invitations#update     |
+|   unlock_account | PUT    | /unlock_accounts/:id(.:format) | rails_jwt_auth/unlock_accounts#update |
 
 ### Session
 
@@ -364,10 +365,10 @@ Password api is defined by `RailsJwtAuth::PasswordsController`.
 
 ```js
 {
-  url: host/passwords,
+  url: host/reset_passwords,
   method: POST,
   data: {
-    password: {
+    reset_password: {
       email: 'user@example.com'
     }
   }
@@ -380,7 +381,7 @@ Used to verify token and show an alert in your web before new password is setted
 
 ```js
 {
-  url: host/passwords/:token,
+  url: host/reset_passwords/:token,
   method: GET
 }
 ```
@@ -392,7 +393,7 @@ Used to verify token and show an alert in your web before new password is setted
   url: host/passwords/:token,
   method: PUT,
   data: {
-    password: {
+    reset_password: {
       password: '1234',
       password_confirmation: '1234'
     }
@@ -455,7 +456,7 @@ Unlock api is provided by `RailsJwtAuth::UnlocksController`.
 
 ```js
 {
-  url: host/unlocks/:unlock_token,
+  url: host/unlock_accounts/:unlock_token,
   method: PUT,
   data: {}
 }

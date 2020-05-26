@@ -1,5 +1,5 @@
 module RailsJwtAuth
-  class UnlocksController < ApplicationController
+  class UnlockAccountsController < ApplicationController
     include ParamsHelper
     include RenderHelper
 

@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe RailsJwtAuth::PasswordsController do
+describe RailsJwtAuth::ResetPasswordsController do
   %w[ActiveRecord Mongoid].each do |orm|
     context "when use #{orm}" do
       before(:all) { initialize_orm(orm) }
@@ -40,17 +40,17 @@ describe RailsJwtAuth::PasswordsController do
       describe 'POST #create' do
         context 'when sends valid email' do
           it 'returns 204 http status code' do
-            post :create, params: {password: {email: user.email}}
+            post :create, params: {reset_password: {email: user.email}}
             expect(response).to have_http_status(204)
           end
 
           it 'upper case and down case are ignored' do
-            post :create, params: {password: {email: user.email.upcase}}
+            post :create, params: {reset_password: {email: user.email.upcase}}
             expect(response).to have_http_status(204)
           end
 
           it 'leading and trailing spaces are ignored' do
-            post :create, params: {password: {email: "  #{user.email}  "}}
+            post :create, params: {reset_password: {email: "  #{user.email}  "}}
             expect(response).to have_http_status(204)
           end
 
@@ -59,18 +59,18 @@ describe RailsJwtAuth::PasswordsController do
               .with(:reset_password_instructions, anything)
 
             old_token = user.reset_password_token
-            post :create, params: {password: {email: user.email}}
+            post :create, params: {reset_password: {email: user.email}}
             expect(user.reload.reset_password_token).not_to eq(old_token)
           end
 
           context 'when user is unconfirmed' do
             it 'returns 422 http status code' do
-              post :create, params: {password: {email: unconfirmed_user.email}}
+              post :create, params: {reset_password: {email: unconfirmed_user.email}}
               expect(response).to have_http_status(422)
             end
 
             it 'returns unconfirmed error message' do
-              post :create, params: {password: {email: unconfirmed_user.email}}
+              post :create, params: {reset_password: {email: unconfirmed_user.email}}
               expect(json['errors']['email'].first['error']).to eq 'unconfirmed'
             end
           end
@@ -79,7 +79,7 @@ describe RailsJwtAuth::PasswordsController do
         context 'when send invalid email and avoid_email_errors is false' do
           before do
             RailsJwtAuth.avoid_email_errors = false
-            post :create, params: {password: {email: 'invalid'}}
+            post :create, params: {reset_password: {email: 'invalid'}}
           end
 
           it 'returns 422 http status code' do
@@ -93,7 +93,7 @@ describe RailsJwtAuth::PasswordsController do
 
         context 'when send invalid email and avoid_email_errors is true' do
           before do
-            post :create, params: {password: {email: 'invalid'}}
+            post :create, params: {reset_password: {email: 'invalid'}}
           end
 
           it 'returns 204 http status code' do
@@ -103,7 +103,7 @@ describe RailsJwtAuth::PasswordsController do
 
         context 'when send empty email' do
           before do
-            post :create, params: {password: {email: ''}}
+            post :create, params: {reset_password: {email: ''}}
           end
 
           it 'returns 422 http status code' do
@@ -122,7 +122,7 @@ describe RailsJwtAuth::PasswordsController do
             user.send_reset_password_instructions
             put :update, params: {
               id: user.reset_password_token,
-              password: {password: 'new_password'}
+              reset_password: {password: 'new_password'}
             }
           end
 
@@ -150,7 +150,7 @@ describe RailsJwtAuth::PasswordsController do
             user.send_reset_password_instructions
             put :update, params: {
               id: user.reset_password_token,
-              password: {password: 'a', password_confirmation: 'b'}
+              reset_password: {password: 'a', password_confirmation: 'b'}
             }
           end
 
@@ -168,7 +168,7 @@ describe RailsJwtAuth::PasswordsController do
             user.send_reset_password_instructions
             put :update, params: {
               id: user.reset_password_token,
-              password: {password: ''}
+              reset_password: {password: ''}
             }
           end
 
