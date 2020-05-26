@@ -507,7 +507,7 @@ class User < ApplicationRecord
 
   def to_token_payload(request)
     {
-      auth_token: regenerate_auth_token,
+      auth_token: auth_tokens.last,
       # add here your custom info
     }
   end
