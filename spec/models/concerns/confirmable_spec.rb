@@ -116,12 +116,17 @@ describe RailsJwtAuth::Confirmable do
           expect(user.confirmation_sent_at).not_to be_nil
         end
 
-        it 'check password' do
+        it 'checks password' do
           expect(user.update_email(email: 'new@email.com')).to be_falsey
           expect(get_record_error(user, :password)).to eq('blank')
 
           expect(user.update_email(email: 'new@email.com', password: 'invalid')).to be_falsey
           expect(get_record_error(user, :password)).to eq('invalid')
+        end
+
+        it 'checks that email has changed' do
+          expect(user.update_email(email: user.email)).to be_falsey
+          expect(get_record_error(user, :email)).to eq('not_change')
         end
 
         context 'when send_email_changed_notification option is false' do

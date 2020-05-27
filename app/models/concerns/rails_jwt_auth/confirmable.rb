@@ -84,6 +84,7 @@ module RailsJwtAuth
 
       valid? # validates first other fields
       errors.add(:password, password_error) if password_error
+      errors.add(email_field, 'not_change') if email == unconfirmed_email
 
       return false unless errors.empty?
       return false unless save
