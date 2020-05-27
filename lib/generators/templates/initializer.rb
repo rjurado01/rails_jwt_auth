@@ -38,15 +38,6 @@ RailsJwtAuth.setup do |config|
   # time an invitation is valid after sent
   # config.invitation_expiration_time = 2.days
 
-  # url used to create email link with confirmation token
-  #config.confirmations_url = 'http://frontend.com/confirmation'
-
-  # url used to create email link with reset password token
-  #config.reset_passwords_url = 'http://frontend.com/reset_password'
-
-  # url used to create email link with activation token parameter to accept invitation
-  #config.invitations_url = 'http://frontend.com/accept_invitation'
-
   # uses deliver_later to send emails instead of deliver method
   #config.deliver_later = false
 
@@ -64,9 +55,18 @@ RailsJwtAuth.setup do |config|
 
   # interval after which to reset failed attempts counter of an account
   #config.reset_attempts_in = 60.minutes
+  #
+  # url used to create email link with confirmation token
+  #config.confirm_email_url = 'http://frontend.com/confirm-email'
+
+  # url used to create email link with reset password token
+  #config.reset_passwords_url = 'http://frontend.com/reset-password'
+
+  # url used to create email link with activation token parameter to accept invitation
+  #config.accept_invitation_url = 'http://frontend.com/accept-invitation'
 
   # url used to create email link with unlock token
-  #config.unlock_url = 'http://frontend.com/unlock-account'
+  #config.unlock_account_url = 'http://frontend.com/unlock-account'
 
   # set false to avoid giving clue about the existing emails with errors
   #config.avoid_email_errors = true
