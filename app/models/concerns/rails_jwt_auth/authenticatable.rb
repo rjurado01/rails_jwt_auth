@@ -54,8 +54,11 @@ module RailsJwtAuth
     end
 
     def save_without_password
-      self.password = nil
+      # when set password to nil only password_digest is setted to nil
+      # https://github.com/rails/rails/blob/master/activemodel/lib/active_model/secure_password.rb#L97
+      instance_variable_set("@password", nil)
       self.password_confirmation = nil
+      self.password_digest = nil
 
       return false unless valid_without_password?
 
@@ -65,6 +68,7 @@ module RailsJwtAuth
     def valid_without_password?
       valid?
       errors.delete(:password) # allow register without pass
+      errors.delete(:password_confirmation)
       errors.empty?
     end
 

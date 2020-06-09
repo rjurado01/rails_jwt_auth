@@ -236,10 +236,17 @@ describe RailsJwtAuth::Authenticatable do
           expect(u.save_without_password).to be_truthy
         end
 
-        it 'remove password before save' do
-          u = FactoryBot.build("#{orm.underscore}_user", password: 'invalid')
+        it 'remove password  and password_confirmation before save' do
+          u = FactoryBot.build(
+            "#{orm.underscore}_user",
+            password: 'invalid',
+            password_confirmation: 'invalid_confirmation'
+          )
+
           expect(u.save_without_password).to be_truthy
-          expect(u.password_digest).to be_nil
+          expect(u.password).to be_nil
+          expect(u.password_confirmation).to be_nil
+          expect(u.reload.password_digest).to be_nil
         end
       end
 
