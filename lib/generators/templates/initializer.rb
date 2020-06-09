@@ -60,7 +60,7 @@ RailsJwtAuth.setup do |config|
   #config.confirm_email_url = 'http://frontend.com/confirm-email'
 
   # url used to create email link with reset password token
-  #config.reset_passwords_url = 'http://frontend.com/reset-password'
+  #config.reset_password_url = 'http://frontend.com/reset-password'
 
   # url used to create email link with activation token parameter to accept invitation
   #config.accept_invitation_url = 'http://frontend.com/accept-invitation'
