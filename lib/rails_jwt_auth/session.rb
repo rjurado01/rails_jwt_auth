@@ -23,7 +23,11 @@ module RailsJwtAuth
         user.clean_lock if lockable?
         user.load_auth_token
 
-        return false unless user.save
+        unless user.save
+          add_error(RailsJwtAuth.model_name.underscore, :invalid)
+
+          return false
+        end
 
         generate_jwt(request)
 
