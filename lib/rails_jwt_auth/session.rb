@@ -33,7 +33,7 @@ module RailsJwtAuth
 
         true
       else
-        user.failed_attempt! if lockable?
+        user.failed_attempt if lockable?
 
         false
       end

@@ -40,7 +40,7 @@ describe RailsJwtAuth::ConfirmationsController do
 
         context 'when email is already confirmed' do
           before do
-            user.confirm!
+            user.confirm
             post :create, params: {confirmation: {email: user.email}}
           end
 

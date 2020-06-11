@@ -9,7 +9,7 @@ describe RailsJwtAuth::Invitable do
       let(:pass) { 'new_password' }
       let(:email) { 'valid@email.com' }
       let(:username) { 'TestName' }
-      let(:invited_user) { RailsJwtAuth.model.invite! email: email, username: username }
+      let(:invited_user) { RailsJwtAuth.model.invite email: email, username: username }
       let(:user) { FactoryBot.create "#{orm.underscore}_user", email: email }
 
       describe '#attributes' do
@@ -18,10 +18,10 @@ describe RailsJwtAuth::Invitable do
         it { expect(user).to respond_to(:invitation_accepted_at) }
       end
 
-      describe '.invite!' do # Class method
+      describe '.invite' do # Class method
         context 'when auth field is blank' do
           it 'returns record with auth field error' do
-            user = RailsJwtAuth.model.invite!
+            user = RailsJwtAuth.model.invite
             expect(get_record_error(user, :email)).to eq(:blank)
           end
         end
@@ -56,7 +56,7 @@ describe RailsJwtAuth::Invitable do
               end
 
               travel_to(Time.current + 30.days) do
-                RailsJwtAuth.model.invite! email: invited_user.email
+                RailsJwtAuth.model.invite email: invited_user.email
                 second_invitation_date = Time.current.to_i
               end
 
@@ -81,11 +81,11 @@ describe RailsJwtAuth::Invitable do
         end
       end
 
-      describe '#invite!' do
+      describe '#invite' do
         context 'when user is new' do
           before do
             @user = FactoryBot.build("#{orm.underscore}_user_without_password")
-            @user.invite!
+            @user.invite
           end
 
           it 'fill in invitation fields' do
@@ -109,7 +109,7 @@ describe RailsJwtAuth::Invitable do
             end
 
             travel_to(Time.current + 30.days) do
-              invited_user.invite!
+              invited_user.invite
               second_invitation_date = Time.current.to_i
             end
 
@@ -121,7 +121,7 @@ describe RailsJwtAuth::Invitable do
             invited_user
             expect(ActionMailer::Base.deliveries.count).to eq(1)
 
-            invited_user.invite!
+            invited_user.invite
             expect(ActionMailer::Base.deliveries.count).to eq(2)
           end
         end
@@ -131,13 +131,13 @@ describe RailsJwtAuth::Invitable do
 
           it 'returns record with registered error' do
             expect(RailsJwtAuth.model.find_by(email: user.email)).not_to be_nil
-            user.invite!
+            user.invite
             expect(get_record_error(user, :email)).to eq(:registered)
           end
         end
       end
 
-      describe '#accept_invitation!' do
+      describe '#accept_invitation' do
         let(:accept_attrs) { {password: pass, password_confirmation: pass} }
 
         context 'with invited user' do
@@ -148,7 +148,7 @@ describe RailsJwtAuth::Invitable do
             expect(invited_user.invitation_sent_at).not_to be_nil
             expect(invited_user.invitation_accepted_at).to be_nil
 
-            invited_user.accept_invitation!(accept_attrs)
+            invited_user.accept_invitation(accept_attrs)
 
             expect(invited_user.invitation_token).to be_nil
             expect(invited_user.invitation_sent_at).to be_nil
@@ -157,13 +157,13 @@ describe RailsJwtAuth::Invitable do
           end
 
           it 'validates password' do
-            invited_user.accept_invitation!({})
+            invited_user.accept_invitation({})
             expect(get_record_error(invited_user, :password)).to eq(:blank)
           end
 
           it 'validates token' do
             invited_user.invitation_sent_at = Time.now - 1.year
-            invited_user.accept_invitation!(accept_attrs)
+            invited_user.accept_invitation(accept_attrs)
             expect(get_record_error(invited_user, :invitation_token)).to eq(:expired)
           end
 
@@ -171,14 +171,14 @@ describe RailsJwtAuth::Invitable do
             invited_user
             ActionMailer::Base.deliveries.clear
 
-            invited_user.accept_invitation!(accept_attrs)
+            invited_user.accept_invitation(accept_attrs)
             expect(ActionMailer::Base.deliveries.count).to eq(0)
           end
         end
 
         context 'with non-invited user' do
           it 'doesn\'t set invitation_accepted_at' do
-            expect(user.accept_invitation!({})).to be_falsey
+            expect(user.accept_invitation({})).to be_falsey
             expect(user.reload.invitation_accepted_at).to be_nil
           end
         end

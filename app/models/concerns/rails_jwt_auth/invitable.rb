@@ -17,7 +17,7 @@ module RailsJwtAuth
 
     module ClassMethods
       # Creates an user and sends an invitation to him.
-      def invite!(attributes={})
+      def invite(attributes={})
         attrs = ActiveSupport::HashWithIndifferentAccess.new(attributes.to_h)
         auth_field = RailsJwtAuth.auth_field_name
         auth_attribute = attrs.delete(auth_field)
@@ -25,14 +25,14 @@ module RailsJwtAuth
         record = RailsJwtAuth.model.find_or_initialize_by(auth_field => auth_attribute)
         record.assign_attributes(attrs)
 
-        record.invite!
+        record.invite
         record
       end
     end
 
     # Sends an invitation to user
     # If the user has pending invitation, new one is sent
-    def invite!
+    def invite
       if persisted? && !invitation_token
         errors.add(RailsJwtAuth.auth_field_name, :registered)
         return false
@@ -51,7 +51,7 @@ module RailsJwtAuth
     end
 
     # Finishes invitation process setting user password
-    def accept_invitation!(params)
+    def accept_invitation(params)
       return false unless invitation_token.present?
 
       self.assign_attributes(params)

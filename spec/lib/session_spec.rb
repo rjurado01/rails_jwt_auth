@@ -68,7 +68,7 @@ module RailsJwtAuth
           end
 
           it 'validates user is not locked' do
-            user.lock_access!
+            user.lock_access
             session = Session.new('email' => user.email, password: 'invalid')
             expect(session.valid?).to be_falsey
             expect(get_record_error(session, :email)).to eq(:locked)
@@ -88,7 +88,7 @@ module RailsJwtAuth
           end
 
           it 'unlock access when lock is expired' do
-            travel_to(Date.today - 30.days) { user.lock_access! }
+            travel_to(Date.today - 30.days) { user.lock_access }
             session = Session.new('email' => user.email, password: pass)
             expect(session.generate!(nil)).to be_truthy
             expect(user.reload.locked_at).to be_nil

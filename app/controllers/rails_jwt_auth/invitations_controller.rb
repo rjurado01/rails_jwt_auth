@@ -15,7 +15,7 @@ module RailsJwtAuth
     # used to invite a user, if user is invited send new invitation
     def create
       authenticate!
-      user = RailsJwtAuth.model.invite!(invitation_create_params)
+      user = RailsJwtAuth.model.invite(invitation_create_params)
       user.errors.empty? ? render_204 : render_422(user.errors.details)
     end
 
@@ -23,7 +23,7 @@ module RailsJwtAuth
     def update
       return render_404 unless @user
 
-      if @user.accept_invitation!(invitation_update_params)
+      if @user.accept_invitation(invitation_update_params)
         render_204
       else
         render_422(@user.errors.details)

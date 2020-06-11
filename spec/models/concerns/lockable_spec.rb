@@ -24,14 +24,14 @@ describe RailsJwtAuth::Lockable do
         it { expect(user).to have_attributes(locked_at: nil) }
       end
 
-      describe '#lock_access!' do
+      describe '#lock_access' do
         context 'when unlock strategy is by time' do
           before do
             RailsJwtAuth.unlock_strategy = :time
           end
 
           it 'locks the user' do
-            user.lock_access!
+            user.lock_access
             expect(user.locked_at).not_to be_nil
           end
         end
@@ -43,13 +43,13 @@ describe RailsJwtAuth::Lockable do
             end
 
             it 'locks the user' do
-              user.lock_access!
+              user.lock_access
               expect(user.locked_at).not_to be_nil
             end
 
             it 'sends unlock instructions' do
               expect(RailsJwtAuth).to receive(:send_email).with(:unlock_instructions, user)
-              user.lock_access!
+              user.lock_access
             end
           end
         end
@@ -58,17 +58,17 @@ describe RailsJwtAuth::Lockable do
       describe '#access_locked?' do
         it 'returns if user is locked' do
           expect(user.access_locked?).to be_falsey
-          user.lock_access!
+          user.lock_access
           expect(user.access_locked?).to be_truthy
         end
       end
 
-      describe '#unlock_access!' do
+      describe '#unlock_access' do
         it 'unlocks the user and reset attempts' do
           expect(locked_user.failed_attempts).to be > 0
           expect(locked_user.access_locked?).to be_truthy
 
-          locked_user.unlock_access!
+          locked_user.unlock_access
           expect(locked_user.locked_at).to be_nil
           expect(locked_user.failed_attempts).to eq 0
           expect(locked_user.first_failed_attempt_at).to be_nil
@@ -76,11 +76,11 @@ describe RailsJwtAuth::Lockable do
         end
       end
 
-      describe '#failed_attempt!' do
+      describe '#failed_attempt' do
         context 'when is first time' do
           it 'increase failed attempts and set first_failed_attempt_at' do
             travel_to Time.now do
-              user.failed_attempt!
+              user.failed_attempt
               expect(user.failed_attempts).to eq 1
               expect(user.first_failed_attempt_at).to eq(Time.current)
               expect(user.access_locked?).to be_falsey
@@ -96,7 +96,7 @@ describe RailsJwtAuth::Lockable do
             first_failed_attempt_at = user.first_failed_attempt_at
 
             travel_to Time.current + 5.seconds do
-              user.failed_attempt!
+              user.failed_attempt
               expect(user.failed_attempts).to eq RailsJwtAuth.maximum_attempts - 1
               expect(user.first_failed_attempt_at).to eq(first_failed_attempt_at)
               expect(user.access_locked?).to be_falsey
@@ -110,7 +110,7 @@ describe RailsJwtAuth::Lockable do
             user.failed_attempts = RailsJwtAuth.maximum_attempts - 1
 
             travel_to Time.current + 5.seconds do
-              user.failed_attempt!
+              user.failed_attempt
               expect(user.failed_attempts).to eq RailsJwtAuth.maximum_attempts
               expect(user.access_locked?).to be_truthy
             end
@@ -120,19 +120,19 @@ describe RailsJwtAuth::Lockable do
         context 'when attempts are expired' do
           it 'reset attempts' do
             travel_to Time.current - RailsJwtAuth.unlock_in - 5.seconds do
-              user.failed_attempt!
+              user.failed_attempt
             end
 
             expect(user.failed_attempts).to eq 1
-            user.failed_attempt!
+            user.failed_attempt
             expect(user.failed_attempts).to eq 1
           end
         end
 
         context 'whe user is locked' do
           it 'does nothing' do
-            user.lock_access!
-            user.failed_attempt!
+            user.lock_access
+            user.failed_attempt
             expect(user.failed_attempts).to eq nil
           end
         end

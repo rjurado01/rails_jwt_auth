@@ -5,7 +5,7 @@ RSpec.describe RailsJwtAuth::InvitationsController do
     context "Using #{orm}" do
       before(:all) { initialize_orm(orm) }
 
-      let(:invited_user) { RailsJwtAuth.model.invite! email: 'valid@example.com' }
+      let(:invited_user) { RailsJwtAuth.model.invite email: 'valid@example.com' }
       let(:json) { JSON.parse(response.body) }
 
       describe 'GET #show' do

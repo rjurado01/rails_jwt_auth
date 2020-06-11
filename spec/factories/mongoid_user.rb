@@ -7,7 +7,7 @@ FactoryBot.define do
 
   factory :mongoid_user, parent: :mongoid_unconfirmed_user do
     before :create do |user|
-      user.skip_confirmation!
+      user.skip_confirmation
     end
   end
 

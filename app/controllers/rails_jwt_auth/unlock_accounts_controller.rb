@@ -8,7 +8,7 @@ module RailsJwtAuth
         params[:id] &&
         (user = RailsJwtAuth.model.where(unlock_token: params[:id]).first)
 
-      user.unlock_access! ? render_204 : render_422(user.errors.details)
+      user.unlock_access ? render_204 : render_422(user.errors.details)
     end
   end
 end

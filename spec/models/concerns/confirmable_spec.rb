@@ -22,9 +22,9 @@ describe RailsJwtAuth::Confirmable do
         end
       end
 
-      describe '#confirm!' do
+      describe '#confirm' do
         it 'confirms user' do
-          unconfirmed_user.confirm!
+          unconfirmed_user.confirm
           expect(unconfirmed_user.confirmed?).to be_truthy
         end
 
@@ -32,7 +32,7 @@ describe RailsJwtAuth::Confirmable do
           it 'confirms new email' do
             user.update_email(email: 'new@email.com', password: password)
 
-            user.confirm!
+            user.confirm
             expect(user.reload.email).to eq('new@email.com')
             expect(user.confirmed?).to be_truthy
           end
@@ -43,7 +43,7 @@ describe RailsJwtAuth::Confirmable do
             user.update_email(email: 'new@email.com', password: password)
 
             travel_to(Time.current + RailsJwtAuth.confirmation_expiration_time + 1.second) do
-              expect(user.confirm!).to be_falsey
+              expect(user.confirm).to be_falsey
               expect(get_record_error(user, :confirmation_token)).to eq :expired
             end
           end
@@ -53,16 +53,16 @@ describe RailsJwtAuth::Confirmable do
           it 'fill in with email' do
             user.update_email(email: 'new@email.com', password: password)
 
-            user.confirm!
+            user.confirm
             expect(user.email_confirmation).to eq(user.email)
           end
         end
       end
 
-      describe '#skip_confirmation!' do
+      describe '#skip_confirmation' do
         it 'skips user confirmation after create' do
           new_user = FactoryBot.build("#{orm.underscore}_user")
-          new_user.skip_confirmation!
+          new_user.skip_confirmation
           new_user.save
           expect(new_user.confirmed?).to be_truthy
         end

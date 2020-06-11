@@ -13,7 +13,7 @@ module RailsJwtAuth
       end
     end
 
-    def lock_access!
+    def lock_access
       self.locked_at = Time.current
 
       save(validate: false).tap do |result|
@@ -27,7 +27,7 @@ module RailsJwtAuth
       reset_attempts
     end
 
-    def unlock_access!
+    def unlock_access
       clean_lock
 
       save(validate: false) if changed?
@@ -37,7 +37,7 @@ module RailsJwtAuth
       locked_at && !lock_expired?
     end
 
-    def failed_attempt!
+    def failed_attempt
       return if access_locked?
 
       reset_attempts if attempts_expired?
@@ -47,7 +47,7 @@ module RailsJwtAuth
       self.first_failed_attempt_at = Time.current if failed_attempts == 1
 
       save(validate: false).tap do |result|
-        lock_access! if result && attempts_exceeded?
+        lock_access if result && attempts_exceeded?
       end
     end
 

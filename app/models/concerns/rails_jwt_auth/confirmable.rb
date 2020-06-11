@@ -43,7 +43,7 @@ module RailsJwtAuth
       confirmed_at.present?
     end
 
-    def confirm!
+    def confirm
       self.confirmed_at = Time.current
       self.confirmation_token = nil
 
@@ -62,7 +62,7 @@ module RailsJwtAuth
       save
     end
 
-    def skip_confirmation!
+    def skip_confirmation
       self.confirmed_at = Time.current
       self.confirmation_token = nil
     end

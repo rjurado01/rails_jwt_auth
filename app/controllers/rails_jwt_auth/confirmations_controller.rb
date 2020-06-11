@@ -31,7 +31,7 @@ module RailsJwtAuth
     def update
       return render_404 unless @user
 
-      @user.confirm! ? render_204 : render_422(@user.errors.details)
+      @user.confirm ? render_204 : render_422(@user.errors.details)
     end
 
     private

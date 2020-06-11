@@ -88,7 +88,7 @@ describe RailsJwtAuth::AuthenticableHelper, type: :helper do
         allow(RailsJwtAuth::JwtManager).to receive(:decode).and_return([{}])
         allow(RailsJwtAuth.model).to receive(:get_by_token).and_return(user)
 
-        expect(user).to receive(:update_tracked_fields!).and_return(true)
+        expect(user).to receive(:update_tracked_fields).and_return(true)
         helper.authenticate!
       end
     end
@@ -171,7 +171,7 @@ describe RailsJwtAuth::AuthenticableHelper, type: :helper do
         allow(RailsJwtAuth::JwtManager).to receive(:decode).and_return([{}])
         allow(RailsJwtAuth.model).to receive(:get_by_token).and_return(user)
 
-        expect(user).to receive(:update_tracked_fields!).and_return(true)
+        expect(user).to receive(:update_tracked_fields).and_return(true)
         helper.authenticate
       end
     end
