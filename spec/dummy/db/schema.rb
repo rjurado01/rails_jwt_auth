@@ -28,6 +28,8 @@ ActiveRecord::Schema.define do
 
     t.datetime  'last_sign_in_at'
     t.string    'last_sign_in_ip'
+    t.datetime  'last_request_at'
+    t.string    'last_request_ip'
 
     t.string    'invitation_token'
     t.datetime  'invitation_sent_at'

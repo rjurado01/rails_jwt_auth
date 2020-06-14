@@ -18,25 +18,14 @@ describe RailsJwtAuth::Trackable do
         it { expect(user).to have_attributes(last_sign_in_ip: user.last_sign_in_ip) }
       end
 
-      describe '#update_tracked_fields' do
-        before do
-          class Request
-            def remote_ip
-            end
-          end
-        end
-
-        after do
-          Object.send(:remove_const, :Request)
-        end
-
-        it 'updates tracked fields and save record' do
+      describe '#track_session_info' do
+        it 'fill in tracked fields' do
           user = FactoryBot.create(:active_record_user)
-          request = Request.new
-          allow(request).to receive(:remote_ip).and_return('127.0.0.1')
-          user.update_tracked_fields(request)
+          request = OpenStruct.new(ip: '127.0.0.1')
+          user.track_session_info(request)
           expect(user.last_sign_in_at).not_to eq(Time.current)
           expect(user.last_sign_in_ip).to eq('127.0.0.1')
+          expect(user.changed?).to be_truthy
         end
       end
     end

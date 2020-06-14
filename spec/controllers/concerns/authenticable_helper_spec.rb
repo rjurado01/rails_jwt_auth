@@ -25,15 +25,25 @@ describe RailsJwtAuth::AuthenticableHelper, type: :helper do
     let(:user) { FactoryBot.create(:active_record_user) }
 
     context 'when jwt is valid' do
-      it 'success!' do
+      before do
         token = user.regenerate_auth_token
         jwt = RailsJwtAuth::JwtManager.encode(auth_token: token)
-        payload = RailsJwtAuth::JwtManager.decode(jwt)[0]
+        @payload = RailsJwtAuth::JwtManager.decode(jwt)[0]
         helper.request.env['HTTP_AUTHORIZATION'] = "Bearer #{jwt}"
 
+        freeze_time
         helper.authenticate!
+      end
+
+      it 'success!' do
         expect(helper.current_user).to eq(user)
-        expect(helper.jwt_payload).to eq(payload)
+        expect(helper.jwt_payload).to eq(@payload)
+      end
+
+      it 'track request' do
+        user.reload
+        expect(user.last_request_at).to eq(Time.current)
+        expect(user.last_request_ip).to eq(helper.request.ip)
       end
     end
 
@@ -77,19 +87,6 @@ describe RailsJwtAuth::AuthenticableHelper, type: :helper do
 
         user.delete
         expect { helper.authenticate! }.to raise_error(RailsJwtAuth::NotAuthorized)
-      end
-    end
-
-    context 'when user is trackable' do
-      it 'call update tracked fields' do
-        user = Object.new
-        user.extend RailsJwtAuth::Trackable
-
-        allow(RailsJwtAuth::JwtManager).to receive(:decode).and_return([{}])
-        allow(RailsJwtAuth.model).to receive(:get_by_token).and_return(user)
-
-        expect(user).to receive(:update_tracked_fields).and_return(true)
-        helper.authenticate!
       end
     end
   end
@@ -103,15 +100,25 @@ describe RailsJwtAuth::AuthenticableHelper, type: :helper do
     let(:user) { FactoryBot.create(:active_record_user) }
 
     context 'when jwt is valid' do
-      it 'success!' do
+      before do
         token = user.regenerate_auth_token
         jwt = RailsJwtAuth::JwtManager.encode(auth_token: token)
-        payload = RailsJwtAuth::JwtManager.decode(jwt)[0]
+        @payload = RailsJwtAuth::JwtManager.decode(jwt)[0]
         helper.request.env['HTTP_AUTHORIZATION'] = "Bearer #{jwt}"
 
+        freeze_time
         helper.authenticate
+      end
+
+      it 'success!' do
         expect(helper.current_user).to eq(user)
-        expect(helper.jwt_payload).to eq(payload)
+        expect(helper.jwt_payload).to eq(@payload)
+      end
+
+      it 'track request' do
+        user.reload
+        expect(user.last_request_at).to eq(Time.current)
+        expect(user.last_request_ip).to eq(helper.request.ip)
       end
     end
 
@@ -160,19 +167,6 @@ describe RailsJwtAuth::AuthenticableHelper, type: :helper do
         user.delete
         expect { helper.authenticate }.not_to raise_error
         expect(helper.current_user).to eq(nil)
-      end
-    end
-
-    context 'when user is trackable' do
-      it 'call update tracked fields' do
-        user = Object.new
-        user.extend RailsJwtAuth::Trackable
-
-        allow(RailsJwtAuth::JwtManager).to receive(:decode).and_return([{}])
-        allow(RailsJwtAuth.model).to receive(:get_by_token).and_return(user)
-
-        expect(user).to receive(:update_tracked_fields).and_return(true)
-        helper.authenticate
       end
     end
   end

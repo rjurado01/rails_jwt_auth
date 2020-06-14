@@ -21,6 +21,7 @@ module RailsJwtAuth
       if valid?
         user.clean_reset_password if recoverable?
         user.clean_lock if lockable?
+        user.track_session_info(request) if trackable?
         user.load_auth_token
 
         unless user.save
@@ -68,6 +69,10 @@ module RailsJwtAuth
 
     def recoverable?
       @user&.kind_of?(RailsJwtAuth::Recoverable)
+    end
+
+    def trackable?
+      @user&.kind_of?(RailsJwtAuth::Trackable)
     end
 
     def user?

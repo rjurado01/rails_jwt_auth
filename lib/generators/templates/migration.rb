@@ -18,6 +18,8 @@ class Create<%= RailsJwtAuth.model_name.pluralize %> < ActiveRecord::Migration<%
       ## Trackable
       # t.string :last_sign_in_ip
       # t.datetime :last_sign_in_at
+      # t.string :last_request_ip
+      # t.datetime :last_request_at
 
       ## Invitable
       # t.string :invitation_token

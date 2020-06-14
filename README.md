@@ -97,7 +97,7 @@ It's composed of 6 modules:
 | Authenticable | Hashes and stores a password in the database to validate the authenticity of a user while signing in            |
 | Confirmable   | Sends emails with confirmation instructions and verifies whether an account is already confirmed during sign in |
 | Recoverable   | Resets the user password and sends reset instructions                                                           |
-| Trackable     | Tracks sign in timestamps and IP address                                                                        |
+| Trackable     | Tracks sign in and request timestamps and IP address                                                            |
 | Invitable     | Allows you to invite an user to your application sending an invitation mail                                     |
 | Lockable      | Locks the user after a specified number of failed sign in attempts                                              |
 

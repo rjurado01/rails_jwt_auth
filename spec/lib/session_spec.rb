@@ -101,6 +101,15 @@ module RailsJwtAuth
             expect(user.reload.reset_password_token).to be_nil
             expect(user.reload.reset_password_sent_at).to be_nil
           end
+
+          it 'track session' do
+            freeze_time
+            request = OpenStruct.new(ip: '127.0.0.1')
+            session = Session.new('email' => user.email, password: pass)
+            expect(session.generate!(request)).to be_truthy
+            expect(user.reload.last_sign_in_at).to eq(Time.current)
+            expect(user.reload.last_sign_in_ip).to eq('127.0.0.1')
+          end
         end
       end
     end
