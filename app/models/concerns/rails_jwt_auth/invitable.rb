@@ -112,9 +112,8 @@ module RailsJwtAuth
     end
 
     def send_invitation_mail
-      RailsJwtAuth.email_field_name! # ensure email field es valid
-      mailer = Mailer.send_invitation(self)
-      RailsJwtAuth.deliver_later ? mailer.deliver_later : mailer.deliver
+      RailsJwtAuth.email_field_name! # ensure email field is valid
+      RailsJwtAuth.send_email(:send_invitation, self)
     end
 
     def invitation_period_valid?

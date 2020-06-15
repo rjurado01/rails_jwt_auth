@@ -114,4 +114,9 @@ module RailsJwtAuth
 
     field_name
   end
+
+  def self.send_email(method, user)
+    mailer = RailsJwtAuth::Mailer.with(user_id: user.id.to_s).public_send(method)
+    RailsJwtAuth.deliver_later ? mailer.deliver_later : mailer.deliver
+  end
 end

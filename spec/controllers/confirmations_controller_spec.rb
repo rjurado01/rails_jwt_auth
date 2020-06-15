@@ -18,15 +18,9 @@ describe RailsJwtAuth::ConfirmationsController do
           end
 
           it 'sends new confirmation email with new token' do
-            class Mock
-              def deliver
-              end
-            end
-
-            expect(RailsJwtAuth::Mailer).to receive(:confirmation_instructions)
-              .with(user).and_return(Mock.new)
-
             old_token = user.confirmation_token
+            expect(RailsJwtAuth).to receive(:send_email).with(:confirmation_instructions, anything)
+
             post :create, params: {confirmation: {email: user.email}}
             expect(user.reload.confirmation_token).not_to eq(old_token)
           end

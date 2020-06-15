@@ -40,8 +40,7 @@ module RailsJwtAuth
       self.reset_password_sent_at = Time.current
       return false unless save
 
-      mailer = Mailer.reset_password_instructions(self)
-      RailsJwtAuth.deliver_later ? mailer.deliver_later : mailer.deliver
+      RailsJwtAuth.send_email(:reset_password_instructions, self)
     end
 
     def set_and_send_password_instructions
@@ -56,8 +55,7 @@ module RailsJwtAuth
       self.reset_password_sent_at = Time.current
       return false unless save
 
-      mailer = Mailer.set_password_instructions(self)
-      RailsJwtAuth.deliver_later ? mailer.deliver_later : mailer.deliver
+      RailsJwtAuth.send_email(:set_password_instructions, self)
       true
     end
 
