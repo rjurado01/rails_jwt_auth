@@ -71,43 +71,16 @@ describe RailsJwtAuth::Confirmable do
       end
 
       describe '#send_confirmation_instructions' do
-        before :all do
-          class Mock
-            def deliver
-            end
-
-            def deliver_later
-            end
-          end
-        end
-
         it 'fills confirmation fields' do
-          mock = Mock.new
-          allow(RailsJwtAuth::Mailer).to receive(:confirmation_instructions).and_return(mock)
           unconfirmed_user.send_confirmation_instructions
           expect(unconfirmed_user.confirmation_token).not_to be_nil
           expect(unconfirmed_user.confirmation_sent_at).not_to be_nil
         end
 
         it 'sends confirmation email' do
-          mock = Mock.new
           new_user = FactoryBot.build("#{orm.underscore}_unconfirmed_user")
-          allow(RailsJwtAuth::Mailer).to receive(:confirmation_instructions).and_return(mock)
-          expect(mock).to receive(:deliver)
+          expect(RailsJwtAuth).to receive(:send_email).with(:confirmation_instructions, anything)
           new_user.send_confirmation_instructions
-        end
-
-        context 'when use deliver_later option' do
-          before { RailsJwtAuth.deliver_later = true }
-          after  { RailsJwtAuth.deliver_later = false }
-
-          it 'uses deliver_later method to send email' do
-            mock = Mock.new
-            new_user = FactoryBot.build("#{orm.underscore}_unconfirmed_user")
-            allow(RailsJwtAuth::Mailer).to receive(:confirmation_instructions).and_return(mock)
-            expect(mock).to receive(:deliver_later)
-            new_user.send_confirmation_instructions
-          end
         end
 
         context 'when user is confirmed' do
@@ -121,9 +94,9 @@ describe RailsJwtAuth::Confirmable do
           end
 
           it 'does not send confirmation email' do
-            mock = Mock.new
-            allow(RailsJwtAuth::Mailer).to receive(:confirmation_instructions).and_return(mock)
-            expect(mock).not_to receive(:deliver)
+            expect(RailsJwtAuth).not_to receive(:send_email)
+              .with(:confirmation_instructions, anything)
+
             user.send_confirmation_instructions
           end
 
@@ -174,22 +147,19 @@ describe RailsJwtAuth::Confirmable do
           context 'when send_email_changed_notification option is false' do
             it 'sends only confirmation email' do
               allow(RailsJwtAuth).to receive(:send_email_changed_notification).and_return(false)
+              expect(RailsJwtAuth).to receive(:send_email).with(:confirmation_instructions, user)
+              expect(RailsJwtAuth).not_to receive(:send_email).with(:email_changed, user)
               user.update(email: 'new@email.com')
-              expect(ActionMailer::Base.deliveries.count).to eq(1)
-              expect(ActionMailer::Base.deliveries.first.subject).to eq('Confirmation instructions')
-              expect(ActionMailer::Base.deliveries.first.to).to eq(['new@email.com'])
             end
           end
 
           context 'when send_email_changed_notification option is true' do
             it 'sends confirmation and nofication email' do
               allow(RailsJwtAuth).to receive(:send_email_changed_notification).and_return(true)
+              expect(RailsJwtAuth).to receive(:send_email).with(:email_changed, user)
+              expect(RailsJwtAuth).to receive(:send_email).with(:confirmation_instructions, user)
               old_email = user.email
               user.update(email: 'new@email.com')
-              expect(ActionMailer::Base.deliveries.first.subject).to eq('Confirmation instructions')
-              expect(ActionMailer::Base.deliveries.first.to).to eq(['new@email.com'])
-              expect(ActionMailer::Base.deliveries.last.subject).to eq('Email changed')
-              expect(ActionMailer::Base.deliveries.last.to).to eq([old_email])
             end
           end
         end
