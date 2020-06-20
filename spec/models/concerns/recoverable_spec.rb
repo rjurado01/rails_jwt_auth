@@ -99,6 +99,13 @@ describe RailsJwtAuth::Recoverable do
           expect(RailsJwtAuth).to receive(:send_email).with(:set_password_instructions, user)
           user.set_and_send_password_instructions
         end
+
+        it 'set password email has correct token' do
+          user.set_and_send_password_instructions
+          mail = ActionMailer::Base.deliveries.last
+          expect(mail.subject).to eq('Set password instructions')
+          expect(mail.body).to match("token=#{user.reset_password_token}")
+        end
       end
 
       describe '#before_save' do
