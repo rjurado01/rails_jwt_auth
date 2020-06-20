@@ -114,9 +114,9 @@ describe RailsJwtAuth::Confirmable do
           it 'throws InvalidEmailField exception' do
             allow(RailsJwtAuth).to receive(:email_field_name).and_return(:invalid)
 
-            expect {
+            expect do
               user.send_confirmation_instructions
-            }.to raise_error(RailsJwtAuth::InvalidEmailField)
+            end.to raise_error(RailsJwtAuth::InvalidEmailField)
           end
         end
       end
@@ -145,11 +145,31 @@ describe RailsJwtAuth::Confirmable do
           end
 
           context 'when send_email_changed_notification option is false' do
-            it 'sends only confirmation email' do
+            before do
               allow(RailsJwtAuth).to receive(:send_email_changed_notification).and_return(false)
+            end
+
+            it 'sends only confirmation email' do
               expect(RailsJwtAuth).to receive(:send_email).with(:confirmation_instructions, user)
               expect(RailsJwtAuth).not_to receive(:send_email).with(:email_changed, user)
               user.update(email: 'new@email.com')
+            end
+
+            it 'adds correct confirmation token to email' do # check bug, don't delete
+              user.update(email: 'new@email.com')
+              first_token = user.confirmation_token
+              expect(first_token).not_to be_nil
+              mail = ActionMailer::Base.deliveries.last
+              expect(mail.subject).to eq('Confirmation instructions')
+              expect(mail.body).to match("token=#{first_token}")
+
+              user.update(email: 'new2@email.com')
+              second_token = user.confirmation_token
+              expect(second_token).not_to be_nil
+              expect(second_token) != first_token
+              mail = ActionMailer::Base.deliveries.last
+              expect(mail.subject).to eq('Confirmation instructions')
+              expect(mail.body).to match("token=#{second_token}")
             end
           end
 
