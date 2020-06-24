@@ -37,9 +37,17 @@ module RailsJwtAuth
         end
 
         if defined?(ActiveRecord) && ancestors.include?(ActiveRecord::Base)
-          after_commit :deliver_email_changed_emails, if: :saved_change_to_unconfirmed_email?
+          after_commit  do
+            if unconfirmed_email && saved_change_to_unconfirmed_email?
+              deliver_email_changed_emails
+            end
+          end
         elsif defined?(Mongoid) && ancestors.include?(Mongoid::Document)
-          after_update :deliver_email_changed_emails, if: :unconfirmed_email_changed?
+          after_update do
+            if unconfirmed_email && unconfirmed_email_changed?
+              deliver_email_changed_emails
+            end
+          end
         end
       end
     end

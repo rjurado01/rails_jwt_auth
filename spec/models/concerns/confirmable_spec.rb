@@ -27,6 +27,14 @@ describe RailsJwtAuth::Confirmable do
           expect(unconfirmed_user.confirmed?).to be_truthy
         end
 
+        it 'does not sends email' do
+          unconfirmed_user
+
+          expect {
+            unconfirmed_user.confirm!
+          }.to change(ActionMailer::Base.deliveries, :count).by(0)
+        end
+
         context 'when unconfirmed_email exists' do
           it 'confirms new email' do
             user.email = 'new@email.com'
