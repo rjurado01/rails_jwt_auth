@@ -83,6 +83,7 @@ module RailsJwtAuth
       self.confirmation_sent_at = Time.current
 
       valid? # validates first other fields
+      errors.add(:email, 'blank') if unconfirmed_email.blank?
       errors.add(:password, password_error) if password_error
       errors.add(email_field, 'not_change') if email == unconfirmed_email
 

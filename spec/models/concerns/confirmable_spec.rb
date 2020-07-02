@@ -116,6 +116,11 @@ describe RailsJwtAuth::Confirmable do
           expect(user.confirmation_sent_at).not_to be_nil
         end
 
+        it 'checks email' do
+          expect(user.update_email(email: '')).to be_falsey
+          expect(get_record_error(user, :email)).to eq('blank')
+        end
+
         it 'checks password' do
           expect(user.update_email(email: 'new@email.com')).to be_falsey
           expect(get_record_error(user, :password)).to eq('blank')
