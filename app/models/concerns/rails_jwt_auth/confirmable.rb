@@ -115,8 +115,8 @@ module RailsJwtAuth
       RailsJwtAuth.send_email(:confirmation_instructions, self)
 
       # send notify to old email
-      if RailsJwtAuth.send_email_changed_notification
-        RailsJwtAuth.send_email(:email_change_notification, self)
+      if RailsJwtAuth.send_email_change_requested_notification
+        RailsJwtAuth.send_email(:email_change_requested_notification, self)
       end
     end
   end

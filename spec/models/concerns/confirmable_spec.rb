@@ -134,20 +134,20 @@ describe RailsJwtAuth::Confirmable do
           expect(get_record_error(user, :email)).to eq('not_change')
         end
 
-        context 'when send_email_changed_notification option is false' do
+        context 'when send_email_change_requested_notification option is false' do
           it 'sends only confirmation email' do
-            allow(RailsJwtAuth).to receive(:send_email_changed_notification).and_return(false)
+            allow(RailsJwtAuth).to receive(:send_email_change_requested_notification).and_return(false)
             expect(RailsJwtAuth).to receive(:send_email).with(:confirmation_instructions, user)
-            expect(RailsJwtAuth).not_to receive(:send_email).with(:email_change_notification, user)
+            expect(RailsJwtAuth).not_to receive(:send_email).with(:email_change_requested_notification, user)
             user.update_email(email: 'new@email.com', password: password)
           end
         end
 
-        context 'when send_email_changed_notification option is true' do
+        context 'when send_email_change_requested_notification option is true' do
           it 'sends confirmation and nofication email' do
-            allow(RailsJwtAuth).to receive(:send_email_changed_notification).and_return(true)
+            allow(RailsJwtAuth).to receive(:send_email_change_requested_notification).and_return(true)
             expect(RailsJwtAuth).to receive(:send_email).with(:confirmation_instructions, user)
-            expect(RailsJwtAuth).to receive(:send_email).with(:email_change_notification, user)
+            expect(RailsJwtAuth).to receive(:send_email).with(:email_change_requested_notification, user)
             user.update_email(email: 'new@email.com', password: password)
           end
         end

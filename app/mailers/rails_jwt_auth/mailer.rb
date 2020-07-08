@@ -20,7 +20,7 @@ if defined?(ActionMailer)
       mail(to: @user.unconfirmed_email || @to, subject: @subject)
     end
 
-    def email_change_notification
+    def email_change_requested_notification
       mail(to: @to, subject: @subject)
     end
 

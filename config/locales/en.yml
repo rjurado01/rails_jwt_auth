@@ -7,7 +7,7 @@ en:
         subject: "Reset password instructions"
       invitation_instructions:
         subject: "Someone has sent you an invitation!"
-      email_change_notification:
+      email_change_requested_notification:
         subject: "Email change"
       password_changed_notification:
         subject: "Password changed"

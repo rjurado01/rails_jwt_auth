@@ -55,7 +55,7 @@ RSpec.describe RailsJwtAuth::Mailer, type: :mailer do
 
       describe '#email_chage_notification' do
         let(:user) { FactoryBot.create("#{orm.underscore}_user") }
-        let(:mail) { described_class.with(mail_params).email_change_notification.deliver_now }
+        let(:mail) { described_class.with(mail_params).email_change_requested_notification.deliver_now }
 
         it 'sends email with notification' do
           expect { mail }.to change { ActionMailer::Base.deliveries.count }.by(1)

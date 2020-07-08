@@ -24,7 +24,7 @@ RailsJwtAuth.setup do |config|
   #config.mailer_sender = 'initialize-mailer_sender@example.com'
 
   # activate email notification when email is changed
-  #config.send_email_changed_notification = true
+  #config.send_email_change_requested_notification = true
 
   # activate email notification when password is changed
   #config.send_password_changed_notification = true
