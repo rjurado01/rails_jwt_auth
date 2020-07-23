@@ -73,21 +73,25 @@ module RailsJwtAuth
 
       # email change must be protected by password
       password_error = if (password = params[:password]).blank?
-                         'blank'
+                         :blank
                        elsif !authenticate(password)
-                         'invalid'
+                         :invalid
                        end
 
-      self.unconfirmed_email = params[email_field]
+      self.email = params[email_field]
       self.confirmation_token = SecureRandom.base58(24)
       self.confirmation_sent_at = Time.current
 
       valid? # validates first other fields
-      errors.add(:email, 'blank') if unconfirmed_email.blank?
       errors.add(:password, password_error) if password_error
-      errors.add(email_field, 'not_change') if email == unconfirmed_email
+      errors.add(email_field, :not_change) unless email_changed?
 
       return false unless errors.empty?
+
+      # move email to unconfirmed_email field and restore
+      self.unconfirmed_email = email
+      self.email = email_was
+
       return false unless save
 
       deliver_email_changed_emails
