@@ -61,33 +61,34 @@ rails g rails_jwt_auth:migrate
 
 You can edit configuration options into `config/initializers/rails_jwt_auth.rb` file created by generator.
 
-| Option                                    | Default value            | Description                                                            |
-| ----------------------------------        | ----------------         | ---------------------------------------------------------------------- |
-| model_name                                | `'User'`                 | Authentication model name                                              |
-| auth_field_name                           | `'email'`                | Field used to authenticate user with password                          |
-| email_auth_field                          | `'email'`                | Field used to send emails                                              |
-| downcase_auth_field                       | `false`                  | Apply downcase to auth field when save user and when init session      |
-| jwt_expiration_time                       | `7.days`                 | Tokens expiration time                                                 |
-| jwt_issuer                                | `'RailsJwtAuth'`         | The "iss" (issuer) claim identifies the principal that issued the JWT  |
-| simultaneous_sessions                     | `2`                      | Number of simultaneous sessions for an user. Set 0 to disable sessions |
-| mailer_name                               | `'RailsJwtAuth::Mailer'` | Authentication model name                                              |
-| mailer_sender                             | `...@example.com`        | E-mail address which will be shown in RailsJwtAuth::Mailer             |
-| send_email_change_requested_notification  | `true`                   | Notify original email when change is requested (unconfirmed)           |
-| send_password_changed_notification        | `true`                   | Notify email when password changes                                     |
-| confirmation_expiration_time              | `1.day`                  | Confirmation token expiration time                                     |
-| reset_password_expiration_time            | `1.day`                  | Confirmation token expiration time                                     |
-| deliver_later                             | `false`                  | Uses `deliver_later` method to send emails                             |
-| invitation_expiration_time                | `2.days`                 | Time an invitation is valid and can be accepted                        |
-| lock_strategy                             | `:none`                  | Strategy to be used to lock an account: `:none` or `:failed_attempts`  |
-| unlock_strategy                           | `:time`                  | Strategy to use when unlocking accounts: `:time`, `:email` or `:both`  |
-| unlock_in                                 | `60.minutes`             | Interval to unlock an account if `unlock_strategy` is `:time`          |
-| reset_attempts_in                         | `60.minutes`             | Interval after which to reset failed attempts counter of an account    |
-| maximum_attempts                          | `3`                      | Number of failed login attempts before locking an account              |
-| confirm_email_url                         | `nil`                    | Your web url where emai link redirects with confirmation token         |
-| reset_password_url                        | `nil`                    | Your web url where emai link redirects with reset password token       |
-| accept_invitation_url                     | `nil`                    | Your web url where emai link redirects with invitation token           |
-| unlock_account_url                        | `nil`                    | Your web url where emai link redirects with unlock token               |
-| avoid_email_errors                        | `true`                   | Avoid returns email errors to avoid giving clue to an attacker         |
+| Option                                    | Default value              | Description                                                            |
+| ----------------------------------        | ----------------           | ---------------------------------------------------------------------- |
+| model_name                                | `'User'`                   | Authentication model name                                              |
+| auth_field_name                           | `'email'`                  | Field used to authenticate user with password                          |
+| email_auth_field                          | `'email'`                  | Field used to send emails                                              |
+| email_regex                               | `URI::MailTo::EMAIL_REGEXP`| Regex used to validate email input on requests like reset password     |
+| downcase_auth_field                       | `false`                    | Apply downcase to auth field when save user and when init session      |
+| jwt_expiration_time                       | `7.days`                   | Tokens expiration time                                                 |
+| jwt_issuer                                | `'RailsJwtAuth'`           | The "iss" (issuer) claim identifies the principal that issued the JWT  |
+| simultaneous_sessions                     | `2`                        | Number of simultaneous sessions for an user. Set 0 to disable sessions |
+| mailer_name                               | `'RailsJwtAuth::Mailer'`   | Authentication model name                                              |
+| mailer_sender                             | `...@example.com`          | E-mail address which will be shown in RailsJwtAuth::Mailer             |
+| send_email_change_requested_notification  | `true`                     | Notify original email when change is requested (unconfirmed)           |
+| send_password_changed_notification        | `true`                     | Notify email when password changes                                     |
+| confirmation_expiration_time              | `1.day`                    | Confirmation token expiration time                                     |
+| reset_password_expiration_time            | `1.day`                    | Confirmation token expiration time                                     |
+| deliver_later                             | `false`                    | Uses `deliver_later` method to send emails                             |
+| invitation_expiration_time                | `2.days`                   | Time an invitation is valid and can be accepted                        |
+| lock_strategy                             | `:none`                    | Strategy to be used to lock an account: `:none` or `:failed_attempts`  |
+| unlock_strategy                           | `:time`                    | Strategy to use when unlocking accounts: `:time`, `:email` or `:both`  |
+| unlock_in                                 | `60.minutes`               | Interval to unlock an account if `unlock_strategy` is `:time`          |
+| reset_attempts_in                         | `60.minutes`               | Interval after which to reset failed attempts counter of an account    |
+| maximum_attempts                          | `3`                        | Number of failed login attempts before locking an account              |
+| confirm_email_url                         | `nil`                      | Your web url where emai link redirects with confirmation token         |
+| reset_password_url                        | `nil`                      | Your web url where emai link redirects with reset password token       |
+| accept_invitation_url                     | `nil`                      | Your web url where emai link redirects with invitation token           |
+| unlock_account_url                        | `nil`                      | Your web url where emai link redirects with unlock token               |
+| avoid_email_errors                        | `true`                     | Avoid returns email errors to avoid giving clue to an attacker         |
 
 ## Modules
 

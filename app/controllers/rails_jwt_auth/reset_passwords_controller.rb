@@ -50,15 +50,16 @@ module RailsJwtAuth
     end
 
     def set_user_from_email
-      if password_create_params[RailsJwtAuth.email_field_name].blank?
+      email = (password_create_params[RailsJwtAuth.email_field_name] || '').strip
+      email.downcase! if RailsJwtAuth.downcase_auth_field
+
+      if email.blank?
         return render_422(RailsJwtAuth.email_field_name => [{error: :blank}])
+      elsif !email.match?(RailsJwtAuth.email_regex)
+        return render_422(RailsJwtAuth.email_field_name => [{error: :format}])
       end
 
-      email_field = RailsJwtAuth.email_field_name
-
-      @user = RailsJwtAuth.model.where(
-        email_field => password_create_params[email_field].to_s.strip.downcase
-      ).first
+      @user = RailsJwtAuth.model.where(RailsJwtAuth.email_field_name => email).first
     end
   end
 end

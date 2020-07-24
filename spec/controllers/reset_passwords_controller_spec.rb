@@ -76,10 +76,10 @@ describe RailsJwtAuth::ResetPasswordsController do
           end
         end
 
-        context 'when send invalid email and avoid_email_errors is false' do
+        context 'when send not registered email and avoid_email_errors is false' do
           before do
             RailsJwtAuth.avoid_email_errors = false
-            post :create, params: {reset_password: {email: 'invalid'}}
+            post :create, params: {reset_password: {email: 'not.found@email.com'}}
           end
 
           it 'returns 422 http status code' do
@@ -91,13 +91,42 @@ describe RailsJwtAuth::ResetPasswordsController do
           end
         end
 
+        context 'when send invalid email and avoid_email_errors is false' do
+          before do
+            RailsJwtAuth.avoid_email_errors = false
+            post :create, params: {reset_password: {email: 'invalid'}}
+          end
+
+          it 'returns 422 http status code' do
+            expect(response).to have_http_status(422)
+          end
+
+          it 'returns format error' do
+            expect(json['errors']['email'].first['error']).to eq 'format'
+          end
+        end
+
+        context 'when send not registered email and avoid_email_errors is true' do
+          before do
+            post :create, params: {reset_password: {email: 'not.found@email.com'}}
+          end
+
+          it 'returns 204 http status code' do
+            expect(response).to have_http_status(204)
+          end
+        end
+
         context 'when send invalid email and avoid_email_errors is true' do
           before do
             post :create, params: {reset_password: {email: 'invalid'}}
           end
 
           it 'returns 204 http status code' do
-            expect(response).to have_http_status(204)
+            expect(response).to have_http_status(422)
+          end
+
+          it 'returns format error' do
+            expect(json['errors']['email'].first['error']).to eq 'format'
           end
         end
 

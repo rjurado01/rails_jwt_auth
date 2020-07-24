@@ -5,7 +5,7 @@ module RailsJwtAuth
     Errors = Struct.new :details # simulate ActiveModel::Errors
 
     def initialize(params={})
-      @auth_field_value = params[RailsJwtAuth.auth_field_name]
+      @auth_field_value = (params[RailsJwtAuth.auth_field_name] || '').strip
       @auth_field_value.downcase! if RailsJwtAuth.downcase_auth_field
       @password = params[:password]
 
@@ -85,7 +85,7 @@ module RailsJwtAuth
     end
 
     def validate_auth_field_presence
-      add_error(RailsJwtAuth.auth_field_name, :blank) unless @auth_field_value
+      add_error(RailsJwtAuth.auth_field_name, :blank) if @auth_field_value.blank?
     end
 
     def validate_password_presence

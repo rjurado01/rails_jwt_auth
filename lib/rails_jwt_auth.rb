@@ -19,6 +19,9 @@ module RailsJwtAuth
   mattr_accessor :email_field_name
   self.email_field_name = 'email'
 
+  mattr_accessor :email_regex
+  self.email_regex = URI::MailTo::EMAIL_REGEXP
+
   mattr_accessor :downcase_auth_field
   self.downcase_auth_field = false
 
