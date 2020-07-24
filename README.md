@@ -66,6 +66,7 @@ You can edit configuration options into `config/initializers/rails_jwt_auth.rb` 
 | model_name                                | `'User'`                 | Authentication model name                                              |
 | auth_field_name                           | `'email'`                | Field used to authenticate user with password                          |
 | email_auth_field                          | `'email'`                | Field used to send emails                                              |
+| downcase_auth_field                       | `false`                  | Apply downcase to auth field when save user and when init session      |
 | jwt_expiration_time                       | `7.days`                 | Tokens expiration time                                                 |
 | jwt_issuer                                | `'RailsJwtAuth'`         | The "iss" (issuer) claim identifies the principal that issued the JWT  |
 | simultaneous_sessions                     | `2`                      | Number of simultaneous sessions for an user. Set 0 to disable sessions |

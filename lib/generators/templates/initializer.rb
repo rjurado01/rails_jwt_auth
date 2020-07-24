@@ -8,6 +8,10 @@ RailsJwtAuth.setup do |config|
   # define email field name used to send emails
   #config.email_field_name = 'email'
 
+
+  # apply downcase to auth field when save user and when init session
+  #config.downcase_auth_field = false
+
   # expiration time for generated tokens
   #config.jwt_expiration_time = 7.days
 

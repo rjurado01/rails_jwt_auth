@@ -14,6 +14,17 @@ module RailsJwtAuth
           FactoryBot.create("#{orm.underscore}_unconfirmed_user", password: pass)
         }
 
+        describe '#initialize' do
+          it 'downcase auth_field when options is enabled' do
+            session = Session.new('email' => 'AAA@email.com', password: pass)
+            expect(session.instance_variable_get(:@auth_field_value)).to eq('AAA@email.com')
+
+            allow(RailsJwtAuth).to receive(:downcase_auth_field).and_return(true)
+            session = Session.new('email' => 'AAA@email.com', password: pass)
+            expect(session.instance_variable_get(:@auth_field_value)).to eq('aaa@email.com')
+          end
+        end
+
         describe '#valid?' do
           it 'returns true when session is valid' do
             session = Session.new('email' => user.email, password: pass)

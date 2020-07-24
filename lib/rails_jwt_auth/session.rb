@@ -6,6 +6,7 @@ module RailsJwtAuth
 
     def initialize(params={})
       @auth_field_value = params[RailsJwtAuth.auth_field_name]
+      @auth_field_value.downcase! if RailsJwtAuth.downcase_auth_field
       @password = params[:password]
 
       find_user if @auth_field_value.present?

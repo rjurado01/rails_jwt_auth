@@ -19,6 +19,9 @@ module RailsJwtAuth
   mattr_accessor :email_field_name
   self.email_field_name = 'email'
 
+  mattr_accessor :downcase_auth_field
+  self.downcase_auth_field = false
+
   mattr_accessor :jwt_expiration_time
   self.jwt_expiration_time = 7.days
 

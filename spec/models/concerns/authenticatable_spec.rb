@@ -12,6 +12,17 @@ describe RailsJwtAuth::Authenticatable do
         it { expect(user).to have_attributes(auth_tokens: user.auth_tokens) }
       end
 
+      describe '#before_validation' do
+        it 'downcase auth field when downcase_auth_field options is actived' do
+          user = FactoryBot.create("#{orm.underscore}_user", email: 'AAA@email.com')
+          expect(user.reload.email).to eq('AAA@email.com')
+
+          allow(RailsJwtAuth).to receive(:downcase_auth_field).and_return(true)
+          user = FactoryBot.create("#{orm.underscore}_user", email: 'BBB@email.com')
+          expect(user.reload.email).to eq('bbb@email.com')
+        end
+      end
+
       describe '#authenticate' do
         it 'authenticates user valid password' do
           user = FactoryBot.create("#{orm.underscore}_user", password: '12345678')
