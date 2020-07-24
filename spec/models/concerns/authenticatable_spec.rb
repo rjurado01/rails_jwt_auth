@@ -74,6 +74,18 @@ describe RailsJwtAuth::Authenticatable do
             user.update_password(current_password: '12345678', password: 'new_password')
             expect(user.authenticate('new_password')).to be_truthy
           end
+
+          it 'clean sessions' do
+            user.update_password(current_password: '12345678', password: 'new_password')
+            expect(user.auth_tokens).to be_empty
+
+            user.update_password(
+              current_password: '12345678',
+              password: 'new_password',
+              current_auth_token: 'xxx'
+            )
+            expect(user.auth_tokens).to eq(['xxx'])
+          end
         end
 
         context 'when password is blank' do

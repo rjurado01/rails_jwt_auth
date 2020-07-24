@@ -69,6 +69,11 @@ RSpec.describe RailsJwtAuth::ProfilesController do
       end
 
       describe 'PUT #password' do
+        before do
+          allow_any_instance_of(RailsJwtAuth::AuthenticableHelper)
+            .to receive(:jwt_payload).and_return('auth_token' => 'xxx')
+        end
+
         context 'when user is logged' do
           before do
             sign_in user
@@ -100,6 +105,12 @@ RSpec.describe RailsJwtAuth::ProfilesController do
 
             expect(response).to have_http_status(422)
             expect(errors['password_confirmation'].first['error']).to eq 'confirmation'
+          end
+
+          it 'close other sessions' do
+            put :password, params: {profile: {current_password: password, password: new_password}}
+
+            expect(user.reload.auth_tokens).to eq(['xxx'])
           end
         end
 

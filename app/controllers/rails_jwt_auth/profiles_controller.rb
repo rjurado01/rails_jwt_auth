@@ -3,7 +3,7 @@ module RailsJwtAuth
     include ParamsHelper
     include RenderHelper
 
-    PASSWORD_PARAMS = %i[current_password password password_confirmation]
+    PASSWORD_PARAMS = %i[current_password password password_confirmation].freeze
 
     before_action :authenticate!
 
@@ -20,7 +20,7 @@ module RailsJwtAuth
     end
 
     def password
-      if current_user.update_password(profile_update_password_params)
+      if current_user.update_password(update_password_params)
         render_204
       else
         render_422(current_user.errors.details)
@@ -28,7 +28,7 @@ module RailsJwtAuth
     end
 
     def email
-      return update unless current_user.kind_of?(RailsJwtAuth::Confirmable)
+      return update unless current_user.is_a?(RailsJwtAuth::Confirmable)
 
       if current_user.update_email(profile_update_email_params)
         render_204
@@ -41,6 +41,10 @@ module RailsJwtAuth
 
     def changing_password?
       profile_update_params.values_at(*PASSWORD_PARAMS).any?(&:present?)
+    end
+
+    def update_password_params
+      profile_update_password_params.merge(current_auth_token: jwt_payload['auth_token'])
     end
   end
 end

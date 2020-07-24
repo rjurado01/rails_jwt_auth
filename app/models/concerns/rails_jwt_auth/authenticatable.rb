@@ -84,6 +84,10 @@ module RailsJwtAuth
         self.reset_password_token = self.reset_password_sent_at = nil
       end
 
+      # close all sessions or other sessions when pass current_auth_token
+      current_auth_token = params.delete :current_auth_token
+      self.auth_tokens = current_auth_token ? [current_auth_token] : []
+
       assign_attributes(params)
       valid? # validates first other fields
       errors.add(:current_password, current_password_error) if current_password_error
