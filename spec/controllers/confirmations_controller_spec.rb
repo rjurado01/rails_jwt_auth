@@ -24,9 +24,10 @@ describe RailsJwtAuth::ConfirmationsController do
           end
         end
 
-        context 'when send invalid email' do
+        context 'when send not registered email and avoid_email_errors is false' do
           before do
-            post :create, params: {confirmation: {email: 'invalid'}}
+            RailsJwtAuth.avoid_email_errors = false
+            post :create, params: {confirmation: {email: 'not.found@email.com'}}
           end
 
           it 'returns 422 http status code' do
@@ -37,6 +38,47 @@ describe RailsJwtAuth::ConfirmationsController do
             expect(json['errors']['email'].first['error']).to eq 'not_found'
           end
         end
+
+        context 'when send invalid email and avoid_email_errors is false' do
+          before do
+            RailsJwtAuth.avoid_email_errors = false
+            post :create, params: {confirmation: {email: 'invalid'}}
+          end
+
+          it 'returns 422 http status code' do
+            expect(response).to have_http_status(422)
+          end
+
+          it 'returns format error' do
+            expect(json['errors']['email'].first['error']).to eq 'format'
+          end
+        end
+
+        context 'when send not registered email and avoid_email_errors is true' do
+          before do
+            post :create, params: {confirmation: {email: 'not.found@email.com'}}
+          end
+
+          it 'returns 204 http status code' do
+            expect(response).to have_http_status(204)
+          end
+        end
+
+        context 'when send invalid email and avoid_email_errors is true' do
+          before do
+            post :create, params: {confirmation: {email: 'invalid'}}
+          end
+
+          it 'returns 204 http status code' do
+            expect(response).to have_http_status(422)
+          end
+
+          it 'returns format error' do
+            expect(json['errors']['email'].first['error']).to eq 'format'
+          end
+        end
+
+
 
         context 'when email is already confirmed' do
           before do

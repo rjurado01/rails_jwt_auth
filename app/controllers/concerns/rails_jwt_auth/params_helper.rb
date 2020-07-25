@@ -16,11 +16,11 @@ module RailsJwtAuth
       params.require(:session).permit(RailsJwtAuth.auth_field_name, :password)
     end
 
-    def password_create_params
+    def reset_password_create_params
       params.require(:reset_password).permit(RailsJwtAuth.email_field_name)
     end
 
-    def password_update_params
+    def reset_password_update_params
       params.require(:reset_password).permit(:password, :password_confirmation)
     end
 

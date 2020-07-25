@@ -34,7 +34,7 @@ module RailsJwtAuth
     def update
       return render_404 unless @user
 
-      if @user.set_reset_password(password_update_params)
+      if @user.set_reset_password(reset_password_update_params)
         render_204
       else
         render_422(@user.errors.details)
@@ -50,7 +50,7 @@ module RailsJwtAuth
     end
 
     def set_user_from_email
-      email = (password_create_params[RailsJwtAuth.email_field_name] || '').strip
+      email = (reset_password_create_params[RailsJwtAuth.email_field_name] || '').strip
       email.downcase! if RailsJwtAuth.downcase_auth_field
 
       if email.blank?
