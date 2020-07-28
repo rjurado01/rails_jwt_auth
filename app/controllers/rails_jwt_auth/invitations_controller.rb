@@ -3,6 +3,7 @@ module RailsJwtAuth
     include ParamsHelper
     include RenderHelper
 
+    before_action :authenticate!, only: [:create]
     before_action :set_user_from_token, only: [:show, :update]
 
     # used to verify token
@@ -14,7 +15,6 @@ module RailsJwtAuth
 
     # used to invite a user, if user is invited send new invitation
     def create
-      authenticate!
       user = RailsJwtAuth.model.invite(invitation_create_params)
       user.errors.empty? ? render_204 : render_422(user.errors.details)
     end
