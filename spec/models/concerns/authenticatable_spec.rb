@@ -21,6 +21,13 @@ describe RailsJwtAuth::Authenticatable do
           user = FactoryBot.create("#{orm.underscore}_user", email: 'BBB@email.com')
           expect(user.reload.email).to eq('bbb@email.com')
         end
+
+        it 'does not fail when auth field is blank and apply downcase!' do
+          allow(RailsJwtAuth).to receive(:downcase_auth_field).and_return(true)
+          user = FactoryBot.create("#{orm.underscore}_user", email: 'BBB@email.com')
+          user.email = nil
+          expect { user.valid? }.not_to raise_exception
+        end
       end
 
       describe '#authenticate' do

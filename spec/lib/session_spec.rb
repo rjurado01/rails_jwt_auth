@@ -15,6 +15,11 @@ module RailsJwtAuth
         }
 
         describe '#initialize' do
+          it 'does not fail when pass empty hash' do
+            allow(RailsJwtAuth).to receive(:downcase_auth_field).and_return(true)
+            expect { Session.new }.not_to raise_exception
+          end
+
           it 'downcase auth_field when options is enabled' do
             session = Session.new('email' => 'AAA@email.com', password: pass)
             expect(session.instance_variable_get(:@auth_field_value)).to eq('AAA@email.com')

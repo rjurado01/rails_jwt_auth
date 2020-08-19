@@ -18,7 +18,7 @@ module RailsJwtAuth
         before_validation do
           if RailsJwtAuth.downcase_auth_field &&
              public_send("#{RailsJwtAuth.auth_field_name}_changed?")
-            self[RailsJwtAuth.auth_field_name].downcase!
+            self[RailsJwtAuth.auth_field_name]&.downcase!
           end
         end
       end
