@@ -5,8 +5,10 @@
 
 Rails-API authentication solution based on JWT and inspired by Devise.
 
-> This is documentation for version `1.x`. If you are using `0.x` version use this
-[link](https://github.com/rjurado01/rails_jwt_auth/tree/0.x)
+> This is documentation for version `2.x`. If you are using `1.x` version use this
+[link](https://github.com/rjurado01/rails_jwt_auth/tree/1.x)
+
+> Version 2.x introduces incompatible API changes.
 
 ## Table of Contents
 
