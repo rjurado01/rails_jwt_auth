@@ -363,7 +363,7 @@ It is necessary to set a value for `confirmations_url` option into `config/initi
 
 ### Password
 
-Password api is defined by `RailsJwtAuth::PasswordsController`.
+Reset password api is defined by `RailsJwtAuth::ResetPasswordsController`.
 
 1.  Send reset password email (init reset password process):
 
