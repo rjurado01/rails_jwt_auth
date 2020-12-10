@@ -8,6 +8,8 @@ module RailsJwtAuth
 
     # Encodes and signs JWT Payload with expiration
     def self.encode(payload)
+      raise InvalidJwtPayload unless payload
+
       payload.reverse_merge!(meta)
       JWT.encode(payload, secret_key_base)
     end

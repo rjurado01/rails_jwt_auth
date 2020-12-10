@@ -8,7 +8,7 @@ module RailsJwtAuth
       base.class_eval do
         if defined?(Mongoid) && ancestors.include?(Mongoid::Document)
           field :password_digest, type: String
-          field :auth_tokens, type: Array if RailsJwtAuth.simultaneous_sessions > 0
+          field :auth_tokens, type: Array, default: [] if RailsJwtAuth.simultaneous_sessions > 0
         elsif defined?(ActiveRecord) && ancestors.include?(ActiveRecord::Base)
           serialize :auth_tokens, Array
         end
@@ -54,7 +54,7 @@ module RailsJwtAuth
 
     def to_token_payload(_request=nil)
       if RailsJwtAuth.simultaneous_sessions > 0
-        {auth_token: auth_tokens.last}
+        auth_tokens&.last ? {auth_token: auth_tokens.last} : false
       else
         {id: id.to_s}
       end

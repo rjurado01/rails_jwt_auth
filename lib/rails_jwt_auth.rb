@@ -9,6 +9,7 @@ module RailsJwtAuth
   NotInvitationsUrl = Class.new(StandardError)
   NotResetPasswordsUrl = Class.new(StandardError)
   NotUnlockUrl = Class.new(StandardError)
+  InvalidJwtPayload = Class.new(StandardError)
 
   mattr_accessor :model_name
   self.model_name = 'User'

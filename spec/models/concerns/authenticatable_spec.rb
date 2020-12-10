@@ -242,6 +242,13 @@ describe RailsJwtAuth::Authenticatable do
       end
 
       describe '#to_token_payload' do
+        context 'when auth_tokens is empty' do
+          it 'returns false' do
+            user_without_tokens = FactoryBot.create("#{orm.underscore}_user")
+            expect(user_without_tokens.to_token_payload).to be_falsey
+          end
+        end
+
         context 'when use simultaneous sessions' do
           it 'returns payload with auth_token' do
             payload = user.to_token_payload
