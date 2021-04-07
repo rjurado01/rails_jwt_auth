@@ -394,7 +394,7 @@ Used to verify token and show an alert in your web before new password is setted
 
 ```js
 {
-  url: host/passwords/:token,
+  url: host/reset_passwords/:token,
   method: PUT,
   data: {
     reset_password: {
