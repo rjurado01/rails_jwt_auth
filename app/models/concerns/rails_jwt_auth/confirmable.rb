@@ -2,8 +2,11 @@
 
 module RailsJwtAuth
   module Confirmable
+    TOKEN_LENGTH = 6
+
     def self.included(base)
       base.class_eval do
+
         if defined?(Mongoid) && ancestors.include?(Mongoid::Document)
           # include GlobalID::Identification to use deliver_later method
           # http://edgeguides.rubyonrails.org/active_job_basics.html#globalid
@@ -31,7 +34,7 @@ module RailsJwtAuth
         return false
       end
 
-      self.confirmation_token = SecureRandom.base58(24)
+      self.confirmation_token = generate_confirmation_token
       self.confirmation_sent_at = Time.current
       return false unless save
 
@@ -79,7 +82,7 @@ module RailsJwtAuth
                        end
 
       self.email = params[email_field]
-      self.confirmation_token = SecureRandom.base58(24)
+      self.confirmation_token = generate_confirmation_token
       self.confirmation_sent_at = Time.current
 
       valid? # validates first other fields
@@ -100,6 +103,13 @@ module RailsJwtAuth
     end
 
     protected
+
+    def generate_confirmation_token
+      loop do
+        token = format "%0#{TOKEN_LENGTH}d", rand(('9' * TOKEN_LENGTH).to_i)
+        return token unless self.class.where(confirmation_token: token).exists?
+      end
+    end
 
     def validate_confirmation
       return true unless confirmed_at
