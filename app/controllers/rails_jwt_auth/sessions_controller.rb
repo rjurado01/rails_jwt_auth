@@ -1,5 +1,5 @@
 module RailsJwtAuth
-  class SessionsController < ApplicationController
+  class SessionsController < RailsJwtAuth.base_controller
     include ParamsHelper
     include RenderHelper
 

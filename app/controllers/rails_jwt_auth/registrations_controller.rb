@@ -1,5 +1,5 @@
 module RailsJwtAuth
-  class RegistrationsController < ApplicationController
+  class RegistrationsController < RailsJwtAuth.base_controller
     include ParamsHelper
     include RenderHelper
 

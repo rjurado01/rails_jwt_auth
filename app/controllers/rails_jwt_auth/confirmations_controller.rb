@@ -1,5 +1,5 @@
 module RailsJwtAuth
-  class ConfirmationsController < ApplicationController
+  class ConfirmationsController < RailsJwtAuth.base_controller
     include ParamsHelper
     include RenderHelper
 

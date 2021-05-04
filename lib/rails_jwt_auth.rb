@@ -11,6 +11,9 @@ module RailsJwtAuth
   NotUnlockUrl = Class.new(StandardError)
   InvalidJwtPayload = Class.new(StandardError)
 
+  mattr_accessor :base_controller_name
+  self.base_controller_name = 'ApplicationController'
+
   mattr_accessor :model_name
   self.model_name = 'User'
 
@@ -116,5 +119,9 @@ module RailsJwtAuth
   def self.send_email(method, user)
     mailer = RailsJwtAuth.mailer.with(user_id: user.id.to_s).public_send(method)
     RailsJwtAuth.deliver_later ? mailer.deliver_later : mailer.deliver
+  end
+
+  def self.base_controller
+    base_controller_name.constantize
   end
 end
