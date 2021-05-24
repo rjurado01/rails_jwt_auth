@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    rails_jwt_auth (2.0.1)
+    rails_jwt_auth (2.0.2)
       bcrypt (~> 3.1)
       jwt (~> 2.1)
       rails (>= 5.0)
@@ -65,7 +65,7 @@ GEM
       activesupport (>= 4.2.0)
     i18n (1.8.10)
       concurrent-ruby (~> 1.0)
-    jwt (2.2.2)
+    jwt (2.2.3)
     loofah (2.9.1)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
