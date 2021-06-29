@@ -73,7 +73,7 @@ You can edit configuration options into `config/initializers/rails_jwt_auth.rb` 
 | jwt_expiration_time                       | `7.days`                   | Tokens expiration time                                                 |
 | jwt_issuer                                | `'RailsJwtAuth'`           | The "iss" (issuer) claim identifies the principal that issued the JWT  |
 | simultaneous_sessions                     | `2`                        | Number of simultaneous sessions for an user. Set 0 to disable sessions |
-| mailer_name                               | `'RailsJwtAuth::Mailer'`   | Authentication model name                                              |
+| mailer_name                               | `'RailsJwtAuth::Mailer'`   | Mailer class name (allow customize mailer)                             |
 | mailer_sender                             | `...@example.com`          | E-mail address which will be shown in RailsJwtAuth::Mailer             |
 | send_email_change_requested_notification  | `true`                     | Notify original email when change is requested (unconfirmed)           |
 | send_password_changed_notification        | `true`                     | Notify email when password changes                                     |
