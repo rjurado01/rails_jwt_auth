@@ -100,10 +100,6 @@ module RailsJwtAuth
       add_error(field_error(:password), :invalid) unless @user.authenticate(@password)
     end
 
-    def validate_custom
-      # allow add custom validation overwriting this method
-    end
-
     def validate_user_is_confirmed
       add_error(RailsJwtAuth.email_field_name, :unconfirmed) unless @user.confirmed?
     end
