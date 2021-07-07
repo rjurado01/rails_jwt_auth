@@ -1,7 +1,7 @@
 FactoryBot.define do
   factory :active_record_unconfirmed_user, class: ActiveRecordUser do
     email
-    password '12345678'
+    password { '12345678' }
     sequence(:username) { |n| "user_#{n}" }
   end
 

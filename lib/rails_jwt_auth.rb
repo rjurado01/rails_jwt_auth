@@ -1,3 +1,4 @@
+require 'active_support/core_ext/integer/time'
 require 'bcrypt'
 
 require 'rails_jwt_auth/engine'
