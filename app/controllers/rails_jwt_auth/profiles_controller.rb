@@ -1,5 +1,6 @@
 module RailsJwtAuth
   class ProfilesController < ApplicationController
+    include AuthenticableHelper
     include ParamsHelper
     include RenderHelper
 

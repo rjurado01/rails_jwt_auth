@@ -1,5 +1,6 @@
 module RailsJwtAuth
   class SessionsController < ApplicationController
+    include AuthenticableHelper
     include ParamsHelper
     include RenderHelper
 
@@ -14,7 +15,7 @@ module RailsJwtAuth
     end
 
     def destroy
-      return render_404 unless RailsJwtAuth.simultaneous_sessions > 0
+      return render_404 unless RailsJwtAuth.simultaneous_sessions.positive?
 
       authenticate!
       current_user.destroy_auth_token @jwt_payload['auth_token']

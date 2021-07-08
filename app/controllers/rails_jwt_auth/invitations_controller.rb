@@ -1,5 +1,6 @@
 module RailsJwtAuth
   class InvitationsController < ApplicationController
+    include AuthenticableHelper
     include ParamsHelper
     include RenderHelper
 
