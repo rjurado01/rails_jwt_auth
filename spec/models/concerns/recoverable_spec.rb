@@ -20,6 +20,35 @@ describe RailsJwtAuth::Recoverable do
           expect(user.reset_password_sent_at).not_to be_nil
         end
 
+        it 'avoid to repeat token' do
+          other_user = FactoryBot.create("#{orm.underscore}_user")
+          other_user.update(reset_password_token: 'xxx')
+          allow(RailsJwtAuth).to receive(:friendly_token).and_return('xxx', 'yyy')
+
+          user.send_reset_password_instructions
+          user.reload
+          expect(user.reset_password_token).to eq('yyy')
+        end
+
+        it 'avoid to repeat token' do
+          other_user = FactoryBot.create("#{orm.underscore}_user")
+          other_user.update(reset_password_token: 'xxx')
+          allow(RailsJwtAuth).to receive(:friendly_token) { %w[xxx yyy].sample }
+        end
+
+        it 'sends reset password email' do
+          expect(RailsJwtAuth).to receive(:send_email).with(:reset_password_instructions, user)
+          user.send_reset_password_instructions
+        end
+
+        context 'when user is unconfirmed' do
+          let(:user) { FactoryBot.create("#{orm.underscore}_unconfirmed_user") }
+
+          it 'returns false' do
+            expect(user.send_reset_password_instructions).to be_falsey
+          end
+        end
+
         it 'sends reset password email' do
           expect(RailsJwtAuth).to receive(:send_email).with(:reset_password_instructions, user)
           user.send_reset_password_instructions

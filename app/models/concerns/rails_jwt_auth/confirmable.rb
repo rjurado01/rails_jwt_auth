@@ -31,7 +31,8 @@ module RailsJwtAuth
         return false
       end
 
-      self.confirmation_token = SecureRandom.base58(24)
+      p 'entro'
+      self.confirmation_token = generate_confirmation_token
       self.confirmation_sent_at = Time.current
       return false unless save
 
@@ -79,7 +80,7 @@ module RailsJwtAuth
                        end
 
       self.email = params[email_field]
-      self.confirmation_token = SecureRandom.base58(24)
+      self.confirmation_token = generate_confirmation_token
       self.confirmation_sent_at = Time.current
 
       valid? # validates first other fields
@@ -100,6 +101,13 @@ module RailsJwtAuth
     end
 
     protected
+
+    def generate_confirmation_token
+      loop do
+        token = RailsJwtAuth.friendly_token
+        return token unless self.class.exists?(confirmation_token: token)
+      end
+    end
 
     def validate_confirmation
       return true unless confirmed_at
