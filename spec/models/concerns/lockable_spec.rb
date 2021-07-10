@@ -34,6 +34,16 @@ describe RailsJwtAuth::Lockable do
             user.lock_access
             expect(user.locked_at).not_to be_nil
           end
+
+          it 'avoid to repeat token' do
+            other_user = FactoryBot.create("#{orm.underscore}_user")
+            other_user.update(unlock_token: 'xxx')
+            allow(RailsJwtAuth).to receive(:friendly_token).and_return('xxx', 'yyy')
+
+            allow(user).to receive(:unlock_strategy_enabled?).and_return(true)
+            user.lock_access
+            expect(user.unlock_token).to eq('yyy')
+          end
         end
 
         %i[email both].each do |unlock_strategy|

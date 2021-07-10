@@ -75,6 +75,14 @@ describe RailsJwtAuth::Confirmable do
           expect(unconfirmed_user.confirmation_sent_at).not_to be_nil
         end
 
+        it 'avoid to repeat token' do
+          other_user = FactoryBot.create("#{orm.underscore}_user")
+          other_user.update(confirmation_token: 'xxx')
+          allow(RailsJwtAuth).to receive(:friendly_token).and_return('xxx', 'yyy')
+
+          expect(unconfirmed_user.confirmation_token).to eq('yyy')
+        end
+
         it 'sends confirmation email' do
           new_user = FactoryBot.build("#{orm.underscore}_unconfirmed_user")
           expect(RailsJwtAuth).to receive(:send_email).with(:confirmation_instructions, new_user)
@@ -114,6 +122,15 @@ describe RailsJwtAuth::Confirmable do
           expect(user.email).to eq(old_email)
           expect(user.confirmation_token).not_to be_nil
           expect(user.confirmation_sent_at).not_to be_nil
+        end
+
+        it 'avoid to repeat token' do
+          allow(RailsJwtAuth).to receive(:friendly_token).and_return('xxx', 'yyy')
+          expect(unconfirmed_user.confirmation_token).to eq('xxx')
+
+          expect(user.update_email(email: 'new@email.com', password: password)).to be_truthy
+          expect(user.reload.unconfirmed_email).to eq('new@email.com')
+          expect(user.confirmation_token).to eq('yyy')
         end
 
         it 'checks email' do

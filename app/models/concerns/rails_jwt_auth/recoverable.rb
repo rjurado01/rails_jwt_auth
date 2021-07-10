@@ -27,7 +27,7 @@ module RailsJwtAuth
         return false
       end
 
-      self.reset_password_token = RailsJwtAuth.friendly_token
+      self.reset_password_token = generate_reset_password_token
       self.reset_password_sent_at = Time.current
       return false unless save
 
@@ -58,6 +58,15 @@ module RailsJwtAuth
     def clean_reset_password
       self.reset_password_sent_at = nil
       self.reset_password_token = nil
+    end
+
+    protected
+
+    def generate_reset_password_token
+      loop do
+        token = RailsJwtAuth.friendly_token
+        return token unless self.class.where(reset_password_token: token).exists?
+      end
     end
   end
 end

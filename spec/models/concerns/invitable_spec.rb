@@ -94,6 +94,14 @@ describe RailsJwtAuth::Invitable do
             expect(@user.invitation_accepted_at).to be_nil
           end
 
+          it 'avoid to repeat token' do
+            other_user = FactoryBot.create("#{orm.underscore}_user")
+            other_user.update(invitation_token: 'xxx')
+            allow(RailsJwtAuth).to receive(:friendly_token).and_return('xxx', 'yyy')
+
+            expect(invited_user.invitation_token).to eq('yyy')
+          end
+
           it 'sends new invitation mail' do
             expect(ActionMailer::Base.deliveries.count).to eq(1)
           end

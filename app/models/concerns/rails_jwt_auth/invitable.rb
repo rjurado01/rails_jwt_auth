@@ -39,7 +39,7 @@ module RailsJwtAuth
       end
 
       @inviting = true
-      self.invitation_token = RailsJwtAuth.friendly_token
+      self.invitation_token = generate_invitation_token
       self.invitation_sent_at = Time.current
 
       return false unless save_without_password
@@ -85,6 +85,15 @@ module RailsJwtAuth
       return false if expiration_time.to_i.zero?
 
       invitation_sent_at && invitation_sent_at < expiration_time.ago
+    end
+
+    protected
+
+    def generate_invitation_token
+      loop do
+        token = RailsJwtAuth.friendly_token
+        return token unless self.class.where(invitation_token: token).exists?
+      end
     end
   end
 end

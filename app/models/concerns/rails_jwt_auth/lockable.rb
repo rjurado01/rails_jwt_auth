@@ -54,7 +54,7 @@ module RailsJwtAuth
     protected
 
     def send_unlock_instructions
-      self.unlock_token = SecureRandom.base58(24)
+      self.unlock_token = generate_unlock_token
       save(validate: false)
 
       RailsJwtAuth.send_email(:unlock_instructions, self)
@@ -83,6 +83,15 @@ module RailsJwtAuth
 
     def attempts_expired?
       first_failed_attempt_at && first_failed_attempt_at < RailsJwtAuth.reset_attempts_in.ago
+    end
+
+    protected
+
+    def generate_unlock_token
+      loop do
+        token = RailsJwtAuth.friendly_token
+        return token unless self.class.where(unlock_token: token).exists?
+      end
     end
 
     def lock_strategy_enabled?(strategy)
