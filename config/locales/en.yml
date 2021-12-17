@@ -13,3 +13,7 @@ en:
         subject: "Password changed"
       unlock_instructions:
         subject: "Unlock instructions"
+    models:
+      omniauthable:
+        from_omniauth:
+          not_implemented: "You must implement 'self.from_omniauth' in your '%{model}' model"

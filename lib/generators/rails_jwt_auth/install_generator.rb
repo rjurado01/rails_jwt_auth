@@ -21,5 +21,6 @@ class RailsJwtAuth::InstallGenerator < Rails::Generators::Base
     route "resources :reset_passwords, controller: 'rails_jwt_auth/reset_passwords', only: [:show, :create, :update]"
     route "resources :invitations, controller: 'rails_jwt_auth/invitations', only: [:show, :create, :update]"
     route "resources :unlock_accounts, controller: 'rails_jwt_auth/unlock_accounts', only: %i[update]"
+    route "post '/auth/:provider/callback', to: 'rails_jwt_auth/omniauths#callback', as: 'oauth_callback'"
   end
 end

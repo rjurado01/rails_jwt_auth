@@ -3,7 +3,10 @@ require 'bcrypt'
 
 require 'rails_jwt_auth/engine'
 require 'rails_jwt_auth/jwt_manager'
+require 'rails_jwt_auth/omniauth_manager'
+require 'rails_jwt_auth/session_helper'
 require 'rails_jwt_auth/session'
+require 'rails_jwt_auth/omniauth_session'
 
 module RailsJwtAuth
   NotConfirmationsUrl = Class.new(StandardError)
@@ -90,6 +93,9 @@ module RailsJwtAuth
   mattr_accessor :avoid_email_errors
   self.avoid_email_errors = true
 
+  mattr_accessor :omniauth_configs
+  self.omniauth_configs = {}
+
   def self.setup
     yield self
   end
@@ -104,6 +110,10 @@ module RailsJwtAuth
 
   def self.table_name
     model_name.underscore.pluralize
+  end
+
+  def self.omniauth(provider, *args)
+    omniauth_configs[provider] = RailsJwtAuth::OmniauthManager.new(provider, args)
   end
 
   # Thanks to https://github.com/heartcombo/devise/blob/master/lib/devise.rb#L496

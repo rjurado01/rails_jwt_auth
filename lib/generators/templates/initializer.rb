@@ -76,4 +76,10 @@ RailsJwtAuth.setup do |config|
 
   # set false to avoid giving clue about the existing emails with errors
   # config.avoid_email_errors = true
+
+  # get omniauth from providers (Require external gems)
+  #config.omniauth :<provider>, ENV['<CLIENT_ID>'], ENV['<SECRET>'], {
+  #  provider_ignores_state: true, # Needed
+  #  scope: 'userinfo.email, userinfo.profile'
+  #}
 end

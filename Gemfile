@@ -12,4 +12,5 @@ gem 'sqlite3'
 
 group :development, :test do
   gem 'pry-rails'
+  gem 'omniauth'
 end

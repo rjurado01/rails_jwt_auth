@@ -91,10 +91,11 @@ You can edit configuration options into `config/initializers/rails_jwt_auth.rb` 
 | accept_invitation_url                     | `nil`                      | Your web url where emai link redirects with invitation token           |
 | unlock_account_url                        | `nil`                      | Your web url where emai link redirects with unlock token               |
 | avoid_email_errors                        | `true`                     | Avoid returns email errors to avoid giving clue to an attacker         |
+| omniauth                                  | `nil`                      | Allow add omniauths providers
 
 ## Modules
 
-It's composed of 6 modules:
+It's composed of 7 modules:
 
 | Module        | Description                                                                                                     |
 | ------------- | --------------------------------------------------------------------------------------------------------------- |
@@ -104,6 +105,7 @@ It's composed of 6 modules:
 | Trackable     | Tracks sign in and request timestamps and IP address                                                            |
 | Invitable     | Allows you to invite an user to your application sending an invitation mail                                     |
 | Lockable      | Locks the user after a specified number of failed sign in attempts                                              |
+| Omniauthable  | Allows you to define behaviours for omniauth sessions                                                           |
 
 ## ORMs support
 
@@ -122,6 +124,7 @@ class User < ApplicationRecord
   include RailsJwtAuth::Trackable
   include RailsJwtAuth::Invitable
   include RailsJwtAuth::Lockable
+  include RailsJwtAuth::Omniauthable
 
   validates :email, presence: true,
                     uniqueness: true,
@@ -142,6 +145,7 @@ class User
   include RailsJwtAuth::Trackable
   include RailsJwtAuth::Invitable
   include RailsJwtAuth::Lockable
+  include RailsJwtAuth::Omniauthable
 
   field :email, type: String
 
@@ -464,6 +468,64 @@ Unlock api is provided by `RailsJwtAuth::UnlocksController`.
   method: PUT,
   data: {}
 }
+```
+
+### Omniauth
+
+Allow you to use omniauth providers to login in the platform. Rails_jwt_auth will not save `auth_token`
+from providers and only will create a jwt session.
+
+To configure omniauth clients:
+
+Select a provider and define it in your Gemfile and install:
+
+```ruby
+# Gemfile
+gem 'omniauth' # Required if omniauth is not dependency in your provider gem
+gem 'omniauth-google-oauth2'
+```
+
+Configuration providers:
+
+```ruby
+# config/initialize/rails_jwt_auth.rb
+RailsJwtAuth.setup do |config|
+  # ...
+  config.omniauth :google_oauth2, ENV['GOOGLE_CLIENT_ID'], ENV['GOOGLE_CLIENT_SECRET'], {
+    provider_ignores_state: true, # this is neccesary for CSRF in extenals requests
+    scope: 'userinfo.email, userinfo.profile'
+  }
+  # You can add multiple omniauth configurations of each provider
+end
+```
+
+In router:
+
+```ruby
+#cofig/router.rb
+post '/auth/:provider/callback', to: 'rails_jwt_auth/omniauths#callback' # If not use generator
+```
+
+In model:
+
+```ruby
+include RailsJwtAuth::Omniauthable
+def self.from_omniauth(auth)
+  # Define logic to search or create User. This method should return a user to be logged
+  # auth.provider: provider that has processed request
+  # auth['info']: User data from provider
+end
+```
+
+In js you will need a library to get auth_code from provider to pass the code to the backend:
+
+```js
+  // Ej: vue-google-oauth2
+  const authCode = await this.$gAuth.getAuthCode()
+  const response = await this.$http.post(
+    'http://yout-backend-server-api/auth/google_oauth2/callback',
+    { code: authCode }
+  )
 ```
 
 ## Customize
