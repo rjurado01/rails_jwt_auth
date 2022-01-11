@@ -616,6 +616,60 @@ end
 
 Copy `config/locales/en.yml` into your project `config/locales` folder and edit it.
 
+## OmniAuth
+
+This gem provides the `RailsJwtAuth::OmniAuthSession` module to create new jwt session using any
+of the gems on this list: [list](https://github.com/omniauth/omniauth/wiki/List-of-Strategies)
+
+You only need to create new controller like this:
+
+```ruby
+class OauthGoogleController < ApplicationController
+  def create
+    # first parameter must be the strategy_class
+    # second parameter is the hash options for this strategy
+    se = RailsJwtAuth::OmniAuthSession.new(
+      OmniAuth::Strategies::GoogleOauth2,
+      {
+        client_id: ENV['GOOGLE_CLIENT_ID'],
+        client_secret: ENV['GOOGLE_CLIENT_SECRET'],
+        ...
+      }
+    )
+
+    if se.generate!(request)
+      render json: {data: {jwt: se.jwt}}, status: 201
+    else
+      render json: {errors: se.errors.details}, status: 422
+    end
+  end
+end
+```
+
+Add this method to your user model:
+
+```ruby
+def self.from_omniauth(strategy_name, info_hash)
+  user = User.where(email: info_hash['email']).first
+  return user if user.present?
+
+  # create user
+  ...
+
+  user
+end
+```
+
+And makes the request:
+
+```json
+{
+  url: "host/oauth_google",
+  method: "POST",
+  data: {code: "4/xxx..."}
+}
+```
+
 ## License
 
 The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).

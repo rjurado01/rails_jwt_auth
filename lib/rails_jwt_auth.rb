@@ -4,6 +4,7 @@ require 'bcrypt'
 require 'rails_jwt_auth/engine'
 require 'rails_jwt_auth/jwt_manager'
 require 'rails_jwt_auth/session'
+require 'rails_jwt_auth/omniauth_session'
 
 module RailsJwtAuth
   NotConfirmationsUrl = Class.new(StandardError)
