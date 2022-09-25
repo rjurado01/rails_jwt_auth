@@ -381,7 +381,7 @@ Reset password api is defined by `RailsJwtAuth::ResetPasswordsController`.
 
 2.  Check token validation:
 
-Used to verify token and show an alert in your web before new password is setted.
+Used to verify a token and show an alert in your website before the new password is set.
 
 ```js
 {
