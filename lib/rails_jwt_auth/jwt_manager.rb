@@ -3,7 +3,7 @@ require 'jwt'
 module RailsJwtAuth
   module JwtManager
     def self.secret_key_base
-      Rails.application.secrets.secret_key_base || Rails.application.credentials.secret_key_base
+      Rails.application.secret_key_base
     end
 
     # Encodes and signs JWT Payload with expiration

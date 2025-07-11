@@ -10,7 +10,7 @@ module RailsJwtAuth
           field :password_digest, type: String
           field :auth_tokens, type: Array, default: [] if RailsJwtAuth.simultaneous_sessions > 0
         elsif defined?(ActiveRecord) && ancestors.include?(ActiveRecord::Base)
-          serialize :auth_tokens, Array
+          serialize :auth_tokens, type: Array
         end
 
         has_secure_password
